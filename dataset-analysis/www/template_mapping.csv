@@ -1,17 +1,21 @@
-﻿Name,Label,Unit
-id,Subject,
-occ,Occasion,
-cmt,Compartments,
-mdv,Missing Dependent Variable,
-evid,Event Identifier,
-amt,Amount,mg
-time,Time,h
-tad,Time After Dose,h
-dv,Observed Concentration,mg/L
-pred,Population Predicted Concentration,mg/L
-ipred,Individual Fitted Concentration,mg/L
-res,Population Residuals,mg/L
-ires,Individual Residuals,mg/L
-wres,WRES,
-iwres,IWRES,
-cwres,CWRES,
+﻿Name,Type,Label,Unit
+ID,id,Subject,
+OCC,occ,Occasion,
+TIME,time,Time,h
+TAD,tad,Time After Dose,h
+AMT,amt,Amount,IU
+DV,dv,Activity,IU/L
+MDV,mdv,,
+EVID,evid,,
+BW,cov,Body Weight,kg
+HT,,Height,cm
+AGE,cov,Age,yrs
+FFM,cov,Fat-free mass,kg
+PREDOSE,,Predose,IU/L
+BASELINE,cov,Baseline,IU/L
+BLQ,blq,BLQ,
+LLOQ,lloq,LLOQ,IU/L
+DOSEKG,cov,Dose,IU/kg
+SVAL,,Surgery ID,
+SMAJ,cat,Surgery Severity,
+SNAME,cat,Surgery,

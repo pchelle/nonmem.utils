@@ -1,0 +1,277 @@
+---
+title: "PK Dataset Analysis"
+date: "`r Sys.Date()`"
+output:
+  officedown::rdocx_document:
+    toc: true
+    toc_depth: 3
+    fig_width: 6.5
+params:
+  dataFile:
+    label: "Dataset"
+    value: "dataset.ext"
+    input: file
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = "#>",
+  dev = "ragg_png",
+  fig.align = "center",
+  fig.width = 6.5
+)
+library(flextable)
+library(tidyverse)
+
+get_variables_with <- function(pattern, variable_names) {
+  selected_var <- grepl(pattern, variable_names)
+  return(variable_names[selected_var])
+}
+
+data <- read.table(file = params$dataFile, header = TRUE, skip = 1, check.names = FALSE)
+variable_names <- setdiff(names(data), "ITERATION")
+```
+  
+## Summary
+
+The optimization included __`r max(data$ITERATION)`__ iterations
+
+__Table__: Summary of optimization
+
+```{r optimization_summary, results='asis'}
+ext_data <- data |> filter(ITERATION >= 0)
+
+summary_data <- bind_cols(
+  Parameter = names(ext_data),
+  ext_data |> summarise_all(first) |> t() |> `colnames<-`("Initial Estimate"),
+  ext_data |> summarise_all(last) |> t() |> `colnames<-`("Final Estimate")
+) |>
+  mutate(
+    Difference = `Final Estimate` - `Initial Estimate`,
+    `Variation [%]` = round(100 * (`Final Estimate` - `Initial Estimate`) / `Initial Estimate`, 1)
+  ) |>
+  filter(Parameter != "ITERATION")
+
+summary_data |>
+  flextable() |>
+  colformat_double(digits = 3)
+```
+
+## Profile by Iterations
+
+__Figure__: Objective function profile
+
+```{r}
+profile_data <- data |> filter(ITERATION >= 0)
+profile_data_r <- profile_data |>
+  mutate(across(all_of(variable_names), ~ 100 * (. - first(.)) / first(.)))
+
+profile_data <- left_join(
+  profile_data,
+  profile_data_r,
+  by = "ITERATION",
+  suffix = c("", "_REL")
+)
+
+p_abs <- ggplot(
+  data = profile_data,
+  mapping = aes(x = ITERATION, y = OBJ)
+) +
+  theme_bw() +
+  geom_hline(
+    mapping = aes(yintercept = first(OBJ)),
+    linetype = "dashed",
+    color = "firebrick"
+  ) +
+  geom_hline(
+    mapping = aes(yintercept = last(OBJ)),
+    linetype = "dashed",
+    color = "slateblue"
+  ) +
+  geom_line(color = "darkgreen") +
+  geom_point(aes(color = OBJ), size = 1) +
+  scale_color_viridis_c(option = "turbo") +
+  guides(color = "none") +
+  labs(x = "Iterations", y = "OFV", color = "OFV")
+
+p_rel <- ggplot(
+  data = profile_data,
+  mapping = aes(x = ITERATION, y = OBJ_REL)
+) +
+  theme_bw() +
+  geom_hline(
+    mapping = aes(yintercept = first(OBJ_REL)),
+    linetype = "dashed",
+    color = "firebrick"
+  ) +
+  geom_hline(
+    mapping = aes(yintercept = last(OBJ_REL)),
+    linetype = "dashed",
+    color = "slateblue"
+  ) +
+  geom_line(color = "darkgreen") +
+  geom_point(aes(color = OBJ), size = 1) +
+  scale_color_viridis_c(option = "turbo") +
+  labs(x = "Iterations", y = "OFV variation [%]", color = "OFV")
+
+patchwork::wrap_plots(p_abs, p_rel, ncol = 2)
+```
+
+__Figure__: Fixed-effects profile
+
+```{r}
+for (y_variable in get_variables_with("THETA", variable_names)) {
+  p_abs <- ggplot(
+    data = profile_data,
+    mapping = aes(x = ITERATION, y = .data[[y_variable]])
+  ) +
+    theme_bw() +
+    geom_hline(
+      mapping = aes(yintercept = first(.data[[y_variable]])),
+      linetype = "dashed",
+      color = "firebrick"
+    ) +
+    geom_hline(
+      mapping = aes(yintercept = last(.data[[y_variable]])),
+      linetype = "dashed",
+      color = "slateblue"
+    ) +
+    geom_line(color = "darkgreen") +
+    geom_point(aes(color = OBJ), size = 1) +
+    scale_color_viridis_c(option = "turbo") +
+    guides(color = "none") +
+    labs(x = "Iterations", y = y_variable, color = "OFV")
+
+  p_rel <- ggplot(
+    data = profile_data,
+    mapping = aes(x = ITERATION, y = .data[[paste0(y_variable, "_REL")]])
+  ) +
+    theme_bw() +
+    geom_hline(
+      mapping = aes(yintercept = first(.data[[paste0(y_variable, "_REL")]])),
+      linetype = "dashed",
+      color = "firebrick"
+    ) +
+    geom_hline(
+      mapping = aes(yintercept = last(.data[[paste0(y_variable, "_REL")]])),
+      linetype = "dashed",
+      color = "slateblue"
+    ) +
+    geom_line(color = "darkgreen") +
+    geom_point(aes(color = OBJ), size = 1) +
+    scale_color_viridis_c(option = "turbo") +
+    labs(x = "Iterations", y = paste0(y_variable, " variation [%]"), color = "OFV")
+
+  plot(patchwork::wrap_plots(p_abs, p_rel, ncol = 2))
+}
+```
+
+__Figure__: Random-effects profile
+
+```{r}
+for (y_variable in get_variables_with("OMEGA", variable_names)) {
+  p_abs <- ggplot(
+    data = profile_data,
+    mapping = aes(x = ITERATION, y = .data[[y_variable]])
+  ) +
+    theme_bw() +
+    geom_hline(
+      mapping = aes(yintercept = first(.data[[y_variable]])),
+      linetype = "dashed",
+      color = "firebrick"
+    ) +
+    geom_hline(
+      mapping = aes(yintercept = last(.data[[y_variable]])),
+      linetype = "dashed",
+      color = "slateblue"
+    ) +
+    geom_line(color = "darkgreen") +
+    geom_point(aes(color = OBJ), size = 1) +
+    scale_color_viridis_c(option = "turbo") +
+    guides(color = "none") +
+    labs(x = "Iterations", y = y_variable, color = "OFV")
+
+  p_rel <- ggplot(
+    data = profile_data,
+    mapping = aes(x = ITERATION, y = .data[[paste0(y_variable, "_REL")]])
+  ) +
+    theme_bw() +
+    geom_hline(
+      mapping = aes(yintercept = first(.data[[paste0(y_variable, "_REL")]])),
+      linetype = "dashed",
+      color = "firebrick"
+    ) +
+    geom_hline(
+      mapping = aes(yintercept = last(.data[[paste0(y_variable, "_REL")]])),
+      linetype = "dashed",
+      color = "slateblue"
+    ) +
+    geom_line(color = "darkgreen") +
+    geom_point(aes(color = OBJ), size = 1) +
+    scale_color_viridis_c(option = "turbo") +
+    labs(x = "Iterations", y = paste0(y_variable, " variation [%]"), color = "OFV")
+
+  plot(patchwork::wrap_plots(p_abs, p_rel, ncol = 2))
+}
+```
+
+__Figure__: Residuals profile
+
+```{r}
+for (y_variable in get_variables_with("SIGMA", variable_names)) {
+  p_abs <- ggplot(
+    data = profile_data,
+    mapping = aes(x = ITERATION, y = .data[[y_variable]])
+  ) +
+    theme_bw() +
+    geom_hline(
+      mapping = aes(yintercept = first(.data[[y_variable]])),
+      linetype = "dashed",
+      color = "firebrick"
+    ) +
+    geom_hline(
+      mapping = aes(yintercept = last(.data[[y_variable]])),
+      linetype = "dashed",
+      color = "slateblue"
+    ) +
+    geom_line(color = "darkgreen") +
+    geom_point(aes(color = OBJ), size = 1) +
+    scale_color_viridis_c(option = "turbo") +
+    guides(color = "none") +
+    labs(x = "Iterations", y = y_variable, color = "OFV")
+
+  p_rel <- ggplot(
+    data = profile_data,
+    mapping = aes(x = ITERATION, y = .data[[paste0(y_variable, "_REL")]])
+  ) +
+    theme_bw() +
+    geom_hline(
+      mapping = aes(yintercept = first(.data[[paste0(y_variable, "_REL")]])),
+      linetype = "dashed",
+      color = "firebrick"
+    ) +
+    geom_hline(
+      mapping = aes(yintercept = last(.data[[paste0(y_variable, "_REL")]])),
+      linetype = "dashed",
+      color = "slateblue"
+    ) +
+    geom_line(color = "darkgreen") +
+    geom_point(aes(color = OBJ), size = 1) +
+    scale_color_viridis_c(option = "turbo") +
+    labs(x = "Iterations", y = paste0(y_variable, " variation [%]"), color = "OFV")
+
+  plot(patchwork::wrap_plots(p_abs, p_rel, ncol = 2))
+}
+```
+
+
+## Appendix: raw data
+
+__Table__: Optimization table
+
+```{r dataset, results='asis'}
+data |>
+  flextable() |>
+  colformat_double(digits = 3)
+```
