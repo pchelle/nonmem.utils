@@ -11,7 +11,7 @@ get_variables_with <- function(pattern, variable_names) {
 
 #---- UI ----
 ui <- page_navbar(
-  title = span(icon("arrow-trend-down"), " Optimization"),
+  title = span(icon("arrows-to-dot"), " Optimization"),
   sidebar = sidebar(
     #---- Inputs ----
     accordion(

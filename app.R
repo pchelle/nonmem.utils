@@ -8,7 +8,7 @@ library(miniUI)
 
 get_app_repo <- function(app_name) {
   switch(app_name,
-    "Dataset" = "pk-analysis",
+    "Dataset" = "dataset-analysis",
     "Workbench" = "model-comparison",
     "Model Fit" = "model-fit",
     "Model Parameters" = "model-parameters",
