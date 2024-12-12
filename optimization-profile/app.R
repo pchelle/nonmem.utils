@@ -1,130 +1,196 @@
-#' @title optimization-profile
-#' @description
-#' A shiny app to review nonmem model optimization saved in .ext files
-
-library(dplyr, warn.conflicts = FALSE)
-library(shinydashboard, warn.conflicts = FALSE)
-library(ggplot2, warn.conflicts = FALSE)
+library(tidyverse)
+library(shiny)
+library(shinyWidgets)
+library(bslib, warn.conflicts = FALSE)
 library(plotly, warn.conflicts = FALSE)
 
-ui <- dashboardPage(
-  dashboardHeader(title = "Nonmem Optimization Review"),
-  dashboardSidebar(
-    sidebarMenu(
-      menuItem(" Get Started", tabName = "home", icon = icon("home")),
-      menuItem(" Summary", tabName = "summary", icon = icon("table")),
-      menuItem(" Profiles", tabName = "profiles", icon = icon("chart-line"))
+get_variables_with <- function(pattern, variable_names) {
+  selected_var <- grepl(pattern, variable_names)
+  return(variable_names[selected_var])
+}
+
+#---- UI ----
+ui <- page_navbar(
+  title = span(icon("arrow-trend-down"), " Optimization"),
+  sidebar = sidebar(
+    #---- Inputs ----
+    accordion(
+      accordion_panel(
+        title = "Input Data",
+        icon = icon("file-import"),
+        card(
+          fileInput(
+            "dataset",
+            span(icon("file-lines"), "Import .ext file"),
+            accept = ".ext"
+          )
+        )
+      ),
+      #---- Report ----
+      accordion_panel(
+        title = "Reporting",
+        icon = icon("file-export"),
+        downloadButton("dataset_report", icon = icon("file-word"))
+      )
     )
   ),
-  dashboardBody(
-    tabItems(
-      tabItem(
-        tabName = "home",
-        box(
-          title = span(icon("home"), "Get Started"),
-          width = 12,
-          solidHeader = TRUE,
-          status = "primary",
-          fileInput(inputId = "newfile", label = "Upload Nonmem .ext file", accept = ".ext")
+  navset_card_tab(
+    #---- Dataset ----
+    nav_panel(
+      title = "Data",
+      icon = icon("database"),
+      card(
+        card_header(
+          textInput(
+            "data_filter",
+            tooltip(
+              span(icon("filter"), "Data Filter"),
+              span(icon("circle-info"), "Filter is expected as dplyr expression")
+            ),
+            value = ""
+          )
         ),
-        box(
-          title = span(icon("database"), "Dataset"),
-          width = 12,
-          solidHeader = TRUE,
-          status = "success",
-          DT::dataTableOutput("dataTable")
-        )
-      ),
-      tabItem(
-        tabName = "summary",
-        box(
-          title = span(icon("table"), " Summary"),
-          solidHeader = TRUE,
-          status = "success",
-          width = 12,
-          textOutput("summaryIterations"),
-          br(),
-          tableOutput("summaryTable")
-        )
-      ),
-      tabItem(
-        tabName = "profiles",
-        box(
-          title = span(icon("gear"), "Settings"),
-          solidHeader = TRUE,
-          status = "warning",
-          width = 4,
-          selectInput("yVariableName", label = "Select Y Variable", choices = NA, multiple = TRUE),
-          selectInput("displayMode", label = "Display Mode", choices = c("Absolute", "Relative")),
-          selectInput("yScale", label = "Y-Scale", choices = c("lin", "log"))
-        ),
-        box(
-          title = span(icon("chart-line"), " Profile"),
-          solidHeader = TRUE,
-          status = "primary",
-          width = 8,
-          plotlyOutput("profilePlot"),
-          align = "center"
-        )
+        card_body(DT::dataTableOutput("data"))
       )
+    ),
+    #---- Iteration Profile ----
+    nav_panel(
+      title = "Iteration Profile",
+      icon = icon("chart-line"),
+      card(
+        card_header(
+          popover(
+            span(icon("gear"), "Settings"),
+            tagList(
+              pickerInput("y_variables", span(icon("list-check"), "Select Variables"), multiple = TRUE, choices = NA),
+              materialSwitch("is_relative", span(icon("percent"), " Relative Values"), status = "success")
+            )
+          )
+        ),
+        card_body(addSpinner(plotlyOutput("time_profile"), spin = "fading-circle"))
+      )
+    ),
+    #---- Summary ----
+    nav_panel(
+      title = "Summary",
+      icon = icon("box-archive"),
+      card(
+        full_screen = TRUE,
+        card_header(value_box(
+          title = "Number of Iterations",
+          value = textOutput("iterations"),
+          showcase = icon("arrows-spin")
+        )),
+        card_body(DT::dataTableOutput("sum_stat"))
+        )
     )
   )
 )
 
 server <- function(input, output, session) {
-  # Define reactive values from loading the data
-  inputData <- reactiveValues(
-    pkData = NULL,
-    variableNames = NULL
-  )
-  observeEvent(input$newfile, {
-    inputData$pkData <- read.table(file = input$newfile$datapath, header = TRUE, skip = 1, check.names = FALSE)
-    inputData$variableNames <- names(inputData$pkData)
-    # Update all the selectInput with the new variable names
-    updateSelectInput(session, "yVariableName", choices = inputData$variableNames, selected = "OBJ")
-  })
-  output$dataTable <- DT::renderDataTable({
-    if (is.null(inputData$pkData)) {
-      return(data.frame("No data loaded" = NA, check.names = FALSE))
-    }
-    return(DT::datatable(inputData$pkData, options = list(scrollX = TRUE)))
+  #---- Reactive Values ----
+  input_data <- reactiveValues(data = NULL, variable_names = NULL)
+
+  observeEvent(input$dataset, {
+    input_data$data <- read.table(file = input$dataset$datapath, header = TRUE, skip = 1, check.names = FALSE)
+    input_data$variable_names <- names(input_data$data)
+
+    updatePickerInput(
+      session = session,
+      "y_variables",
+      choices = list(
+        "Objective Function" = "OBJ",
+        "Fixed-Effects" = get_variables_with("THETA", input_data$variable_names),
+        "Random-Effects" = get_variables_with("OMEGA", input_data$variable_names),
+        "Residuals" = get_variables_with("SIGMA", input_data$variable_names)
+      ),
+      selected = "OBJ"
+    )
+
+
+    max(input_data$data$ITERATION)
   })
 
-  output$profilePlot <- renderPlotly({
-    if (is.null(inputData$pkData)) {
+  #---- Tables ----
+  output$data <- DT::renderDataTable({
+    if (is.null(input_data$data)) {
       return()
     }
-    if (length(input$yVariableName) == 0) {
+    data <- input_data$data
+    if (!(input$data_filter %in% "")) {
+      eval(parse(
+        text = paste0(
+          "data <- data |> filter(", input$data_filter, ")"
+        )
+      ))
+    }
+    data |> DT::datatable() |> DT::formatSignif(columns = 'OBJ', digits = 3)
+  })
+
+  output$sum_stat <- DT::renderDataTable({
+    if (is.null(input_data$data)) {
       return()
     }
 
-    profilePlots <- list()
-    for (yVariableName in input$yVariableName) {
-      profilePlot <- ggplot(
-        data = inputData$pkData |> filter(ITERATION >= 0),
+    # Summary providing for each variable but iteration, initial and final values, their difference and variation
+    ext_data <- input_data$data |> filter(ITERATION >= 0)
+    summary_data <- bind_cols(
+      Parameter = names(ext_data),
+      ext_data |> summarise_all(first) |> t() |> `colnames<-`("Initial Estimate"),
+      ext_data |> summarise_all(last) |> t() |> `colnames<-`("Final Estimate")
+    ) |>
+      mutate(
+        Difference = `Final Estimate` - `Initial Estimate`,
+        `Variation [%]` = round(100 * (`Final Estimate` - `Initial Estimate`) / `Initial Estimate`, 1)
+      ) |>
+      filter(Parameter != "ITERATION")
+    summary_table <- summary_data |> 
+      DT::datatable() |> 
+      DT::formatSignif(columns = c('Initial Estimate', 'Final Estimate', 'Difference'), digits = 3)
+    return(summary_table)
+  })
+
+  #---- Figures  ----
+  output$time_profile <- renderPlotly({
+    if (is.null(input_data$data)) {
+      return()
+    }
+    if (length(input$y_variables) == 0) {
+      return()
+    }
+
+    profile_data <- input_data$data |> filter(ITERATION >= 0)
+    profile_data_r <- profile_data |>
+      mutate(across(all_of(input$y_variables), ~ 100 * (. - first(.)) / first(.)))
+
+    profile_data <- left_join(
+      profile_data,
+      profile_data_r,
+      by = "ITERATION",
+      suffix = c("", "_REL")
+    )
+
+    profile_plots <- list()
+    for (y_variable in input$y_variables) {
+      profile_plot <- ggplot(
+        data = profile_data,
         mapping = aes(
           x = ITERATION,
-          y = switch(input$displayMode,
-            "Absolute" = .data[[yVariableName]],
-            "Relative" = 100 * (.data[[yVariableName]] - first(.data[[yVariableName]])) / first(.data[[yVariableName]])
-          ),
+          y = .data[[ifelse(input$is_relative, paste0(y_variable, "_REL"), y_variable)]],
           group = 1,
           text = paste0(
-            "Iteration: ", .data$ITERATION, "\n",
-            "OFV: ", round(.data$OBJ, 3), "\n",
-            yVariableName, ": ", .data[[yVariableName]], "\n",
-            "Relative: ", round(100 * (.data[[yVariableName]] - first(.data[[yVariableName]])) / first(.data[[yVariableName]]), 1), " %"
+            "Iteration: ", .data[["ITERATION"]], "\n",
+            "OFV: ", round(.data[["OBJ"]], 3), "\n",
+            y_variable, ": ", .data[[y_variable]], "\n",
+            "Relative: ", .data[[paste0(y_variable, "_REL")]], " %"
           )
         )
       ) +
-        theme_bw(base_size = 12) +
+        theme_bw() +
         geom_hline(
-          aes(
+          mapping = aes(
             text = "Initial Estimate",
-            yintercept = switch(input$displayMode,
-              "Absolute" = first(.data[[yVariableName]]),
-              "Relative" = 0
-            )
+            yintercept = ifelse(input$is_relative, 0, first(.data[[y_variable]]))
           ),
           linetype = "dashed",
           color = "firebrick"
@@ -132,9 +198,10 @@ server <- function(input, output, session) {
         geom_hline(
           aes(
             text = "Final Estimate",
-            yintercept = switch(input$displayMode,
-              "Absolute" = last(.data[[yVariableName]]),
-              "Relative" = 100 * (last(.data[[yVariableName]]) - first(.data[[yVariableName]])) / first(.data[[yVariableName]])
+            yintercept = ifelse(
+              input$is_relative,
+              last(.data[[paste0(y_variable, "_REL")]]),
+              last(.data[[y_variable]])
             )
           ),
           linetype = "dashed",
@@ -145,52 +212,56 @@ server <- function(input, output, session) {
         scale_color_viridis_c(option = "turbo") +
         labs(
           x = "Iterations",
-          y = switch(input$displayMode,
-            "Absolute" = yVariableName,
-            "Relative" = paste("Variation from initial", yVariableName, "[%]")
+          y = ifelse(
+            input$is_relative,
+            paste0(y_variable, " variation [%]"),
+            y_variable
           )
         )
-      if (input$yScale %in% "log") {
-        profilePlot <- profilePlot + scale_y_log10()
-      }
-      profilePlots[[yVariableName]] <- ggplotly(profilePlot, tooltip = "text")
+      profile_plots[[y_variable]] <- ggplotly(profile_plot, tooltip = "text")
     }
-    finalProfilePlot <- subplot(
-      profilePlots,
-      nrows = length(input$yVariableName),
+    final_profile_plot <- subplot(
+      profile_plots,
+      nrows = length(input$y_variables),
       shareX = TRUE,
       shareY = FALSE,
       titleY = TRUE
     )
-    return(finalProfilePlot)
+    return(final_profile_plot)
   })
 
-  output$summaryIterations <- renderText({
-    if (is.null(inputData$pkData)) {
-      return()
+  #---- Text ----
+  output$iterations <- renderText({
+    if (is.null(input_data$data)) {
+      return("")
     }
-    return(paste("Nonmem ran", max(inputData$pkData$ITERATION), "iterations"))
+    max(input_data$data$ITERATION)
   })
-
-  output$summaryTable <- renderTable({
-    if (is.null(inputData$pkData)) {
-      return()
+  
+  #---- Downloads ----
+  output$dataset_report <- downloadHandler(
+    filename = function() {
+      "optimization-report.docx"
+    },
+    content = function(file) {
+      showModal(
+        modalDialog(
+          title = span(icon("file-pen"), " Writing report..."),
+          size = "s",
+          addSpinner(tableOutput("spinner"), spin = "fading-circle")
+        ),
+        session = session
+      )
+      rmarkdown::render(
+        "www/optimization-analysis.qmd",
+        output_file = file,
+        params = list(dataFile = input$dataset$datapath)
+      )
+      removeModal(session = session)
     }
-    # Summary providing for each variable but iteration, initial and final values, their difference and variation
-    extData <- inputData$pkData |> filter(ITERATION >= 0)
-    summaryData <- bind_cols(
-      Parameter = names(extData),
-      extData |> summarise_all(first) |> t() |> `colnames<-`("Initial Estimate"),
-      extData |> summarise_all(last) |> t() |> `colnames<-`("Final Estimate")
-    ) |>
-      mutate(
-        Difference = `Final Estimate` - `Initial Estimate`,
-        `Variation [%]` = round(100 * (`Final Estimate` - `Initial Estimate`) / `Initial Estimate`, 1)
-      ) |>
-      filter(Parameter != "ITERATION")
-    return(summaryData)
-  })
+  )
 
+  #---- Clean closure ----
   session$onSessionEnded(function() {
     stopApp()
   })
