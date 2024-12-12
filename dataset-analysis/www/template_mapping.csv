@@ -1,0 +1,17 @@
+﻿Name,Label,Unit
+id,Subject,
+occ,Occasion,
+cmt,Compartments,
+mdv,Missing Dependent Variable,
+evid,Event Identifier,
+amt,Amount,mg
+time,Time,h
+tad,Time After Dose,h
+dv,Observed Concentration,mg/L
+pred,Population Predicted Concentration,mg/L
+ipred,Individual Fitted Concentration,mg/L
+res,Population Residuals,mg/L
+ires,Individual Residuals,mg/L
+wres,WRES,
+iwres,IWRES,
+cwres,CWRES,
