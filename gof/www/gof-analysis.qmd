@@ -1,0 +1,146 @@
+---
+title: "Goodness of Fit Analysis"
+date: "`r Sys.Date()`"
+output:
+  officedown::rdocx_document:
+    toc: true
+    toc_depth: 3
+    fig_width: 6.5
+params:
+  dataFile:
+    label: "Nonmem Table"
+    value: "dataset.tab"
+    input: file
+  metadataFile:
+    label: "Metadata"
+    value: "metadata.csv"
+    input: file
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = "#>",
+  dev = "ragg_png",
+  fig.align = "center",
+  fig.width = 6.5
+)
+meta_data <- read.csv(params$metadataFile)
+dv_name <- "FIX activity [IU/L]"
+data <- read.table(params$dataFile, header = TRUE, skip = 1) |>
+  filter(MDV == 0)
+library(flextable)
+library(tidyverse)
+library(pmplots)
+```
+  
+# Observed vs Predicted
+
+__Figure__: Observed vs Population (left) and Individual (right) Predictions in linear scale
+
+```{r}
+#| message: false
+patchwork::wrap_plots(
+  dv_preds(
+    df = data,
+    xname = dv_name,
+    yname = dv_name
+  ),
+  ncol = 2
+)
+```
+
+```{=openxml}
+<w:br w:type="page"/>
+```
+
+__Figure__: Observed vs Population (left) and Individual (right) Predictions in logarithmic scale
+
+```{r}
+#| message: false
+patchwork::wrap_plots(
+  dv_preds(
+    df = data,
+    xname = dv_name,
+    yname = dv_name,
+    loglog = TRUE
+  ),
+  ncol = 2
+)
+```
+
+```{=openxml}
+<w:br w:type="page"/>
+```
+
+# Conditional Weighted Residuals
+
+Conditional Weighted Residuals (CWRES) are a measure of the difference between the observed and predicted values, adjusted for the variability in the data.
+
+__Figure__: Histogram (left) and QQ plot (right) of CWRES
+
+```{r}
+#| message: false
+patchwork::wrap_plots(
+  cwres_hist(df = data),
+  cwres_q(df = data),
+  ncol = 2
+)
+```
+
+```{=openxml}
+<w:br w:type="page"/>
+```
+
+__Figure__: CWRES vs Time (left), Time After Dose (right) and Population Predictions (bottom)
+
+```{r}
+#| message: false
+patchwork::wrap_plots(
+  cwres_time(df = data),
+  cwres_tad(df = data),
+  ncol = 2
+)
+```
+```{r}
+#| message: false
+cwres_pred(df = data)
+```
+
+```{=openxml}
+<w:br w:type="page"/>
+```
+
+# Normalized Prediction Distribution Errors
+
+The Normalized Prediction Distribution Errors (NPDE) is a simulation-based analysis useful to investigate the accuracy of the model predictions, focusing more on comparing observations with their own simulated distributions than on capturing the concentration-time profile.
+
+__Figure__: Histogram (left) and QQ plot (right) of NPDE
+
+```{r}
+#| message: false
+patchwork::wrap_plots(
+  cwres_hist(df = data),
+  cwres_q(df = data),
+  ncol = 2
+)
+```
+
+```{=openxml}
+<w:br w:type="page"/>
+```
+
+__Figure__: NPDE vs Time (left), Time After Dose (right) and Population Predictions (bottom)
+
+```{r}
+#| message: false
+patchwork::wrap_plots(
+  cwres_time(df = data),
+  cwres_tad(df = data),
+  ncol = 2
+)
+```
+```{r}
+#| message: false
+cwres_pred(df = data)
+```
