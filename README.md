@@ -41,11 +41,14 @@ The following tasks can be launched from the app:
 
 ### Check Input PK dataset
 
-The app requires you to load a csv dataset that uses a Nonmem format and 
-a csv metadata file that maps the variables of the dataset.
+The app requires you to load a csv dataset that uses a Nonmem format and a csv dictionary that maps and labels the variables of the dataset.
+
+```r
+shiny::runGitHub(repo = "nonmem-utils", subdir = "dataset-analysis", username = "pchelle", ref = "main")
+```
 
 > [!TIP]
-> A template of the metadata file is available [here](dataset-analysis/www/template_mapping.csv).
+> A template of the csv dictionary is available [here](dataset-analysis/www/template_mapping.csv).
 > You can also download the template from within the app.
 
 ### Compare Model Runs
@@ -54,8 +57,11 @@ The app requires you to indicate a directory on which all the `.res` files will 
 
 ### Model Fit
 
-The app requires you to load a `.tab` file exported from Nonmem and 
-a csv metadata file that maps the variables of the dataset.
+The app requires you to load a `.tab` file exported from Nonmem and a csv dictionary that maps and labels the variables of the dataset.
+
+```r
+shiny::runGitHub(repo = "nonmem-utils", subdir = "model-fit", username = "pchelle", ref = "main")
+```
 
 ### Check Model Parameters
 
@@ -64,8 +70,11 @@ a csv metadata file that maps the variables of the dataset.
 
 ### Check Optimization Profile
 
-The app requires you to load an `.ext` file exported from Nonmem and 
-a csv metadata file that maps the variables of the dataset.
+The app requires you to load an `.ext` file exported from Nonmem.
+
+```r
+shiny::runGitHub(repo = "nonmem-utils", subdir = "optimization-profile", username = "pchelle", ref = "main")
+```
 
 ### Visual Predictive Check
 
