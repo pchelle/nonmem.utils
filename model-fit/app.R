@@ -4,20 +4,10 @@ library(shinyWidgets)
 library(bslib, warn.conflicts = FALSE)
 library(pmplots)
 library(plotly, warn.conflicts = FALSE)
-#library(GGally)
 
-get_field <- function(data, field_name, type_name) {
-  data |>
-    filter(Type %in% type_name) |>
-    pull(field_name)
-}
-to_label <- function(label, unit) {
-  no_unit <- (is.na(unit) | unit %in% "")
-  return(paste0(label, ifelse(no_unit, "", paste0(" [", unit, "]"))))
-}
-get_label <- function(var_names, mapping) {
-  selected_rows <- sapply(var_names, function(var_name){which(mapping$Name %in% var_name)})
-  return(to_label(mapping$Label[selected_rows], mapping$Unit[selected_rows]))
+add_col <- function(data, col_name) {
+  data[[col_name]] <- data[[col_name]] %||% 0
+  return(data)
 }
 
 #---- UI ----
@@ -41,13 +31,12 @@ ui <- page_navbar(
             fileInput(
               "metadata",
               tooltip(
-                span(icon("signs-post"), " Import meta-data"),
-                span(icon("circle-info"), "Meta-data indicates type, label and unit for each dataset variable")
+                span(icon("signs-post"), " Import dictionary"),
+                span(icon("circle-info"), "Dictionary is a csv file indicating Name, Type, Label, Unit and Description for each dataset variable")
               ),
               accept = ".csv"
             )
-          ),
-          card_footer(downloadButton("metadata_template", "Template"))
+          )
         )
       ),
       #---- Report ----
@@ -198,68 +187,65 @@ ui <- page_navbar(
 
 server <- function(input, output, session) {
   #---- Reactive Values ----
-  get_data <- reactive({
-    if (is.null(input$dataset)) {
-      return()
-    }
-    #read.csv(input$dataset$datapath)
-    read.table(input$dataset$datapath, skip = 1, header = TRUE)
-  })
   get_metadata <- reactive({
     if (is.null(input$metadata)) {
       return()
     }
     read.csv(input$metadata$datapath)
   })
+  mdv_name <- reactive({
+    # Assumes column is MDV
+    if (is.null(get_metadata())) {
+      return("MDV")
+    }
+    mdv_row <- get_metadata() |> filter(Type %in% "mdv")
+    if (nrow(mdv_row) == 1) {
+      return(mdv_row$Name)
+    }
+    return("MDV")
+  })
+  blq_name <- reactive({
+    # Assumes column is MDV
+    if (is.null(get_metadata())) {
+      return("BLQ")
+    }
+    blq_row <- get_metadata() |> filter(Type %in% "blq")
+    if (nrow(blq_row) == 1) {
+      return(blq_row$Name)
+    }
+    return("BLQ")
+  })
+  get_data <- reactive({
+    if (is.null(input$dataset)) {
+      return()
+    }
+    if (grepl("\\.csv$", input$dataset$datapath)) {
+      data <- read.csv(input$dataset$datapath) |>
+        add_col(mdv_name()) |>
+        add_col(blq_name()) |>
+        filter(.data[[mdv_name()]] == 0, .data[[blq_name()]] <= 0)
+      return(data)
+    }
+    data <- read.table(input$dataset$datapath, skip = 1, header = TRUE) |>
+      add_col(mdv_name()) |>
+      add_col(blq_name()) |>
+      filter(.data[[mdv_name()]] == 0, .data[[blq_name()]] <= 0)
+    return(data)
+  })
+
   enough_data <- reactive({
     !any(is.null(get_data()), is.null(get_metadata()))
   })
-  
-  #---- Selectors ----
-  observeEvent(input$metadata, {
-    all_covariates <- get_metadata() |>
-      filter(Type %in% c("cov", "cat"))
 
-    updatePickerInput(
-      session = session,
-      "select_cov",
-      choices = list(
-        Continuous = all_covariates$Name[all_covariates$Type %in% "cov"],
-        Categorical = all_covariates$Name[all_covariates$Type %in% "cat"]
-      ),
-      selected = first(all_covariates$Name),
-      choicesOpt = list(
-        subtext = c(
-          all_covariates$Label[all_covariates$Type %in% "cov"],
-          all_covariates$Label[all_covariates$Type %in% "cat"]
-        )
-      )
-    )
-    updatePickerInput(
-      session = session,
-      "select_time",
-      choices = get_metadata() |>
-        filter(Type %in% c("time", "tad")) |>
-        pull(Name),
-      selected = get_metadata() |>
-        filter(Type %in% "time") |>
-        pull(Name),
-      choicesOpt = list(
-        subtext = get_metadata() |>
-          filter(Type %in% c("time", "tad")) |>
-          pull(Label)
-      )
-    )
-  })
-  
+  #---- Selectors ----
   observeEvent(c(input$dataset, input$ind_rows, input$ind_cols), {
     updateSliderInput(
       session = session,
       "ind_page",
-      max = ceiling(n_distinct(get_data()$ID)/(input$ind_rows*input$ind_cols)),
+      max = ceiling(n_distinct(get_data()$ID) / (input$ind_rows * input$ind_cols)),
     )
   })
-  
+
 
   #---- Tables ----
   output$data <- DT::renderDataTable({
@@ -276,76 +262,67 @@ server <- function(input, output, session) {
   output$data_mapping <- DT::renderDataTable({
     get_metadata() |> DT::datatable()
   })
-  
+
   #---- Figures ----
   output$obs_vs_pred <- renderPlotly({
-    p <- dv_pred(df = get_data() |> filter(MDV==0))
+    p <- dv_pred(df = get_data())
     p <- ggplotly(p, dynamicTicks = TRUE)
-    if(input$obs_vs_pred_scale %in% "linear") {
+    if (input$obs_vs_pred_scale %in% "linear") {
       return(p)
     }
     return(p |> layout(xaxis = list(type = "log"), yaxis = list(type = "log")))
   })
   output$obs_vs_ipred <- renderPlotly({
-    p <- dv_ipred(df = get_data() |> filter(MDV==0))
+    p <- dv_ipred(df = get_data())
     p <- ggplotly(p, dynamicTicks = TRUE)
-    if(input$obs_vs_pred_scale %in% "linear") {
+    if (input$obs_vs_pred_scale %in% "linear") {
       return(p)
     }
     return(p |> layout(xaxis = list(type = "log"), yaxis = list(type = "log")))
   })
   output$res_hist <- renderPlotly({
-    cwres_hist(df = get_data() |> filter(MDV==0))
+    cwres_hist(df = get_data())
   })
   output$res_qq <- renderPlotly({
-    cwres_q(df = get_data() |> filter(MDV==0))
+    cwres_q(df = get_data())
   })
   output$res_vs_pred <- renderPlotly({
-    cwres_pred(df = get_data() |> filter(MDV==0))
+    cwres_pred(df = get_data())
   })
   output$res_vs_time <- renderPlotly({
-    cwres_time(df = get_data() |> filter(MDV==0))
+    cwres_time(df = get_data())
   })
   output$res_vs_tad <- renderPlotly({
-    cwres_tad(df = get_data() |> filter(MDV==0))
+    cwres_tad(df = get_data())
   })
   output$npde_hist <- renderPlotly({
-    npde_hist(df = get_data() |> filter(MDV==0))
+    npde_hist(df = get_data())
   })
   output$npde_qq <- renderPlotly({
-    npde_q(df = get_data() |> filter(MDV==0))
+    npde_q(df = get_data())
   })
   output$npde_vs_pred <- renderPlotly({
-    npde_pred(df = get_data() |> filter(MDV==0))
+    npde_pred(df = get_data())
   })
   output$npde_vs_time <- renderPlotly({
-    npde_time(df = get_data() |> filter(MDV==0))
+    npde_time(df = get_data())
   })
   output$npde_vs_tad <- renderPlotly({
-    npde_tad(df = get_data() |> filter(MDV==0))
+    npde_tad(df = get_data())
   })
-  
+
   output$time_profile <- renderPlot({
     p <- dv_pred_ipred(
-      get_data() |> filter(MDV==0), 
+      get_data(),
       # facets = "ID", TODO: could be changed according to meta
-      id_per_plot = input$ind_rows*input$ind_cols,
+      id_per_plot = input$ind_rows * input$ind_cols,
       nrow = input$ind_rows,
       ncol = input$ind_cols
-      )
+    )
     return(p[[input$ind_page]])
   })
 
   #---- Downloads ----
-  output$metadata_template <- downloadHandler(
-    filename = function() {
-      "metadata.csv"
-    },
-    content = function(file) {
-      write.csv(read.csv("www/template_mapping.csv"), file, row.names = FALSE)
-    }
-  )
-
   output$dataset_report <- downloadHandler(
     filename = function() {
       "gof-report.docx"
