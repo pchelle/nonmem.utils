@@ -23,21 +23,11 @@ install.packages(c("flextable", "officedown", "ragg"))
 
 ## Usage
 
-The following code runs a shiny app that will launch the tool you need for your task:
+This repo is a toolbox shiny app helping you out with Nonmem modeling and reporting:
 
 ```r
 shiny::runGitHub(repo = "nonmem-utils", username = "pchelle", ref = "main")
 ```
-
-The following tasks can be launched from the app:
-
-- Check Input PK dataset
-- Compare Model Runs
-- Model Fit
-- Check Model Parameters
-- Check Optimization Profile
-- Visual Predictive Check
-- Bootrstrap Analysis
 
 ### Check Input PK dataset
 
