@@ -12,7 +12,7 @@ A toolbox of shiny apps to preview, investigate and report output files exported
 > The Shiny Apps below require the following packages to be installed on RStudio
 
 ```r
-install.packages(c("tidyverse", "GGally", "DT", "shiny", "miniUI", "shinyWidgets", "bslib", "shinydashboard", "plotly", "mrgsolve"))
+install.packages(c("tidyverse", "GGally", "DT", "shiny", "miniUI", "shinyWidgets", "bslib", "shinydashboard", "plotly", "mrgsolve", "pmplots"))
 ```
 
 Exporting word reports uses the following packages that may also need to be installed
