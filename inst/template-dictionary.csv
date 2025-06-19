@@ -1,0 +1,21 @@
+Name,Type,Label,Unit,Min,Max
+CID,id,Subject,,1,1000000
+OCC,occ,Occasion,,1,10
+TIME,time,Time,h,0,8544
+TAD,tad,Time After Dose,h,-6,336
+AMT,amt,Amount,IU,100,10000
+DV,dv,Activity,IU/L,4,2500
+MDV,mdv,,,0,1
+EVID,evid,,,0,4
+BW,cov,Body Weight,kg,3,250
+HT,cov,Height,cm,40,220
+AGE,cov,Age,yrs,0,100
+FFM,cov,Fat-free mass,kg,3,100
+BMI,cov,BMI,kg/m2,15,35
+BT,cat,Blood Type,"""0"":""Non-O""|""1"":""O""",0,4
+DOSEPERKG,cov,Dose,IU/kg,5,300
+PREDOSE,,Predose,IU/L,0,500
+BASELINE,cov,Baseline,IU/L,2,400
+BLQ,blq,BLQ,,0,1
+LLOQ,lloq,LLOQ,IU/L,4,15
+SOURCE,cat,Source,"""1"":""WAPPS""|""2"":""Industry""",1,2

@@ -1,0 +1,53 @@
+---
+title: "Workflow Summary"
+date: "`r Sys.Date()`"
+output:
+  officedown::rdocx_document:
+    toc: true
+    toc_depth: 3
+    fig_width: 6.5
+    tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      conditional:
+        first_row: true
+        first_column: false
+        last_row: false
+        last_column: false
+        no_hband: true
+        no_vband: false
+params:
+  dir_path:
+    label: "Directory"
+    value: "path/to/directory"
+    input: file
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = "#>",
+  dev = "ragg_png",
+  fig.align = "center",
+  fig.width = 6.5
+)
+library(tidyverse)
+library(nonmem.utils)
+
+files_to_review <- list.files(params$dir_path, full.names = TRUE, pattern = ".res")
+nonmem_results <- lapply(files_to_review, nonmem_res)
+nonmem_data <- lapply(nonmem_results, format_result)
+nonmem_data <- do.call(rbind, nonmem_data) |> arrange(desc(OFV))
+```
+  
+## Summary of nonmem results
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+knitr::kable(nonmem_data, digits = 2, escape = FALSE)
+```
+

@@ -1,0 +1,151 @@
+---
+title: "VPC Analyses"
+date: "`r Sys.Date()`"
+output:
+  officedown::rdocx_document:
+    toc: true
+    toc_depth: 3
+    fig_width: 6.5
+    tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      conditional:
+        first_row: true
+        first_column: false
+        last_row: false
+        last_column: false
+        no_hband: true
+        no_vband: false
+params:
+  data_path:
+    label: "Dataset"
+    value: "dataset.csv"
+    input: file
+  meta_data_path:
+    label: "Metadata"
+    value: "metadata.csv"
+    input: file
+  bins:
+    label: "Bins for summary statistics"
+    value: 11
+    input: slider
+    min: 1
+    max: 20
+  ci:
+    label: "Confidence Interval"
+    value: 80
+    input: slider
+    min: 51
+    max: 99
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = "#>",
+  dev = "ragg_png",
+  fig.align = "center",
+  fig.width = 6.5
+)
+library(tidyverse)
+library(nonmem.utils)
+
+is_nonmem_file <- grepl(".tab", params$data_path)
+if (is_nonmem_file) {
+  sim_data_content <- readLines(params$data_path)
+  # Remove header rows
+  sim_data_file <- tempfile(fileext = ".tab")
+  header_rows <- grepl(pattern = "ID", sim_data_content)
+  data_header <- head(sim_data_content[header_rows], 1)
+  sim_data_content <- sim_data_content[!header_rows]
+  # Remove Table rows
+  table_rows <- grepl(pattern = "TABLE", sim_data_content)
+  sim_data_content <- sim_data_content[!table_rows]
+  # Re-write temp file
+  writeLines(c(data_header, sim_data_content), file = sim_data_file)
+  data <- readr::read_table(sim_data_file) |> filter(MDV == 0)
+} else {
+  data <- readr::read_csv(params$data_path, na = c("NA", "N/A", "", "."))
+}
+meta_data <- readr::read_csv(params$meta_data_path, na = c("NA", "N/A", "", "."))
+
+# Run VPC analysis
+all_vpc_plots <- vpc_plots(
+  data,
+  meta_data,
+  x = pull_name("tad", meta_data),
+  bins = params$bins,
+  ci = params$ci / 100
+)
+```
+
+## Context
+
+Visual Predictive Checks (VPCs) are graphical tools to compare the observed data with the simulated data from a population pharmacokinetic model. 
+The VPCs display the median and confidence intervals (`r params$ci` %) of the simulated data, as well as the observed data.
+
+
+## Regular Visual Predictive Checks
+
+__Figure__: VPC in linear scale
+
+```{r}
+#| echo: false
+#| warning: false
+
+all_vpc_plots$vpc
+```
+
+__Figure__: VPC in log scale
+
+```{r}
+#| echo: false
+#| warning: false
+
+all_vpc_plots$vpc |> gg_log(x = FALSE)
+```
+
+
+## Visual Predictive Checks of BLQ distribution
+
+__Figure__: VPC of BLQ distribution
+
+```{r}
+#| echo: false
+#| warning: false
+
+all_vpc_plots$blq
+```
+
+## Prediction-corrected Visual Predictive Checks
+
+__Figure__: pc-VPC in linear scale
+
+```{r}
+#| echo: false
+#| warning: false
+
+all_vpc_plots$pc_vpc
+```
+
+__Figure__: pc-VPC in log scale
+
+```{r}
+#| echo: false
+#| warning: false
+
+all_vpc_plots$pc_vpc |> gg_log(x = FALSE)
+```
+
+
+## Visual Predictive Checks of Normalized Prediction Distribution Errors (NPDE)
+
+__Figure__: VPC of NPDE distribution
+
+```{r}
+#| echo: false
+#| warning: false
+
+all_vpc_plots$npde
+```

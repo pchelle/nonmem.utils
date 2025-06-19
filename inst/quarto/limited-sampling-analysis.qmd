@@ -1,0 +1,565 @@
+---
+title: "Limited Sampling Analysis"
+author: "P. Chelle"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float: true
+    theme: united
+    highlight: tango
+params:
+  model_path: "xx.cpp"
+  data_path: "xx.csv"
+  sampling_path: "Sampling-Strategies.xlsx"
+  run_folder: "LSA_Runs"
+  pop_size: 1000
+  pop_cv: 0.025
+  covariates: ["BW", "AGE", "FFM"]
+  categoricals: []
+  lloq: 0.01
+  baseline: 0.005
+  y_lim: 50
+---
+
+```{r setup}
+#| include: false
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = "#>",
+  dev = "ragg_png",
+  fig.align = "center",
+  fig.width = 6.5
+)
+library(tidyverse)
+library(mapbayr)
+library(mrgsolve)
+```
+
+## Context
+
+Limited Sampling Analyis (LSA) is a method used in pharmacokinetics to estimate drug concentrations in patients based on a limited number of blood samples.
+It is particularly useful when full PK profiles are not feasible due to practical constraints such as patient burden or resource limitations.
+
+LSA provides insight on PK sampling pattern are most informative to estimate PK parameters from a limited number of samples, as well as to which extent some patterns may affect the estimation of PK parameters.
+
+The LSA consists of the following steps:
+
+- 1 Simulating the covariate values of a virtual population
+- 2 Simulating PK parameters based on the PopPK model and covariates
+- 3 Simulating the observed dataset based on the PopPK PK model, dosing and reference sampling
+- 4 Generate limited sampling versions of the dataset from the reference dataset
+- 5 Perform Bayesian estimation of the PK parameters for each dataset
+- 6 Compare the results of the Bayesian estimation across the different sampling strategies against the reference sampling
+
+```{r}
+#| include: false
+
+#' @description Helpers used in the LSA
+#' TODO: find a way to pass the dosing expression as a parameter
+
+#' @title calc_amt
+#' @description
+#' Get the dosing of the patients as a function of potential characteristics
+#' such as `weight`, `bsa`, etc.
+#' For Plasminogen, package insert was used indicating 6.6 mg/kg body weight given every 2 to 4 days
+#' @param data dataset of simulated patient characteristics
+#' @return A named list including `doses` and `times`
+calc_amt <- function(data, sampling_strategies) {
+  evid <- as.numeric(sampling_strategies$DataType %in% "Dose")
+  # 50 IU/kg body weight rounded to vial size of 250 IU
+  return(250 * round(50 * data$BW * evid / 250))
+}
+
+#' @title calc_predose
+#' @description Calculate all predose values in the dataset
+#' @param data a data.frame including `ID`/`CID`, `EVID` and `BLQ`
+calc_predose <- function(data) {
+  predose <- stats::ave(data$DV, data$ID, FUN = function(dv) {
+    head(dv, 1)
+  })
+  dose_is_first <- stats::ave(data$EVID, data$ID, FUN = function(evid) {
+    head(evid, 1) == 0
+  })
+  blq <- stats::ave(data$BLQ, data$ID, FUN = function(blq) {
+    head(blq, 1)
+  })
+  blq[blq < 0] <- 0
+  return(predose * dose_is_first + blq / 2)
+}
+
+#' @title reset_time
+#' @description Reset time variable to start at 0
+#' @param data a data.frame including `ID`/`CID` and `TIME`
+reset_time <- function(data) {
+  return(stats::ave(data$TIME, data$ID, FUN = function(time) {
+    time - time[1]
+  }))
+}
+
+#' @title calc_pk_outcomes
+#' @description Calculate and save PK outcomes from Bayesian estimation
+#' TODO: re-write the rflorio function
+calc_pk_outcomes <- function(pk_model, data_path, result_file) {
+  pk_data <- read.csv(data_path)
+  pk_estimate <- mapbayr::mapbayest(x = pk_model, data = pk_data, verbose = FALSE, progress = FALSE)
+  etas <- mapbayr::get_eta(pk_estimate)
+  pk_results <- lapply(
+    etas$ID,
+    function(id) {
+      eta <- etas |>
+        filter(ID %in% id) |>
+        select(starts_with("ETA")) |>
+        as.numeric()
+      id_data <- pk_data |> filter(ID %in% id)
+      pk_report <- rflorio::report_pk(
+        eta = eta,
+        pk_model = pk_model,
+        pk_data = id_data,
+        sim_time = c(seq(0, 1, 0.1), seq(2, 24 * 30 * 2, 2))
+      )
+
+      data.frame(
+        ID = id,
+        CL = pk_report$CL,
+        V1 = pk_report$V1,
+        THalf = pk_report$Thalf,
+        TAT10 = pk_report$TAT10,
+        TAT5 = pk_report$TAT5,
+        TAT2 = pk_report$TAT2
+      )
+    }
+  )
+  pk_results <- do.call("rbind", pk_results)
+  write.csv(pk_results, file = result_file, quote = FALSE, row.names = FALSE)
+  return(pk_results)
+}
+```
+
+```{r}
+#' @param PopPKModel The `.cpp` population pk model used to create the simulated dataset
+pk_model <- mread(params$model_path)
+
+#' @param initialPopulation
+#' @description
+#' Simulation of the virtual population is performed by bootstrap
+#' of a dataset + adding random proportional noise
+#' For the dataset it is also possible to load the NHANES database
+initial_population <- read.csv(params$data_path) |>
+  group_by(CID) |>
+  summarise_all(first)
+
+#' @title sampling_strategies
+#' @description
+#' Use the sampling strategies Excel file to provide
+#' Reference sampling as well as the limited sampling to test
+sampling_strategies <- readxl::read_xlsx(path = params$sampling_path, sheet = "Sampling-Strategies")
+```
+
+## Sampling strategies
+
+__Table__: Sampling Strategies (<font color="green">&#10003;</font>: samples and doses kept in the limited sampling scenarios)
+
+```{r}
+#| echo: false
+#| results: asis
+table_sampling_strategies <- sampling_strategies
+for (index in tail(seq_along(table_sampling_strategies), -2)) {
+  table_sampling_strategies[[index]] <- sapply(
+    table_sampling_strategies[[index]],
+    function(is_sampled) {
+      ifelse(is_sampled, '<font color="green">&#10003;</font>', "")
+    }
+  )
+}
+knitr::kable(t(table_sampling_strategies))
+```
+
+## Dataset simulations 
+
+The virtual population includes __`r params$pop_size`__ virtual patients simulated by bootstrap of the source population dataset (`r params$data_path`), with a random proportional noise added to the covariates of __`r 100*params$pop_cv`__ %.
+
+```{r}
+#| include: false
+# Bootstrap patients
+selected_rows <- sample(1:nrow(initial_population), size = params$pop_size, replace = TRUE)
+simulated_population <- lapply(
+  params$covariates,
+  function(covariate) {
+    round(initial_population[[covariate]][selected_rows] * rlnorm(1, sdlog = params$pop_cv), 1)
+  }
+)
+simulated_population <- as.data.frame(simulated_population)
+names(simulated_population) <- params$covariates
+
+# Simulate the reference dataset
+simulated_population <- lapply(
+  1:nrow(simulated_population),
+  function(index) {
+    evid <- as.numeric(sampling_strategies$DataType %in% "Dose")
+    ind_data <- cbind.data.frame(
+      data.frame(
+        ID = index,
+        TIME = sampling_strategies$Reference,
+        MDV = evid,
+        EVID = evid,
+        AMT = calc_amt(simulated_population[index, params$covariates], sampling_strategies),
+        CMT = 1
+      ),
+      simulated_population[index, params$covariates],
+      row.names = NULL
+    )
+    return(ind_data)
+  }
+)
+simulated_population <- do.call("rbind", simulated_population)
+
+simulated_pk <- pk_model |>
+  data_set(simulated_population) |>
+  mrgsim(tad = TRUE)
+
+# Format reference dataset
+simulated_population$TAD <- simulated_pk$tad
+simulated_population$DV <- round(simulated_pk$DV * (simulated_population$EVID == 0), 4)
+simulated_population$LLOQ <- params$lloq
+simulated_population$BLQ <- 0
+blq_rows <- (simulated_population$DV < params$lloq) & (simulated_population$EVID == 0)
+simulated_population$DV[blq_rows] <- 0
+simulated_population$BLQ[blq_rows] <- 1
+simulated_population$BASELINE <- params$baseline
+simulated_population$PREDOSE <- calc_predose(simulated_population)
+simulated_population$TPREDOSE <- 0
+
+selected_variables <- c("ID", "TIME", "TAD", "AMT", "DV", "MDV", "EVID", "CMT", "LLOQ", "BLQ", "BASELINE", "PREDOSE", "TPREDOSE", params$covariates)
+ref_simulated_population <- simulated_population[, selected_variables]
+
+dir.create(params$run_folder)
+write.csv(
+  ref_simulated_population,
+  file = file.path(params$run_folder, "REFERENCE.csv"),
+  quote = FALSE,
+  row.names = FALSE
+)
+```
+
+__Table__: Ten first lines of simulated dataset
+
+```{r}
+#| echo: false
+#| results: asis
+knitr::kable(head(ref_simulated_population, 10))
+```
+
+__Table__: Ten last lines of simulated dataset
+
+```{r}
+#| echo: false
+#| results: asis
+knitr::kable(tail(ref_simulated_population, 10))
+```
+
+### Simulated covariate distributions
+
+To evaluate that the simulated population is representative of the source population, the covariate distributions are compared between the source and simulated populations.
+
+__Figure__: Boxplots comparing distributions of covariates in the source and simulated populations
+
+```{r}
+#| echo: false
+simulated_summary <- simulated_population |>
+  group_by(ID) |>
+  summarise_all(first)
+cov_data <- data.frame()
+for (covariate in params$covariates) {
+  cov_data <- bind_rows(
+    cov_data,
+    data.frame(
+      Value = initial_population[[covariate]],
+      Population = "Source Data",
+      Covariate = covariate
+    ),
+    data.frame(
+      Value = simulated_summary[[covariate]],
+      Population = "Simulated Data",
+      Covariate = covariate
+    )
+  )
+}
+
+ggplot(data = cov_data, mapping = aes(x = Population, y = Value, fill = Population)) +
+  theme_bw() +
+  geom_boxplot() +
+  scale_fill_brewer(palette = "Set1") +
+  guides(fill = "none") +
+  facet_wrap(~Covariate, scales = "free")
+```
+
+### Simulated Time Profile
+
+Representation of the simulated time profile provides an overview of the simulated dataset. 
+BLQ distribution over time is a useful indicator that may explain why some sampling strategies lead to less accurate estimation of PK parameters.
+
+```{r}
+#| include: false
+plot_data <- simulated_population |> filter(MDV == 0)
+plot_data_sum <- plot_data |>
+  group_by(TIME) |>
+  summarise(
+    Min = quantile(DV, probs = 0.05),
+    Max = quantile(DV, probs = 0.95),
+    Med = median(DV),
+    BLQRatio = 100 * sum(BLQ > 0) / n()
+  )
+
+tp_figure <- ggplot(data = plot_data, mapping = aes(x = TIME, y = DV)) +
+  theme_bw() +
+  geom_point(mapping = aes(color = "Simulated Points")) +
+  geom_line(data = plot_data_sum, mapping = aes(y = Min, color = "Median [5th-95th] Percentile"), linetype = "dashed") +
+  geom_line(data = plot_data_sum, mapping = aes(y = Max, color = "Median [5th-95th] Percentile"), linetype = "dashed") +
+  geom_line(data = plot_data_sum, mapping = aes(y = Med, color = "Median [5th-95th] Percentile")) +
+  labs(x = "Time [h]", y = "Concentration [IU/mL]", color = NULL) +
+  scale_color_manual(values = c("tomato", "black"))
+```
+
+__Figure__: Time profile for the simulated dataset in linear scale
+
+```{r}
+#| echo: false
+tp_figure
+```
+
+__Figure__: Time profile for the simulated dataset in log scale
+
+```{r}
+#| echo: false
+tp_figure + scale_y_log10(breaks = scales::log_breaks(), labels = scales::label_log(), guide = "axis_logticks")
+```
+
+__Figure__: Percent of BLQ data over time for the simulated dataset
+
+```{r}
+#| echo: false
+ggplot(data = plot_data_sum, mapping = aes(x = TIME, y = BLQRatio)) +
+  theme_bw() +
+  geom_line(color = "dodgerblue") +
+  labs(x = "Time [h]", y = "Ratio of BLQ data [%]")
+```
+
+### Limited Sampling Datasets
+
+Limited sampling datasets are generated from the reference dataset by keeping only the time points defined in the sampling strategies.
+These datasets are saved as intermediate results if reviewing the limited sampling analysis is needed.
+
+```{r}
+#| include: false
+ls_columns <- tail(seq_along(sampling_strategies), -2)
+ls_names <- tail(names(sampling_strategies), -2)
+for (ls_index in ls_columns) {
+  # Filter selected data
+  kept_time_points <- sampling_strategies$Reference[sampling_strategies[[ls_index]]]
+  ls_simulated_population <- simulated_population |>
+    filter(TIME %in% kept_time_points)
+
+  # Reset time and predose for nonmem runs
+  ls_simulated_population$TIME <- reset_time(ls_simulated_population)
+  ls_simulated_population$PREDOSE <- calc_predose(ls_simulated_population)
+  # Save limited sampling dataset
+  ls_simulated_population <- ls_simulated_population[, selected_variables]
+
+  write.csv(
+    ls_simulated_population,
+    file = file.path(params$run_folder, paste0("LS", ls_index, ".csv")),
+    quote = FALSE,
+    row.names = FALSE
+  )
+}
+```
+
+
+__Table__: Mapping of the datasets and sampling scenarios
+
+```{r}
+#| echo: false
+#| results: asis
+knitr::kable(data.frame(
+  "Dataset" = paste0("LS", ls_columns, ".csv"),
+  "Results" = paste0("results-LS", ls_columns, ".csv"),
+  "Sampling Strategy" = ls_names,
+  check.names = FALSE
+))
+```
+
+## LSA Runs
+
+The LSA runs are performed in this section. The results are also saved as intermediate files if reviewing the limited sampling analysis is needed.
+
+```{r}
+#| echo: false
+#| results: asis
+tic <- Sys.time()
+
+ref_results <- calc_pk_outcomes(
+  pk_model = pk_model,
+  data_path = file.path(params$run_folder, "REFERENCE.csv"),
+  result_file = file.path(params$run_folder, "results-REFERENCE.csv")
+)
+cat(paste(
+  "Bayesian estimation for __reference__ dataset completed in",
+  round(difftime(Sys.time(), tic, units = "mins"), 1),
+  "minutes\n\n"
+))
+
+for (ls_index in ls_columns) {
+  ls_tic <- Sys.time()
+  ls_results <- calc_pk_outcomes(
+    pk_model = pk_model,
+    data_path = file.path(params$run_folder, paste0("LS", ls_index, ".csv")),
+    result_file = file.path(params$run_folder, paste0("results-LS", ls_index, ".csv"))
+  )
+  cat(paste0(
+    "Bayesian estimation for scenario __", ls_names[ls_index - 2],
+    "__ completed in ", round(difftime(Sys.time(), ls_tic, units = "mins"), 1),
+    " minutes\n\n"
+  ))
+}
+
+cat(paste("Total run time for LSA:", round(difftime(Sys.time(), tic, units = "mins"), 1), "minutes\n\n"))
+```
+
+
+## LSA Results
+
+### Reference Dataset
+
+__Table__: Summary of the PK estimation results for the reference dataset
+
+```{r}
+#| echo: false
+ref_results <- read.csv(file.path(params$run_folder, "results-REFERENCE.csv"))
+ref_summary <- cbind.data.frame(
+  Summary = c("Mean", "CV [%]"),
+  bind_rows(
+    ref_results |> summarise_all(mean),
+    ref_results |> summarise_all(~ 100 * sd(.) / mean(.))
+  )
+)
+
+knitr::kable(ref_summary, digits = 2)
+```
+
+### Limited Sampling Comparisons
+
+```{r}
+#| include: false
+ls_comparison <- lapply(
+  ls_columns,
+  function(ls_index) {
+    ls_results <- read.csv(file.path(params$run_folder, paste0("results-LS", ls_index, ".csv")))
+    ls_difference <- 100 * (ls_results - ref_results) / ref_results
+    ls_summary_results <- bind_rows(
+      ls_difference |> summarise_all(function(x) {
+        quantile(x, probs = 0.05, na.rm = TRUE)
+      }),
+      ls_difference |> summarise_all(function(x) {
+        quantile(x, probs = 0.25, na.rm = TRUE)
+      }),
+      ls_difference |> summarise_all(function(x) {
+        quantile(x, probs = 0.50, na.rm = TRUE)
+      }),
+      ls_difference |> summarise_all(function(x) {
+        quantile(x, probs = 0.75, na.rm = TRUE)
+      }),
+      ls_difference |> summarise_all(function(x) {
+        quantile(x, probs = 0.95, na.rm = TRUE)
+      }),
+      ls_difference |> summarise_all(function(x) {
+        mean(x, na.rm = TRUE)
+      }),
+      ls_difference |> summarise_all(function(x) {
+        sqrt(mean(x^2, na.rm = TRUE))
+      }),
+      ls_difference |> summarise_all(function(x) {
+        sum(abs(x) <= 20, na.rm = TRUE) / length(x)
+      })
+    ) |>
+      mutate(
+        SamplingID = ls_index,
+        Scenario = ls_names[ls_index - 2],
+        Doses = sum(sampling_strategies$DataType[sampling_strategies[[ls_index]]] %in% "Dose"),
+        Samples = sum(sampling_strategies$DataType[sampling_strategies[[ls_index]]] %in% "Sample"),
+        Statistics = c(paste0(c(5, 25, 50, 75, 95), "th percentile"), "Bias [%]", "RMSE [%]", "Proportion within 20% difference"),
+        .before = everything()
+      )
+    return(ls_summary_results)
+  }
+)
+
+ls_comparison <- do.call("rbind", ls_comparison)
+ls_comparison$Scenario <- factor(ls_comparison$Scenario, levels = ls_names)
+
+write.csv(ls_comparison, file = "LS-Results.csv", row.names = FALSE)
+```
+
+__Table__: Summary of the PK estimation results for the limited sampling scenarios
+
+```{r}
+#| echo: false
+#| results: asis
+ls_comparison |>
+  filter(Statistics %in% c("Bias [%]", "RMSE [%]", "Proportion within 20% difference")) |>
+  knitr::kable(digits = 1)
+```
+
+```{r}
+#| echo: false
+#| results: asis
+# Plot results grouped by number of doses and samples for each PK Outcome to compare
+pk_outcomes <- data.frame(
+  name = c("CL", "V1", "THalf", "TAT10", "TAT5", "TAT2"),
+  label = c("Clearance", "Volume", "Half-life", "Time to reach 10 IU/dL", "Time to reach 5 IU/dL", "Time to reach 2 IU/dL")
+)
+pk_outcomes <- split(pk_outcomes, seq(nrow(pk_outcomes)))
+for (pk_outcome in pk_outcomes) {
+  cat(paste("#### Limited Sampling Results for", pk_outcome$label, "\n\n"))
+  for (n_doses in sort(unique(ls_comparison$Doses))) {
+    for (n_samples in sort(unique(ls_comparison$Samples))) {
+      comparison_data <- ls_comparison |> filter(Doses %in% n_doses, Samples %in% n_samples)
+      if (nrow(comparison_data) == 0) {
+        next
+      }
+      ls_plot <- ggplot(
+        data = comparison_data |>
+          select(Scenario, Statistics, matches(pk_outcome$name)) |>
+          filter(Statistics %in% paste0(c(5, 25, 50, 75, 95), "th percentile")) |>
+          pivot_wider(names_from = Statistics, values_from = .data[[pk_outcome$name]]),
+        mapping = aes(
+          x = 1,
+          ymin = `5th percentile`,
+          lower = `25th percentile`,
+          middle = `50th percentile`,
+          upper = `75th percentile`,
+          ymax = `95th percentile`,
+          fill = Scenario
+        )
+      ) +
+        theme_bw() +
+        geom_boxplot(stat = "identity") +
+        geom_hline(yintercept = 0, color = "firebrick") +
+        geom_hline(yintercept = c(-20, 20), color = "dodgerblue", linetype = "dotted") +
+        scale_fill_viridis_d(option = "viridis") +
+        scale_x_continuous(breaks = NULL) +
+        scale_y_continuous(breaks = seq(-100, 100, 10)) +
+        coord_cartesian(ylim = c(-params$y_lim, params$y_lim)) +
+        labs(x = NULL, y = paste("Relative errors on", pk_outcome$label, "[%]"), fill = "Sampling Scenarios")
+
+      ls_plot_file <- file.path(params$run_folder, paste0("LS-", pk_outcome$name, "-dose-", n_doses, "-samples-", n_samples, ".png"))
+      ggsave(filename = ls_plot_file, plot = ls_plot, width = 16, height = 9, units = "cm", device = ragg::agg_png)
+
+      cat(paste("__Figure__: Relative errors on", pk_outcome$label, "for limited sampling strategies with", n_doses, "doses and", n_samples, "samples\n\n"))
+      cat(paste0("![](", ls_plot_file, ") \n\n"))
+      # TODO: Add results splitting by covariates ?
+    }
+  }
+}
+```

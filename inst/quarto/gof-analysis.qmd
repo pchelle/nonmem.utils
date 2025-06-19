@@ -1,0 +1,137 @@
+---
+title: "Goodness of Fit Analysis"
+date: "`r Sys.Date()`"
+output:
+  officedown::rdocx_document:
+    toc: true
+    toc_depth: 3
+    fig_width: 6.5
+    tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      conditional:
+        first_row: true
+        first_column: false
+        last_row: false
+        last_column: false
+        no_hband: true
+        no_vband: false
+params:
+  data_path:
+    label: "Dataset"
+    value: "dataset.tab"
+    input: file
+  meta_data_path:
+    label: "Metadata"
+    value: "metadata.csv"
+    input: file
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = "#>",
+  dev = "ragg_png",
+  fig.align = "center",
+  fig.width = 6.5
+)
+library(tidyverse)
+library(patchwork)
+library(nonmem.utils)
+
+is_nonmem_file <- grepl(".tab", params$data_path)
+if (is_nonmem_file) {
+  data <- readr::read_table(params$data_path, na = c("NA", "N/A", "", "."), skip = 1)
+} else {
+  data <- readr::read_csv(params$data_path, na = c("NA", "N/A", "", "."))
+}
+data$LLOQ <- 10
+meta_data <- readr::read_csv(params$meta_data_path, na = c("NA", "N/A", "", "."))
+```
+  
+## Observed vs predicted
+
+__Figure__: Observed vs population and individual predictions in linear scale (left) and logarithmic scale (right)
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+dv_plot <- dv_preds(data, meta_data)
+wrap_plots(
+  dv_plot + guides(color = guide_legend(ncol = 2)),
+  gg_log(dv_plot) + guides(color = "none"),
+  ncol = 2
+)
+```
+
+
+## Conditional Weighted Residuals
+
+__Figure__: Histogram (left) and QQ-plot (right) of conditional weighted residuals (CWRES)
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+wrap_plots(
+  residual_hist(y_type = "cwres", data, meta_data),
+  residual_qq(y_type = "cwres", data, meta_data),
+  ncol = 2
+)
+```
+
+__Figure__: Conditional weighted residuals (CWRES) vs time, time after dose, population predictions, and individual predictions.
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+wrap_plots(
+  residual_plot(x_type = "time", y_type = "cwres", data, meta_data),
+  residual_plot(x_type = "tad", y_type = "cwres", data, meta_data),
+  residual_plot(x_type = "pred", y_type = "cwres", data, meta_data),
+  residual_plot(x_type = "ipred", y_type = "cwres", data, meta_data),
+  ncol = 2
+)
+```
+
+
+## Normalized Prediction Distribution Errors
+
+__Figure__: Histogram (left) and QQ-plot (right) of normalized prediction distribution errors (NPDE)
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+#| eval: !expr '"NPDE" %in% names(data)'
+
+wrap_plots(
+  residual_hist(y_type = "npde", data, meta_data),
+  residual_qq(y_type = "npde", data, meta_data),
+  ncol = 2
+)
+```
+
+__Figure__: Normalized prediction distribution errors (NPDE) vs time, time after dose, population predictions, and individual predictions.
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+#| eval: !expr '"NPDE" %in% names(data)'
+
+wrap_plots(
+  residual_plot(x_type = "time", y_type = "npde", data, meta_data),
+  residual_plot(x_type = "tad", y_type = "npde", data, meta_data),
+  residual_plot(x_type = "pred", y_type = "npde", data, meta_data),
+  residual_plot(x_type = "ipred", y_type = "npde", data, meta_data),
+  ncol = 2
+)
+```
+

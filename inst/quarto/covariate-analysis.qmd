@@ -1,0 +1,124 @@
+---
+title: "Covariate Analysis"
+date: "`r Sys.Date()`"
+output:
+  officedown::rdocx_document:
+    toc: true
+    toc_depth: 3
+    fig_width: 6.5
+    tables:
+      style: Table
+      layout: autofit
+      width: 1.0
+      conditional:
+        first_row: true
+        first_column: false
+        last_row: false
+        last_column: false
+        no_hband: true
+        no_vband: false
+params:
+  data_path:
+    label: "Dataset"
+    value: "dataset.csv"
+    input: file
+  meta_data_path:
+    label: "Metadata"
+    value: "metadata.csv"
+    input: file
+  res_path:
+    label: "Run result (.res)"
+    value: na
+    input: file
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = "#>",
+  dev = "ragg_png",
+  fig.align = "center",
+  fig.width = 6.5
+)
+library(tidyverse)
+library(patchwork)
+library(nonmem.utils)
+
+is_nonmem_file <- grepl("\\.tab", params$data_path)
+if (is_nonmem_file) {
+  data <- readr::read_table(params$data_path, na = c("NA", "N/A", "", "."), skip = 1)
+} else {
+  data <- readr::read_csv(params$data_path, na = c("NA", "N/A", "", "."))
+}
+meta_data <- readr::read_csv(params$meta_data_path, na = c("NA", "N/A", "", "."))
+res_path <- ifelse(
+  is.na(params$res_path), 
+  gsub(pattern = "(\\.csv|\\.tab)", ".res", params$data_path),
+  params$res_path
+  )
+res <- tryCatch({nonmem_res(res_path)}, error = function(e) {list()})
+
+```
+  
+### &eta; distributions and correlations
+
+__Table__: &Omega; matrix summary
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+#| eval: !expr '!is.null(res$Omega)'
+
+omega_table <- as.data.frame(res$Omega) |> 
+  filter(Estimates > 0) |>
+  select(-Initial) |>
+  mutate(CV = 100*sqrt(Estimates))
+names(omega_table) <- c("Name", "Covariance", "RSE [%]", "Shrinkage [%]", "CV [%]")
+
+knitr::kable(omega_table, digits = 1)
+```
+
+__Figure__: &eta; pairs plot
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+inventory_list <- eta_plot(data, meta_data)
+for (inventory_name in names(inventory_list)) {
+  cat(inventory_name, "\n\n")
+  cat(inventory_list[[inventory_name]] |> knitr::kable(), sep = "\n")
+  cat("\n\n")
+}
+```
+
+## Covariate analysis
+
+__Figure__: &eta; vs covariates
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+inventory_list <- eta_cov_plot(data, meta_data)
+for (inventory_name in names(inventory_list)) {
+  cat(inventory_name, "\n\n")
+  cat(inventory_list[[inventory_name]] |> knitr::kable(), sep = "\n")
+  cat("\n\n")
+}
+```
+
+
+__Table__: correlations between &eta; vs covariates
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+eta_cov_table <- eta_cor(data, meta_data)
+knitr::kable(eta_cov_table)
+```

@@ -1,0 +1,4 @@
+Name: Run Shiny Toolbox
+Description: Run Shiny Toolbox to select which Nonmem tool to use
+Binding: shiny_toolbox
+Interactive: true

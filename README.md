@@ -1,77 +1,92 @@
-# nonmem-utils
 
+# nonmem.utils
+
+<!-- badges: start -->
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
 
-A toolbox of shiny apps to preview, investigate and report output files exported by Nonmem.
+The goal of `{nonmem.utils}` is to provide a toolbox that includes helper functions, shiny apps and quarto template reports to help viewing, investigating and reporting Nonmem.
 
 > [!CAUTION]
 > This repository is currently under development
 
-> [!IMPORTANT]
-> The Shiny Apps below require the following packages to be installed on RStudio
+## Installation
 
-```r
-install.packages(c("tidyverse", "GGally", "DT", "shiny", "miniUI", "shinyWidgets", "bslib", "shinydashboard", "plotly", "mrgsolve", "pmplots"))
+You can install the development version of nonmem.utils like so:
+
+``` r
+remotes::install_github("pchelle/nonmem.utils")
 ```
 
-Exporting word reports uses the following packages that may also need to be installed
+## Example
 
-```r
-install.packages(c("flextable", "officedown", "ragg"))
+Run the following code to open the toolbox (also available in the RStudio Addins menu):
+
+``` r
+nonmem.utils::shiny_toolbox()
 ```
+
+Select the desired tool from the toolbox (for instance, covariate-analysis) and click on the button <button>Done</button>.
+
+The appropriate code will be added to the R console to start the corresponding tool.
 
 ## Usage
 
-This repo is a toolbox shiny app helping you out with Nonmem modeling and reporting:
+Most of the functions use the following arguments `data` and `meta_data`.
+
+### `data`
+
+The `data` argument is a data.frame that contains the data to be analyzed.
+
+In Nonmem, the input datasets are usually provided as `.csv` files. 
+In such cases, the tools will read them using `readr::read_csv()`.
 
 ```r
-shiny::runGitHub(repo = "nonmem-utils", username = "pchelle", ref = "main")
+data <- readr::read_csv("path/to/your/data.csv")
 ```
 
-### Check Input PK dataset
-
-The app requires you to load a csv dataset that uses a Nonmem format and a csv dictionary that maps and labels the variables of the dataset.
+Nonmem output files are usually provided as `.tab` files with 2 lines header. 
+In such cases, the tools will read them using `readr::read_table()`.
 
 ```r
-shiny::runGitHub(repo = "nonmem-utils", subdir = "dataset-analysis", username = "pchelle", ref = "main")
+data <- readr::read_table("path/to/your/data.tab", skip = 1)
 ```
 
-> [!TIP]
-> A template of the csv dictionary is available [here](dataset-analysis/www/template_mapping.csv).
-> You can also download the template from within the app.
+### `meta_data`
 
-### Compare Model Runs
+The `meta_data` argument is a dictionary data.frame that contains the information about the dataset.
 
-The app requires you to indicate a directory on which all the `.res` files will be parsed and summarized.
-
-### Model Fit
-
-The app requires you to load a `.tab` file exported from Nonmem and a csv dictionary that maps and labels the variables of the dataset.
+The `meta_data` is expected to be provided as `.csv` files.
+The tools will read them using `readr::read_csv()`.
 
 ```r
-shiny::runGitHub(repo = "nonmem-utils", subdir = "model-fit", username = "pchelle", ref = "main")
+meta_data <- readr::read_csv("path/to/your/dictionary.csv")
 ```
 
-### Check Model Parameters
+It should contain the following columns:
 
-The app requires you to load a table file exported from Nonmem and 
-a csv metadata file that maps the variables of the dataset.
+- __`Name`__: name of the dataset variable
+- __`Type`__: type of the dataset variables in lower cases.
+  - The type can be one of the following: `id`, `occ`, `time`, `tad`, `dv`, `amt`, `evid`, `mdv`.
+  - If the variable is a continuous covariate, use `cov`.
+  - If the variable is a categorical covariate, use `cat`.
+  - If the variable is a model BSV/BOV parameters, use `eta`.
 
-### Check Optimization Profile
+- __`Label`__: displayed label of the dataset variable
+- __`Unit`__: displayed unit of the dataset variable
+  - For categorical covariates (Type is `cat`), see explanations and example below.
+  
+- __`Min`__: the minimum expected value of the dataset variable
+- __`Max`__: the maximum expected value of the dataset variable
 
-The app requires you to load an `.ext` file exported from Nonmem.
+Mapping between the categorical covariate values and labels can be provided in the __`Label`__ column.
+The `jsonlite` package is leveraged to parse the mapping.
+As a consequence, the mapping is expected to be provided as __`"value":"label"`__ split by pipes `|`.
 
-```r
-shiny::runGitHub(repo = "nonmem-utils", subdir = "optimization-profile", username = "pchelle", ref = "main")
+For instance, to map a variable named `sex` with `0` coding for _male_ and `1` coding for _female_, 
+the Label cell should be have the following value:
+
+```json
+"0":"male"|"1":"female"
 ```
-
-### Visual Predictive Check
-
-The app requires you to load a `.tab` file exported from Nonmem and 
-a csv metadata file that maps the variables of the dataset.
-The first step of this app creates a `.csv` that you can re-use to speed up the processing of the VPC output file.
-
-### Bootstrap Analysis
-
-TODO
