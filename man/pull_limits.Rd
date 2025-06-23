@@ -14,3 +14,10 @@ pull_limits(name, meta_data = NULL)
 \description{
 Pull limits \code{Name} field
 }
+\examples{
+# Dictionary
+meta_data_501
+
+pull_limits("TIME", meta_data_501)
+
+}

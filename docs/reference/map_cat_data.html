@@ -58,6 +58,46 @@
 
 </dl></div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Dictionary</span></span></span>
+<span class="r-in"><span><span class="va">meta_data_501</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Name Type                      Label                    Unit Min Max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    ID   id                    Subject                    &lt;NA&gt;  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   OCC  occ                   Occasion                    &lt;NA&gt;  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  TIME time                       Time                       h  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   TAD  tad            Time After Dose                       h  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    DV   dv              Concentration                    mg/L  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  EVID evid           Event Identifier                    &lt;NA&gt;  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   MDV  mdv Missing Dependent Variable                    &lt;NA&gt;  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   AMT  amt                     Amount                      mg  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  RATE rate                       Rate                    mg/h  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   WT  cov                     Weight                      kg  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  AGE  cov                        Age                     yrs  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  SEX  cat                        Sex "0":"Male"|"1":"Female"  NA  NA</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data_501</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ID OCC TIME TAD    DV EVID MDV  AMT RATE   WT AGE SEX</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1   1    0  -5  0.00    1   1 1000  200 58.4  51   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1   1    1  -4  6.47    0   0    0    0 58.4  51   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1   1    5   0 23.96    0   0    0    0 58.4  51   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1   1   12   7 17.81    0   0    0    0 58.4  51   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1   1   24  19  5.63    0   0    0    0 58.4  51   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  2   1    0  -5  0.00    1   1 1000  200 79.3  53   1</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Map data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">map_cat_data</span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ID OCC TIME TAD    DV EVID MDV  AMT RATE   WT AGE    SEX</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1   1    0  -5  0.00    1   1 1000  200 58.4  51 Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1   1    1  -4  6.47    0   0    0    0 58.4  51 Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1   1    5   0 23.96    0   0    0    0 58.4  51 Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1   1   12   7 17.81    0   0    0    0 58.4  51 Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1   1   24  19  5.63    0   0    0    0 58.4  51 Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  2   1    0  -5  0.00    1   1 1000  200 79.3  53 Female</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

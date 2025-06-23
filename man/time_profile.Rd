@@ -10,7 +10,34 @@ time_profile(data, meta_data = NULL, bins = 7)
 \item{data}{A data.frame of data}
 
 \item{meta_data}{A data.frame of meta data}
+
+\item{bins}{Number of bins to use for VPC, default is 7}
 }
 \description{
 Plot TIME vs DV
+}
+\examples{
+
+# Requires BLQ and LLOQ
+tp_meta <- dplyr::bind_rows(
+  meta_data_501,
+  data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"))
+)
+tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
+
+# Get the time profile plots
+tp_plots <- time_profile(tp_data, tp_meta)
+
+# Plots are split by categorical variables, all use them all
+names(tp_plots)
+
+# DV in linear scale
+tp_plots$All$Linear
+
+# DV in log scale
+tp_plots$All$Log
+
+# Data split by categorical covariate
+tp_plots$SEX$Linear
+
 }

@@ -3,13 +3,15 @@ eta_bar <- function(data, mapping, ...) {
     geom_vline(
       mapping = aes(xintercept = mean(.data[[mapping$x]])),
       color = "royalblue"
-      ) +
+    ) +
     geom_vline(xintercept = 0, color = "firebrick", linetype = "dashed")
 }
 
 robust_cor <- function(data, mapping, ...) {
   tryCatch(
-    {GGally::ggally_cor(data, mapping, ...)},
+    {
+      GGally::ggally_cor(data, mapping, ...)
+    },
     error = function(e) {
       GGally::ggally_blank(...)
     }
@@ -124,7 +126,7 @@ eta_cov_plot <- function(data, meta_data = NULL) {
       columnsX = covariates$Name,
       columnsY = etas$Name,
       types = list(
-        continuous = "points", #wrap("smooth_loess", se = FALSE),
+        continuous = "points", # wrap("smooth_loess", se = FALSE),
         comboVertical = "box_no_facet",
         comboHorizontal = "box_no_facet",
         discrete = "colbar",
@@ -152,6 +154,10 @@ eta_cov_plot <- function(data, meta_data = NULL) {
 #' @param meta_data A data.frame of meta data
 #' @export
 #' @import GGally
+#' @examples
+#'
+#' cov_plot(data_501, meta_data_501)
+#'
 cov_plot <- function(data, meta_data = NULL) {
   id_variable <- pull_name("id", meta_data)
   covariates <- meta_data |>
@@ -474,6 +480,8 @@ plotly_log <- function(plotly_object, x = TRUE, y = TRUE) {
 #' Apply `Min` and `Max` from `meta_data` as limits of the ggplot
 #' @param plot_object A ggplot object
 #' @param meta_data A meta_data data.frame
+#' @param x A variable name for x-axis
+#' @param y A variable name for y-axis
 #' @export
 gg_lim <- function(plot_object, meta_data, x = NULL, y = NULL) {
   x_lim <- NULL
@@ -538,13 +546,35 @@ if (FALSE) {
 #' @description Plot TIME vs DV
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
+#' @param bins Number of bins to use for VPC, default is 7
 #' @export
+#' @examples
+#'
+#' # Requires BLQ and LLOQ
+#' tp_meta <- dplyr::bind_rows(
+#'   meta_data_501,
+#'   data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"))
+#' )
+#' tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
+#'
+#' # Get the time profile plots
+#' tp_plots <- time_profile(tp_data, tp_meta)
+#'
+#' # Plots are split by categorical variables, all use them all
+#' names(tp_plots)
+#'
+#' # DV in linear scale
+#' tp_plots$All$Linear
+#'
+#' # DV in log scale
+#' tp_plots$All$Log
+#'
+#' # Data split by categorical covariate
+#' tp_plots$SEX$Linear
+#'
 time_profile <- function(data, meta_data = NULL, bins = 7) {
   # By default assumes usual Nonmem names and labels
-  meta_data <- meta_data %||% read.csv(
-    system.file("template-dictionary.csv", package = "nonmem.utils"),
-    na = c("NA", "N/A", "", ".")
-  )
+  meta_data <- meta_data %||% default_meta_data
   variable_names <- sapply(
     c("time", "mdv", "dv", "blq", "lloq"),
     function(x) pull_name(x, meta_data),
@@ -641,13 +671,35 @@ time_profile <- function(data, meta_data = NULL, bins = 7) {
 #' @description Plot Time After Dose (TAD) vs DV
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
+#' @param bins Number of bins to use for VPC, default is 7
 #' @export
+#' @examples
+#'
+#' # Requires BLQ and LLOQ
+#' tp_meta <- dplyr::bind_rows(
+#'   meta_data_501,
+#'   data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"))
+#' )
+#' tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
+#'
+#' # Get the time profile plots
+#' tp_plots <- tad_profile(tp_data, tp_meta)
+#'
+#' # Plots are split by categorical variables, all use them all
+#' names(tp_plots)
+#'
+#' # DV in linear scale
+#' tp_plots$All$Linear
+#'
+#' # DV in log scale
+#' tp_plots$All$Log
+#'
+#' # Data split by categorical covariate
+#' tp_plots$SEX$Linear
+#'
 tad_profile <- function(data, meta_data = NULL, bins = 7) {
   # By default assumes usual Nonmem names and labels
-  meta_data <- meta_data %||% read.csv(
-    system.file("template-dictionary.csv", package = "nonmem.utils"),
-    na = c("NA", "N/A", "", ".")
-  )
+  meta_data <- meta_data %||% default_meta_data
   variable_names <- sapply(
     c("tad", "mdv", "dv", "blq", "lloq"),
     function(x) pull_name(x, meta_data),
@@ -815,6 +867,10 @@ base_tp_plot <- function(data,
 #' Generate VPC plots for a given dataset.
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
+#' @param x The x variable to use for VPC, default is "TAD"
+#' @param bins Number of bins to use for VPC, default is 7
+#' @param ci Confidence interval for the VPC plot, default is 0.8
+#' @param lloq Lower limit of quantification, default is 10
 #' @export
 vpc_plots <- function(data, meta_data, x = "TAD", bins = 7, ci = 0.8, lloq = 10) {
   vpc_data_all <- run_vpc(data, x = x, group = "All", bins = bins, ci = ci, lloq = lloq)

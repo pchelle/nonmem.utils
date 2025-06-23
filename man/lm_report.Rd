@@ -9,13 +9,29 @@ lm_report(data, x, y)
 \arguments{
 \item{data}{A data.frame}
 
-\item{x}{name of \code{x} variable}
+\item{x}{name of \code{x} variable (categorical variable)}
 
-\item{y}{name of \code{y} variable}
+\item{y}{name of \code{y} variable (continuous variable)}
 }
 \value{
 A character of lm coefficients and p-value
 }
 \description{
 Report of lm coefficients with p-value
+If a categorical variable is used, should be as \code{x} argument
+}
+\examples{
+
+# Summarize data by ID
+sum_data <- data_501 |>
+  dplyr::group_by(ID) |>
+  dplyr::summarise_all(dplyr::first)
+
+# Map categorical data
+sum_data <- map_cat_data(sum_data, meta_data_501)
+
+# ANOVA correlation with p-value
+# Categorical variable, SEX, as x argument
+lm_report(sum_data, x = "SEX", y = "WT")
+
 }

@@ -1,0 +1,13 @@
+﻿Name,Type,Label,Unit,Min,Max
+ID,id,Subject,,,
+OCC,occ,Occasion,,,
+TIME,time,Time,h,,
+TAD,tad,Time After Dose,h,,
+DV,dv,Concentration,mg/L,,
+EVID,evid,Event Identifier,,,
+MDV,mdv,Missing Dependent Variable,,,
+AMT,amt,Amount,mg,,
+RATE,rate,Rate,mg/h,,
+WT,cov,Weight,kg,,
+AGE,cov,Age,yrs,,
+SEX,cat,Sex,"""0"":""Male""|""1"":""Female""",,

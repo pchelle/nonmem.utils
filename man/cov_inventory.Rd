@@ -12,8 +12,19 @@ cov_inventory(data, meta_data)
 \item{meta_data}{A data.frame of meta data}
 }
 \value{
-A data.frame summarizing the data
+A list of data.frames summarizing the covariate data
 }
 \description{
-Get a data.frame summarizing covariate data
+Get a list of data.frames summarizing covariate data
+}
+\examples{
+
+cov_inventories <- cov_inventory(data_501, meta_data_501)
+
+cov_inventories$All
+
+cov_inventories[["SEX : Female"]]
+
+cov_inventories[["SEX : Male"]]
+
 }

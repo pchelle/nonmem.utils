@@ -30,3 +30,13 @@ with variables: \code{bins}, \code{x}, \code{n}, \code{y}, \code{ymin}, \code{ym
 \description{
 Get a data.frame summarizing data as a vpc
 }
+\examples{
+
+vpc_summary(
+  data = data_501 |> dplyr::filter(MDV == 0),
+  x = "TIME",
+  y = "DV",
+  bins = 7
+)
+
+}

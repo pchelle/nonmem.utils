@@ -17,3 +17,10 @@ A data.frame summarizing the data
 \description{
 Get a data.frame summarizing categorical data
 }
+\examples{
+
+cat_inventories <- cat_inventory(data_501, meta_data_501)
+
+cat_inventories
+
+}

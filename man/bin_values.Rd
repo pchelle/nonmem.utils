@@ -17,3 +17,8 @@ A factor with the binned values
 \description{
 Bin values into specified number of bins based on quantiles.
 }
+\examples{
+
+data_501 |> dplyr::mutate(Bins = bin_values(values = TIME, bins = 7))
+
+}

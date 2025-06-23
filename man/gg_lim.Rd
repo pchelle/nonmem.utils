@@ -10,6 +10,10 @@ gg_lim(plot_object, meta_data, x = NULL, y = NULL)
 \item{plot_object}{A ggplot object}
 
 \item{meta_data}{A meta_data data.frame}
+
+\item{x}{A variable name for x-axis}
+
+\item{y}{A variable name for y-axis}
 }
 \description{
 Apply \code{Min} and \code{Max} from \code{meta_data} as limits of the ggplot

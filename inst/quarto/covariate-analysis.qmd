@@ -52,12 +52,18 @@ if (is_nonmem_file) {
 }
 meta_data <- readr::read_csv(params$meta_data_path, na = c("NA", "N/A", "", "."))
 res_path <- ifelse(
-  is.na(params$res_path), 
+  is.na(params$res_path),
   gsub(pattern = "(\\.csv|\\.tab)", ".res", params$data_path),
   params$res_path
-  )
-res <- tryCatch({nonmem_res(res_path)}, error = function(e) {list()})
-
+)
+res <- tryCatch(
+  {
+    nonmem_res(res_path)
+  },
+  error = function(e) {
+    list()
+  }
+)
 ```
   
 ### &eta; distributions and correlations
@@ -70,10 +76,10 @@ __Table__: &Omega; matrix summary
 #| warning: false
 #| eval: !expr '!is.null(res$Omega)'
 
-omega_table <- as.data.frame(res$Omega) |> 
+omega_table <- as.data.frame(res$Omega) |>
   filter(Estimates > 0) |>
   select(-Initial) |>
-  mutate(CV = 100*sqrt(Estimates))
+  mutate(CV = 100 * sqrt(Estimates))
 names(omega_table) <- c("Name", "Covariance", "RSE [%]", "Shrinkage [%]", "CV [%]")
 
 knitr::kable(omega_table, digits = 1)

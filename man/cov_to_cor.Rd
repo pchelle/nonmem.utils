@@ -8,6 +8,8 @@ cov_to_cor(data, cov_name = "Estimates")
 }
 \arguments{
 \item{data}{A data.frame}
+
+\item{cov_name}{Name of the column containing covariance values}
 }
 \description{
 Translate covariance to correlation values

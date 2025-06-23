@@ -16,12 +16,10 @@ Pull Label potentially with Unit from \code{Name} field
 }
 \examples{
 # Dictionary
-meta_data <- readr::read_csv(
-system.file("template-dictionary.csv", package = "nonmem.utils"),
-na = c("NA", "N/A", "", ".")
-)
-meta_data
+meta_data_501
 
-pull_label("TIME", meta_data)
+pull_label("TIME", meta_data_501)
+
+pull_label(c("WT", "AGE", "SEX"), meta_data_501)
 
 }

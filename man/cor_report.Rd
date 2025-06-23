@@ -19,3 +19,14 @@ A character of correlation and p-value
 \description{
 Report of Spearman correlation with p-value
 }
+\examples{
+
+# Summarize data by ID
+sum_data <- data_501 |>
+  dplyr::group_by(ID) |>
+  dplyr::summarise_all(dplyr::first)
+
+# Spearman correlation with p-value
+cor_report(sum_data, x = "WT", y = "AGE")
+
+}

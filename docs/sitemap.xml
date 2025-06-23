@@ -43,6 +43,9 @@
     <loc>/reference/cov_to_cor.html</loc>
   </url>
   <url>
+    <loc>/reference/data_501.html</loc>
+  </url>
+  <url>
     <loc>/reference/data_inventory.html</loc>
   </url>
   <url>
@@ -86,6 +89,9 @@
   </url>
   <url>
     <loc>/reference/matrix_indices.html</loc>
+  </url>
+  <url>
+    <loc>/reference/meta_data_501.html</loc>
   </url>
   <url>
     <loc>/reference/nonmem_res.html</loc>

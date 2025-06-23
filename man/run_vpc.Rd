@@ -7,6 +7,8 @@
 run_vpc(data, x = "TIME", group = "All", bins = 7, ci = 0.8, lloq = 10)
 }
 \arguments{
+\item{data}{A data.frame of the pk data}
+
 \item{x}{Name of \code{x} variable, usually \code{"TIME"}}
 
 \item{group}{Name of \code{group} variable}
@@ -22,5 +24,9 @@ A data.frame
 }
 \description{
 Run a VPC analysis on the provided data.
-#' @param data A data.frame of the pk data
+}
+\examples{
+
+run_vpc(data_501, x = "TIME")
+
 }

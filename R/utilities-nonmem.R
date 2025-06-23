@@ -312,6 +312,7 @@ parse_omega <- function(n_omega, text) {
 #' @description
 #' Translate covariance to correlation values
 #' @param data A data.frame
+#' @param cov_name Name of the column containing covariance values
 #' @export
 cov_to_cor <- function(data, cov_name = "Estimates") {
   n_dim <- round((sqrt(1 + 8 * nrow(data)) - 1) / 2)

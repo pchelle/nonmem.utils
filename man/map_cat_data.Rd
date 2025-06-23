@@ -14,3 +14,14 @@ map_cat_data(data, meta_data)
 \description{
 Map categorical factor levels to a data.frame
 }
+\examples{
+# Dictionary
+meta_data_501
+
+# Data
+head(data_501)
+
+# Map data
+head(map_cat_data(data_501, meta_data_501))
+
+}

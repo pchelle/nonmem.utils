@@ -6,18 +6,32 @@
 #' @param y name of `y` variable
 #' @return A character of correlation and p-value
 #' @export
-cor_report <- function(data, x, y){
-  cor_result <- tryCatch({
-    cor.test(x = data[[x]], y = data[[y]], method = "spearman", exact = FALSE)
+#' @importFrom stats cor.test
+#' @examples
+#'
+#' # Summarize data by ID
+#' sum_data <- data_501 |>
+#'   dplyr::group_by(ID) |>
+#'   dplyr::summarise_all(dplyr::first)
+#'
+#' # Spearman correlation with p-value
+#' cor_report(sum_data, x = "WT", y = "AGE")
+#'
+cor_report <- function(data, x, y) {
+  cor_result <- tryCatch(
+    {
+      cor.test(x = data[[x]], y = data[[y]], method = "spearman", exact = FALSE)
     },
-    error = function(e) {list(estimate = NA, p.value = 1)}
+    error = function(e) {
+      list(estimate = NA, p.value = 1)
+    }
   )
 
   cor_value <- paste0(
     sprintf("%.3f", cor_result$estimate),
     " (p",
-    ifelse(cor_result$p.value<1e-3, "<", ":"),
-    ifelse(cor_result$p.value<1e-3, "0.001", sprintf("%.3f", cor_result$p.value)),
+    ifelse(cor_result$p.value < 1e-3, "<", ":"),
+    ifelse(cor_result$p.value < 1e-3, "0.001", sprintf("%.3f", cor_result$p.value)),
     ")"
   )
   return(cor_value)
@@ -26,20 +40,36 @@ cor_report <- function(data, x, y){
 #' @title lm_report
 #' @description
 #' Report of lm coefficients with p-value
+#' If a categorical variable is used, should be as `x` argument
 #' @param data A data.frame
-#' @param x name of `x` variable
-#' @param y name of `y` variable
+#' @param x name of `x` variable (categorical variable)
+#' @param y name of `y` variable (continuous variable)
 #' @return A character of lm coefficients and p-value
 #' @export
-lm_report <- function(data, x, y){
+#' @importFrom stats lm as.formula
+#' @examples
+#'
+#' # Summarize data by ID
+#' sum_data <- data_501 |>
+#'   dplyr::group_by(ID) |>
+#'   dplyr::summarise_all(dplyr::first)
+#'
+#' # Map categorical data
+#' sum_data <- map_cat_data(sum_data, meta_data_501)
+#'
+#' # ANOVA correlation with p-value
+#' # Categorical variable, SEX, as x argument
+#' lm_report(sum_data, x = "SEX", y = "WT")
+#'
+lm_report <- function(data, x, y) {
   lm_result <- summary(lm(formula = as.formula(paste(y, "~", x)), data = data))
   lm_value <- paste0(
     gsub(pattern = x, replacement = "", row.names(lm_result$coefficients)),
     ":",
-    sprintf("%.3f", lm_result$coefficients[,1]),
+    sprintf("%.3f", lm_result$coefficients[, 1]),
     " (p",
-    ifelse(lm_result$coefficients[,4]<1e-3, "<", ":"),
-    ifelse(lm_result$coefficients[,4]<1e-3, "0.001", sprintf("%.3f", lm_result$coefficients[,4])),
+    ifelse(lm_result$coefficients[, 4] < 1e-3, "<", ":"),
+    ifelse(lm_result$coefficients[, 4] < 1e-3, "0.001", sprintf("%.3f", lm_result$coefficients[, 4])),
     ")",
     collapse = "/"
   )
@@ -53,6 +83,15 @@ lm_report <- function(data, x, y){
 #' @param meta_data A data.frame of meta data
 #' @return A data.frame summarizing the data
 #' @export
+#' @examples
+#'
+#' # Summarize data by ID
+#' sum_data <- data_501 |>
+#'   dplyr::group_by(ID) |>
+#'   dplyr::summarise_all(dplyr::first)
+#'
+#' cov_cor(sum_data, meta_data_501)
+#'
 cov_cor <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
   covariates <- meta_data |>
@@ -76,21 +115,21 @@ cov_cor <- function(data, meta_data) {
 
   cor_data <- data.frame(Covariates = c(cov_labels, cat_labels))
 
-  for(cov_index_y in seq_along(cov_names)){
+  for (cov_index_y in seq_along(cov_names)) {
     cov_name_y <- cov_names[cov_index_y]
     cor_data[[cov_name_y]] <- ""
     # Continuous covariates: spearman correlation
-    for(cov_index_x in seq_along(cov_names)){
-      if(cov_index_x<=cov_index_y){
+    for (cov_index_x in seq_along(cov_names)) {
+      if (cov_index_x <= cov_index_y) {
         next
       }
       cov_name_x <- cov_names[cov_index_x]
       cor_data[cov_index_x, cov_name_y] <- cor_report(sum_data, cov_name_x, cov_name_y)
     }
     # Categorical covariates: lm regression
-    for(cat_index_x in seq_along(cat_names)){
+    for (cat_index_x in seq_along(cat_names)) {
       cat_name_x <- cat_names[cat_index_x]
-      cor_data[length(cov_names)+cat_index_x, cov_name_y] <- lm_report(sum_data, cat_name_x, cov_name_y)
+      cor_data[length(cov_names) + cat_index_x, cov_name_y] <- lm_report(sum_data, cat_name_x, cov_name_y)
     }
   }
   names(cor_data) <- c("Covariates", cov_labels)
@@ -126,15 +165,15 @@ eta_cor <- function(data, meta_data) {
 
   cor_data <- data.frame(Covariates = c(covariates$Label, categoricals$Label))
 
-  for(eta_name in etas$Name){
+  for (eta_name in etas$Name) {
     cor_data[[eta_name]] <- NA
-    for(cov_index_x in seq_along(covariates$Name)){
+    for (cov_index_x in seq_along(covariates$Name)) {
       cov_name <- covariates$Name[cov_index_x]
       cor_data[cov_index_x, eta_name] <- cor_report(sum_data, cov_name, eta_name)
     }
-    for(cat_index_x in seq_along(categoricals$Name)){
+    for (cat_index_x in seq_along(categoricals$Name)) {
       cat_name <- categoricals$Name[cat_index_x]
-      cor_data[length(covariates$Name)+cat_index_x, eta_name] <- lm_report(sum_data, cat_name, eta_name)
+      cor_data[length(covariates$Name) + cat_index_x, eta_name] <- lm_report(sum_data, cat_name, eta_name)
     }
   }
   names(cor_data) <- c("Covariates", etas$Label)
@@ -143,12 +182,27 @@ eta_cor <- function(data, meta_data) {
 
 #' @title data_inventory
 #' @description
-#' Get a data.frame summarizing data
+#' Get a list of data.frames summarizing data
 #' @param data A data.frame of the pk data
 #' @param meta_data A data.frame of meta data
 #' @return A list of data.frame summarizing the data
 #' @export
 #' @import dplyr
+#' @examples
+#'
+#' # Currently requires BLQ data
+#' inventory_meta <- dplyr::bind_rows(
+#'   meta_data_501,
+#'   data.frame(Name = "BLQ", Type = "blq", Label = "Below LLOQ")
+#' )
+#' inventory_data <- data_501 |> dplyr::mutate(BLQ = 0)
+#'
+#' all_inventories <- data_inventory(inventory_data, inventory_meta)
+#'
+#' all_inventories$All
+#'
+#' all_inventories$Sex
+#'
 data_inventory <- function(data, meta_data) {
   variable_names <- sapply(
     c("id", "occ", "mdv", "amt", "dv", "blq", "cat"),
@@ -213,13 +267,23 @@ data_inventory <- function(data, meta_data) {
 
 #' @title cov_inventory
 #' @description
-#' Get a data.frame summarizing covariate data
+#' Get a list of data.frames summarizing covariate data
 #' @param data A data.frame of the pk data
 #' @param meta_data A data.frame of meta data
-#' @return A data.frame summarizing the data
+#' @return A list of data.frames summarizing the covariate data
 #' @export
 #' @import tidyr
 #' @importFrom stats median quantile sd
+#' @examples
+#'
+#' cov_inventories <- cov_inventory(data_501, meta_data_501)
+#'
+#' cov_inventories$All
+#'
+#' cov_inventories[["SEX : Female"]]
+#'
+#' cov_inventories[["SEX : Male"]]
+#'
 cov_inventory <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
   covariates <- meta_data |>
@@ -305,6 +369,12 @@ cov_inventory <- function(data, meta_data) {
 #' @param meta_data A data.frame of meta data
 #' @return A data.frame summarizing the data
 #' @export
+#' @examples
+#'
+#' cat_inventories <- cat_inventory(data_501, meta_data_501)
+#'
+#' cat_inventories
+#'
 cat_inventory <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
   categoricals <- meta_data |>
@@ -434,6 +504,15 @@ check_ranges <- function(data, meta_data) {
 #' @return A data.frame summarizing the data distribution
 #' with variables: `bins`, `x`, `n`, `y`, `ymin`, `ymax`, and `blq`
 #' @export
+#' @examples
+#'
+#' vpc_summary(
+#'   data = data_501 |> dplyr::filter(MDV == 0),
+#'   x = "TIME",
+#'   y = "DV",
+#'   bins = 7
+#' )
+#'
 vpc_summary <- function(data, x, y, group = NULL, bins = 5, stairstep = FALSE, ci = 0.9) {
   if (is.null(group)) {
     group <- "group"
@@ -477,6 +556,10 @@ vpc_summary <- function(data, x, y, group = NULL, bins = 5, stairstep = FALSE, c
 #' @param bins Number of bins to create
 #' @return A factor with the binned values
 #' @export
+#' @examples
+#'
+#' data_501 |> dplyr::mutate(Bins = bin_values(values = TIME, bins = 7))
+#'
 bin_values <- function(values, bins = 7) {
   time_bins <- unique(quantile(x = values, probs = seq(0, 1, length.out = bins + 1), na.rm = TRUE))
   time_bins[1] <- floor(time_bins[1] * 100) / 100
@@ -489,7 +572,7 @@ bin_values <- function(values, bins = 7) {
 #' @title run_vpc
 #' @description
 #' Run a VPC analysis on the provided data.
-#' #' @param data A data.frame of the pk data
+#' @param data A data.frame of the pk data
 #' @param x Name of `x` variable, usually `"TIME"`
 #' @param group Name of `group` variable
 #' @param bins Number of bins for the VPC
@@ -497,6 +580,10 @@ bin_values <- function(values, bins = 7) {
 #' @param lloq Lower limit of quantification
 #' @return A data.frame
 #' @export
+#' @examples
+#'
+#' run_vpc(data_501, x = "TIME")
+#'
 run_vpc <- function(data, x = "TIME", group = "All", bins = 7, ci = 0.8, lloq = 10) {
   # First step prepare data bins
   vpc_data <- fill_nonmem_vars(data) |>

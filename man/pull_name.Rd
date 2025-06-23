@@ -16,12 +16,10 @@ Pull Name from data \code{Type} field
 }
 \examples{
 # Dictionary
-meta_data <- readr::read_csv(
-system.file("template-dictionary.csv", package = "nonmem.utils"),
-na = c("NA", "N/A", "", ".")
-)
-meta_data
+meta_data_501
 
-pull_name("time", meta_data)
+pull_name("time", meta_data_501)
+
+pull_name("cov", meta_data_501)
 
 }

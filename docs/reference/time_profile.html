@@ -56,8 +56,53 @@
 <dt>meta_data</dt>
 <dd><p>A data.frame of meta data</p></dd>
 
+
+<dt>bins</dt>
+<dd><p>Number of bins to use for VPC, default is 7</p></dd>
+
 </dl></div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Requires BLQ and LLOQ</span></span></span>
+<span class="r-in"><span><span class="va">tp_meta</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">meta_data_501</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLQ"</span>, <span class="st">"LLOQ"</span><span class="op">)</span>, Type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"blq"</span>, <span class="st">"lloq"</span><span class="op">)</span>, Label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BLQ"</span>, <span class="st">"LLOQ"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">tp_data</span> <span class="op">&lt;-</span> <span class="va">data_501</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>BLQ <span class="op">=</span> <span class="fl">0</span>, LLOQ <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Get the time profile plots</span></span></span>
+<span class="r-in"><span><span class="va">tp_plots</span> <span class="op">&lt;-</span> <span class="fu">time_profile</span><span class="op">(</span><span class="va">tp_data</span>, <span class="va">tp_meta</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Plots are split by categorical variables, all use them all</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">tp_plots</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "SEX" "All"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># DV in linear scale</span></span></span>
+<span class="r-in"><span><span class="va">tp_plots</span><span class="op">$</span><span class="va">All</span><span class="op">$</span><span class="va">Linear</span></span></span>
+<span class="r-plt img"><img src="time_profile-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># DV in log scale</span></span></span>
+<span class="r-in"><span><span class="va">tp_plots</span><span class="op">$</span><span class="va">All</span><span class="op">$</span><span class="va">Log</span></span></span>
+<span class="r-plt img"><img src="time_profile-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Data split by categorical covariate</span></span></span>
+<span class="r-in"><span><span class="va">tp_plots</span><span class="op">$</span><span class="va">SEX</span><span class="op">$</span><span class="va">Linear</span></span></span>
+<span class="r-plt img"><img src="time_profile-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

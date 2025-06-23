@@ -15,5 +15,21 @@ data_inventory(data, meta_data)
 A list of data.frame summarizing the data
 }
 \description{
-Get a data.frame summarizing data
+Get a list of data.frames summarizing data
+}
+\examples{
+
+# Currently requires BLQ data
+inventory_meta <- dplyr::bind_rows(
+  meta_data_501,
+  data.frame(Name = "BLQ", Type = "blq", Label = "Below LLOQ")
+)
+inventory_data <- data_501 |> dplyr::mutate(BLQ = 0)
+
+all_inventories <- data_inventory(inventory_data, inventory_meta)
+
+all_inventories$All
+
+all_inventories$Sex
+
 }

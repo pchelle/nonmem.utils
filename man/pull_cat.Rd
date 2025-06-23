@@ -14,3 +14,10 @@ pull_cat(name, meta_data = NULL)
 \description{
 Parse categorical variable names from meta_data
 }
+\examples{
+# Dictionary
+meta_data_501
+
+pull_cat("SEX", meta_data_501)
+
+}

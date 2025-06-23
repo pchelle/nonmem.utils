@@ -10,6 +10,14 @@ vpc_plots(data, meta_data, x = "TAD", bins = 7, ci = 0.8, lloq = 10)
 \item{data}{A data.frame of data}
 
 \item{meta_data}{A data.frame of meta data}
+
+\item{x}{The x variable to use for VPC, default is "TAD"}
+
+\item{bins}{Number of bins to use for VPC, default is 7}
+
+\item{ci}{Confidence interval for the VPC plot, default is 0.8}
+
+\item{lloq}{Lower limit of quantification, default is 10}
 }
 \description{
 Generate VPC plots for a given dataset.

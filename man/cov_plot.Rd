@@ -14,3 +14,8 @@ cov_plot(data, meta_data = NULL)
 \description{
 Pairs plot of covariates
 }
+\examples{
+
+cov_plot(data_501, meta_data_501)
+
+}

@@ -57,6 +57,12 @@ fill_nonmem_vars <- function(data, lloq = 10, group = "All") {
 #' @param name Name of variable to retrieve
 #' @param meta_data A data.frame of meta data
 #' @export
+#' @examples
+#' # Dictionary
+#' meta_data_501
+#'
+#' pull_cat("SEX", meta_data_501)
+#'
 pull_cat <- function(name, meta_data = NULL) {
   meta_data <- meta_data %||% default_meta_data
   unit <- meta_data |>
@@ -87,13 +93,11 @@ pull_cat <- function(name, meta_data = NULL) {
 #' @export
 #' @examples
 #' # Dictionary
-#' meta_data <- readr::read_csv(
-#' system.file("template-dictionary.csv", package = "nonmem.utils"),
-#' na = c("NA", "N/A", "", ".")
-#' )
-#' meta_data
+#' meta_data_501
 #'
-#' pull_name("time", meta_data)
+#' pull_name("time", meta_data_501)
+#'
+#' pull_name("cov", meta_data_501)
 #'
 pull_name <- function(type, meta_data = NULL) {
   meta_data <- meta_data %||% default_meta_data
@@ -111,13 +115,11 @@ pull_name <- function(type, meta_data = NULL) {
 #' @export
 #' @examples
 #' # Dictionary
-#' meta_data <- readr::read_csv(
-#' system.file("template-dictionary.csv", package = "nonmem.utils"),
-#' na = c("NA", "N/A", "", ".")
-#' )
-#' meta_data
+#' meta_data_501
 #'
-#' pull_label("TIME", meta_data)
+#' pull_label("TIME", meta_data_501)
+#'
+#' pull_label(c("WT", "AGE", "SEX"), meta_data_501)
 #'
 pull_label <- function(name, meta_data = NULL) {
   meta_data <- meta_data %||% default_meta_data
@@ -139,6 +141,12 @@ pull_label <- function(name, meta_data = NULL) {
 #' @param name Name of variable to retrieve
 #' @param meta_data A data.frame of meta data
 #' @export
+#' @examples
+#' # Dictionary
+#' meta_data_501
+#'
+#' pull_limits("TIME", meta_data_501)
+#'
 pull_limits <- function(name, meta_data = NULL) {
   meta_data <- meta_data %||% default_meta_data
   map_limits <- meta_data |>
@@ -157,6 +165,16 @@ pull_limits <- function(name, meta_data = NULL) {
 #' @param data A data.frame of the pk data
 #' @param meta_data A data.frame of meta data
 #' @export
+#' @examples
+#' # Dictionary
+#' meta_data_501
+#'
+#' # Data
+#' head(data_501)
+#'
+#' # Map data
+#' head(map_cat_data(data_501, meta_data_501))
+#'
 map_cat_data <- function(data, meta_data) {
   cat_variables <- pull_name("cat", meta_data)
   if (length(cat_variables) == 0) {
