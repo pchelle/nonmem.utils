@@ -22,6 +22,9 @@
     <loc>/reference/bin_values.html</loc>
   </url>
   <url>
+    <loc>/reference/calc_tad.html</loc>
+  </url>
+  <url>
     <loc>/reference/cat_inventory.html</loc>
   </url>
   <url>
@@ -64,6 +67,9 @@
     <loc>/reference/eta_plot.html</loc>
   </url>
   <url>
+    <loc>/reference/fill_meta_vars.html</loc>
+  </url>
+  <url>
     <loc>/reference/fill_nonmem_vars.html</loc>
   </url>
   <url>
@@ -80,6 +86,12 @@
   </url>
   <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ind_tad_profiles.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ind_time_profiles.html</loc>
   </url>
   <url>
     <loc>/reference/lm_report.html</loc>
@@ -158,6 +170,9 @@
   </url>
   <url>
     <loc>/reference/shiny_toolbox.html</loc>
+  </url>
+  <url>
+    <loc>/reference/simulate_pk.html</loc>
   </url>
   <url>
     <loc>/reference/tad_profile.html</loc>

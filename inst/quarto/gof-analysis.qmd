@@ -135,3 +135,12 @@ wrap_plots(
 )
 ```
 
+## Individual Time Profiles
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+ind_time_profiles(data, meta_data)
+```

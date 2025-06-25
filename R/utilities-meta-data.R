@@ -1,3 +1,73 @@
+#' @title fill_meta_vars
+#' @description
+#' Fill required meta data types and variables
+#' @param meta_data A data.frame of meta data
+#' @return A data.frame with the meta data variables filled in
+#' @export
+fill_meta_vars <- function(meta_data = NULL){
+  if(is.null(meta_data)){
+    return(NULL)
+  }
+  meta_data_types <- meta_data$Type
+  # Filling ID variable
+  if (isFALSE("id" %in% meta_data_types)) {
+    meta_data <- bind_rows(
+      meta_data,
+      data.frame(Name = "ID", Type = "id", Label = "Subject ID")
+    )
+  }
+  # Filling OCC variable
+  if (isFALSE("occ" %in% meta_data_types)) {
+    meta_data <- bind_rows(
+      meta_data,
+      data.frame(Name = "ID", Type = "occ", Label = "Occasion")
+    )
+  }
+  # Filling TIME variable
+  if (isFALSE("time" %in% meta_data_types)) {
+    meta_data <- bind_rows(
+      meta_data,
+      data.frame(Name = "TIME", Type = "time", Label = "Time", Unit = "h")
+    )
+  }
+  # Filling TAD variable
+  if (isFALSE("tad" %in% meta_data_types)) {
+    meta_data <- bind_rows(
+      meta_data,
+      data.frame(Name = "TIME", Type = "tad", Label = "Time after dose", Unit = "h")
+    )
+  }
+  # Filling EVID variable
+  if (isFALSE("evid" %in% meta_data_types)) {
+    meta_data <- bind_rows(
+      meta_data,
+      data.frame(Name = "EVID", Type = "evid", Label = "Event ID")
+    )
+  }
+  # Filling MDV variable
+  if (isFALSE("mdv" %in% meta_data_types)) {
+    meta_data <- bind_rows(
+      meta_data,
+      data.frame(Name = "MDV", Type = "mdv", Label = "Missing Dependent Variable")
+    )
+  }
+  # Filling BLQ variable
+  if (isFALSE("blq" %in% meta_data_types)) {
+    meta_data <- bind_rows(
+      meta_data,
+      data.frame(Name = "BLQ", Type = "blq", Label = "BLQ")
+    )
+  }
+  # Filling BLQ variable
+  if (isFALSE("lloq" %in% meta_data_types)) {
+    meta_data <- bind_rows(
+      meta_data,
+      data.frame(Name = "LLOQ", Type = "lloq", Label = "LLOQ")
+    )
+  }
+  return(meta_data)
+}
+
 #' @title fill_nonmem_vars
 #' @description
 #' Fill in the nonmem variables that are not present in the data
@@ -8,38 +78,44 @@
 #' @export
 fill_nonmem_vars <- function(data, lloq = 10, group = "All") {
   data_names <- names(data)
-  if (isFALSE("ID" %in% data_names)) {
+  # Filling ID variable
+  no_id <- all(isFALSE("ID" %in% data_names), isFALSE("CID" %in% data_names))
+  if (no_id) {
     data$ID <- 1
   }
-  if (isFALSE("CID" %in% data_names)) {
-    data$CID <- 1
+  if (isFALSE("ID" %in% data_names)) {
+    data$ID <- data$CID
   }
-  if (isFALSE("OCC" %in% data_names)) {
-    data$OCC <- 1
-  }
-  if (isFALSE("MDV" %in% data_names)) {
-    data$MDV <- 0
-  }
+  # EVID
   if (isFALSE("EVID" %in% data_names)) {
-    data$EVID <- 0
+    data$EVID <- ifelse(is.na(data$AMT), 0, as.numeric(data$AMT>0))
   }
-  if (isFALSE("OBS" %in% data_names)) {
-    data$OBS <- data$DV
+  # OCC
+  if (isFALSE("OCC" %in% data_names)) {
+    data$OCC <- stats::ave(
+      data$EVID,
+      data$ID,
+      FUN = function(x) {cumsum(x >= 3)+1}
+      )
   }
-  if (isFALSE("IPRED" %in% data_names)) {
-    data$IPRED <- data$DV
+  # MDV
+  if (isFALSE("MDV" %in% data_names)) {
+    data$MDV <- as.numeric(data$EVID>0)
   }
-  if (isFALSE("PRED" %in% data_names)) {
-    data$PRED <- data$DV
-  }
-  if (isFALSE("BLQ" %in% data_names)) {
-    data$BLQ <- 0
-  }
+  # BLQ handling
   if (isFALSE("LLOQ" %in% data_names)) {
     data$LLOQ <- lloq
   }
-  if (isFALSE("NPDE" %in% data_names)) {
-    data$NPDE <- 0
+  # Diagnostic plots
+  for(var_name in c("OBS", "PRED", "IPRED")){
+    if (isFALSE(var_name %in% data_names)) {
+      data[[var_name]] <- data$DV
+      }
+  }
+  for(var_name in c("BLQ", "CWRES", "NPDE")){
+    if (isFALSE(var_name %in% data_names)) {
+      data[[var_name]] <- 0
+    }
   }
   if (isFALSE("REP" %in% data_names)) {
     data$REP <- 1
@@ -49,7 +125,6 @@ fill_nonmem_vars <- function(data, lloq = 10, group = "All") {
   }
   return(data)
 }
-
 
 #' @title pull_cat
 #' @description

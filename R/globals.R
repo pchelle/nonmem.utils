@@ -9,7 +9,7 @@ dplyrVariables <- c(
   # Inventory variables
   "Subjects", "Studies", "Doses", "Observations", "Covariate", "Values",
   # Nonmem variables
-  "PRED", "IPRED", 'MDV', 'BLQ', 'OBS', 'REP', 'DV','NPDE', "LLOQ",
+  "ID", "EVID", "TIME", "PRED", "IPRED", 'MDV', 'BLQ', 'OBS', 'REP', 'DV','NPDE', "LLOQ",
   # VPC variables
   'blq', 'blq_obs_med_med', 'med_pred', 'time_med_med',
   'Bins', 'pcOBS', 'pcDV', 'statistics', 'Max', 'Min',

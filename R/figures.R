@@ -1,23 +1,3 @@
-eta_bar <- function(data, mapping, ...) {
-  GGally::ggally_barDiag(data, mapping, ..., bins = 11, color = "black", fill = "grey80") +
-    geom_vline(
-      mapping = aes(xintercept = mean(.data[[mapping$x]])),
-      color = "royalblue"
-    ) +
-    geom_vline(xintercept = 0, color = "firebrick", linetype = "dashed")
-}
-
-robust_cor <- function(data, mapping, ...) {
-  tryCatch(
-    {
-      GGally::ggally_cor(data, mapping, ...)
-    },
-    error = function(e) {
-      GGally::ggally_blank(...)
-    }
-  )
-}
-
 #' @title eta_plot
 #' @description Pairs plot of etas
 #' @param data A data.frame of data
@@ -190,7 +170,7 @@ cov_plot <- function(data, meta_data = NULL) {
       na = "na"
     ),
     diag = list(
-      continuous = wrap("barDiag", bins = 11),
+      continuous = wrap("barDiag", bins = 11, color = "black", fill = "grey80"),
       discrete = "barDiag",
       na = "naDiag"
     )
@@ -206,10 +186,7 @@ cov_plot <- function(data, meta_data = NULL) {
 #' @export
 dv_preds <- function(data, meta_data = NULL) {
   # By default assumes usual Nonmem names and labels
-  meta_data <- meta_data %||% read.csv(
-    system.file("template-dictionary.csv", package = "nonmem.utils"),
-    na = c("NA", "N/A", "", ".")
-  )
+  meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
     c("mdv", "dv", "blq", "lloq"),
     function(x) pull_name(x, meta_data),
@@ -222,7 +199,7 @@ dv_preds <- function(data, meta_data = NULL) {
   )
 
   p <- ggplot(
-    data = data |>
+    data = fill_nonmem_vars(data) |>
       dplyr::filter(
         .data[[variable_names$mdv]] == 0,
         .data[[variable_names$blq]] <= 0
@@ -232,7 +209,7 @@ dv_preds <- function(data, meta_data = NULL) {
     theme_bw() +
     theme(legend.position = "top", legend.direction = "vertical") +
     geom_rug(
-      data = data |>
+      data = fill_nonmem_vars(data) |>
         dplyr::filter(
           .data[[variable_names$mdv]] == 0,
           .data[[variable_names$blq]] > 0
@@ -274,10 +251,7 @@ dv_preds <- function(data, meta_data = NULL) {
 #' @export
 residual_plot <- function(x_type = "time", y_type = "cwres", data, meta_data = NULL) {
   # By default assumes usual Nonmem names and labels
-  meta_data <- meta_data %||% read.csv(
-    system.file("template-dictionary.csv", package = "nonmem.utils"),
-    na = c("NA", "N/A", "", ".")
-  )
+  meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
     c(x_type, "mdv", "dv", "blq"),
     function(x) pull_name(x, meta_data),
@@ -329,10 +303,7 @@ residual_plot <- function(x_type = "time", y_type = "cwres", data, meta_data = N
 #' @export
 residual_qq <- function(y_type = "cwres", data, meta_data = NULL) {
   # By default assumes usual Nonmem names and labels
-  meta_data <- meta_data %||% read.csv(
-    system.file("template-dictionary.csv", package = "nonmem.utils"),
-    na = c("NA", "N/A", "", ".")
-  )
+  meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
     c("mdv", "dv", "blq"),
     function(x) pull_name(x, meta_data),
@@ -370,10 +341,7 @@ residual_qq <- function(y_type = "cwres", data, meta_data = NULL) {
 #' @export
 residual_hist <- function(y_type = "cwres", data, meta_data = NULL) {
   # By default assumes usual Nonmem names and labels
-  meta_data <- meta_data %||% read.csv(
-    system.file("template-dictionary.csv", package = "nonmem.utils"),
-    na = c("NA", "N/A", "", ".")
-  )
+  meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
     c("mdv", "dv", "blq"),
     function(x) pull_name(x, meta_data),
@@ -407,141 +375,6 @@ residual_hist <- function(y_type = "cwres", data, meta_data = NULL) {
   return(p)
 }
 
-#' @title tooltip_text
-#' @description
-#' When interactive plots are generated using `plotly`,
-#' `tootltip` will display text aesthetic allowing easy tracking of data.
-#' @param data A data.frame of data
-#' @param var_names A vector of variable names to display
-#' @export
-tooltip_text <- function(data, var_names) {
-  text_display <- lapply(
-    var_names,
-    function(var_name) {
-      paste("<b>", var_name, "</b>:", data[[var_name]])
-    }
-  )
-  text_display <- do.call(paste, c(text_display, sep = "<br>"))
-  return(text_display)
-}
-
-#' @title gg_log
-#' @description Use pretty log scale plot
-#' @param plot_object A ggplot object
-#' @param x Logical, if `TRUE`, x-axis will be log scale
-#' @param y Logical, if `TRUE`, y-axis will be log scale
-#' @export
-#' @import ggplot2
-gg_log <- function(plot_object, x = TRUE, y = TRUE) {
-  if (!any(x, y)) {
-    return(plot_object)
-  }
-  log_plot_object <- plot_object
-  if (x) {
-    log_plot_object <- log_plot_object +
-      scale_x_log10(
-        breaks = scales::log_breaks(),
-        labels = scales::label_log(),
-        guide = "axis_logticks"
-      )
-  }
-  if (y) {
-    log_plot_object <- log_plot_object +
-      scale_y_log10(
-        breaks = scales::log_breaks(),
-        labels = scales::label_log(),
-        guide = "axis_logticks"
-      )
-  }
-  return(log_plot_object)
-}
-
-#' @title plotly_log
-#' @description
-#' Use log scale when plotting with `plotly`
-#' @param plotly_object A plotly object
-#' @param x Logical, if `TRUE`, x-axis will be log scale
-#' @param y Logical, if `TRUE`, y-axis will be log scale
-#' @export
-plotly_log <- function(plotly_object, x = TRUE, y = TRUE) {
-  if (!any(x, y)) {
-    return(plotly_object)
-  }
-  log_plotly_object <- plotly_object |>
-    plotly::layout(
-      xaxis = list(type = ifelse(x, "log", "lin")),
-      yaxis = list(type = ifelse(y, "log", "lin"))
-    )
-  return(log_plotly_object)
-}
-
-#' @title gg_lim
-#' @description
-#' Apply `Min` and `Max` from `meta_data` as limits of the ggplot
-#' @param plot_object A ggplot object
-#' @param meta_data A meta_data data.frame
-#' @param x A variable name for x-axis
-#' @param y A variable name for y-axis
-#' @export
-gg_lim <- function(plot_object, meta_data, x = NULL, y = NULL) {
-  x_lim <- NULL
-  y_lim <- NULL
-  if (!is.null(x)) {
-    x_lim <- pull_limits(x, meta_data)
-  }
-  if (!is.null(y)) {
-    y_lim <- pull_limits(y, meta_data)
-  }
-  plot_object + coord_cartesian(xlim = x_lim, ylim = y_lim)
-}
-
-if (FALSE) {
-  getShrinkageResults <- function(data,
-                                  etaName,
-                                  etaBSV,
-                                  etaDisplayName = etaName,
-                                  binwidth = stats::sd(data[, etaName], na.rm = TRUE) / 2) {
-    x <- data[, etaName]
-    shrinkage <- 100 * (1 - stats::sd(x, na.rm = TRUE) / etaBSV)
-
-    xFit <- seq(-max(abs(x)) * 1.1, max(abs(x)) * 1.1, length.out = 1e3)
-    dataFit <- data.frame(
-      x = xFit,
-      yObserved = length(x) * binwidth * dnorm(xFit, mean = mean(x, na.rm = TRUE), sd = stats::sd(x, na.rm = TRUE)),
-      yEstimated = length(x) * binwidth * dnorm(xFit, mean = 0, sd = etaBSV)
-    )
-    names(dataFit) <- c(etaName, "yObserved", "yEstimated")
-
-    etaPlot <- ggplot2::ggplot(
-      dataFit,
-      mapping = ggplot2::aes_string(x = paste0("`", etaName, "`"))
-    ) +
-      ggplot2::theme_light(base_size = 12) +
-      ggplot2::geom_histogram(
-        data = data, binwidth = binwidth,
-        color = "black", fill = "grey80"
-      ) +
-      ggplot2::geom_line(
-        mapping = ggplot2::aes_string(y = "yObserved"),
-        color = "dodgerblue", size = 1
-      ) +
-      ggplot2::geom_line(
-        mapping = ggplot2::aes_string(y = "yEstimated"),
-        color = "firebrick", size = 1
-      ) +
-      ggplot2::geom_vline(xintercept = mean(x, na.rm = TRUE), color = "dodgerblue", size = 1) +
-      ggplot2::geom_vline(xintercept = 0, color = "firebrick", size = 1) +
-      labs(x = etaDisplayName, y = "Count", caption = paste0("shrinkage: ", round(shrinkage, 1), "%"))
-
-    return(list(
-      plot = etaPlot,
-      mean = mean(x, na.rm = TRUE),
-      sd = stats::sd(x, na.rm = TRUE),
-      shrinkage = shrinkage
-    ))
-  }
-}
-
 #' @title time_profile
 #' @description Plot TIME vs DV
 #' @param data A data.frame of data
@@ -555,7 +388,9 @@ if (FALSE) {
 #'   meta_data_501,
 #'   data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"))
 #' )
-#' tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
+#' tp_data <- data_501 |>
+#' dplyr::mutate(BLQ = 0, LLOQ = 1) |>
+#' dplyr::filter(MDV==0)
 #'
 #' # Get the time profile plots
 #' tp_plots <- time_profile(tp_data, tp_meta)
@@ -574,7 +409,7 @@ if (FALSE) {
 #'
 time_profile <- function(data, meta_data = NULL, bins = 7) {
   # By default assumes usual Nonmem names and labels
-  meta_data <- meta_data %||% default_meta_data
+  meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
     c("time", "mdv", "dv", "blq", "lloq"),
     function(x) pull_name(x, meta_data),
@@ -588,7 +423,7 @@ time_profile <- function(data, meta_data = NULL, bins = 7) {
   categoricals <- meta_data |>
     filter(Name %in% pull_name("cat", meta_data))
 
-  tp_data <- map_cat_data(data, meta_data) |>
+  tp_data <- map_cat_data(fill_nonmem_vars(data), meta_data) |>
     dplyr::filter(.data[[variable_names$mdv]] == 0)
 
   vpc_data_all <- vpc_summary(
@@ -699,7 +534,7 @@ time_profile <- function(data, meta_data = NULL, bins = 7) {
 #'
 tad_profile <- function(data, meta_data = NULL, bins = 7) {
   # By default assumes usual Nonmem names and labels
-  meta_data <- meta_data %||% default_meta_data
+  meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
     c("tad", "mdv", "dv", "blq", "lloq"),
     function(x) pull_name(x, meta_data),
@@ -713,7 +548,7 @@ tad_profile <- function(data, meta_data = NULL, bins = 7) {
   categoricals <- meta_data |>
     filter(Name %in% pull_name("cat", meta_data))
 
-  tp_data <- map_cat_data(data, meta_data) |>
+  tp_data <- map_cat_data(fill_nonmem_vars(data), meta_data) |>
     dplyr::filter(.data[[variable_names$mdv]] == 0)
 
   vpc_data_all <- vpc_summary(
@@ -794,74 +629,6 @@ tad_profile <- function(data, meta_data = NULL, bins = 7) {
   return(tp_plots)
 }
 
-#' @title base_tp_plot
-#' @description Base time profile plot
-#' @param data A data.frame of data
-#' @param vpc_data A data.frame of VPC data
-#' @param variable_names A list of variable names
-#' @param variable_labels A list of variable labels
-#' @param use_tad Logical, if `TRUE`, use TAD instead of time
-base_tp_plot <- function(data,
-                         vpc_data,
-                         variable_names,
-                         variable_labels,
-                         use_tad = FALSE) {
-  tp_plot <- ggplot(
-    data = data |> filter(.data[[variable_names$blq]] <= 0),
-    mapping = aes(x = .data[[variable_names[[ifelse(use_tad, "tad", "time")]]]])
-  ) +
-    theme_bw() +
-    theme(legend.position = "top", legend.direction = "vertical") +
-    geom_rug(
-      data = data |> filter(.data[[variable_names$blq]] > 0),
-      mapping = aes(y = .data[[variable_names$lloq]], text = tooltip_text(.data, names(data)))
-    ) +
-    geom_point(mapping = aes(y = .data[[variable_names$dv]], text = tooltip_text(.data, names(data)), color = "Observed")) +
-    geom_line(
-      data = vpc_data,
-      mapping = aes(
-        x = x, y = ymin,
-        text = tooltip_text(.data, names(vpc_data)),
-        group = "Median [5th-95th] Percentile",
-        color = "Median [5th-95th] Percentile"
-      ),
-      linewidth = 0.75
-    ) +
-    geom_line(
-      data = vpc_data,
-      mapping = aes(
-        x = x, y = ymax,
-        text = tooltip_text(.data, names(vpc_data)),
-        group = "Median [5th-95th] Percentile",
-        color = "Median [5th-95th] Percentile"
-      ),
-      linewidth = 0.75
-    ) +
-    geom_line(
-      data = vpc_data,
-      mapping = aes(
-        x = x, y = y,
-        text = tooltip_text(.data, names(vpc_data)),
-        group = "Median [5th-95th] Percentile",
-        color = "Median [5th-95th] Percentile"
-      ),
-      linewidth = 0.75
-    ) +
-    labs(
-      x = variable_labels[[ifelse(use_tad, "tad", "time")]],
-      y = variable_labels$dv,
-      color = NULL
-    ) +
-    scale_color_manual(
-      values = c(
-        "Observed" = "grey30",
-        "Median [5th-95th] Percentile" = "royalblue"
-      )
-    )
-  return(tp_plot)
-}
-
-
 #' @title vpc_plots
 #' @description
 #' Generate VPC plots for a given dataset.
@@ -909,129 +676,161 @@ vpc_plots <- function(data, meta_data, x = "TAD", bins = 7, ci = 0.8, lloq = 10)
   return(vpc_plots_all)
 }
 
-
-#' @title base_vpc_plot
-#' @description Base vpc plot
+#' @title ind_time_profiles
+#' @description Plot DV, PRED and IPRED vs TIME
 #' @param data A data.frame of data
-#' @param vpc_data A data.frame of VPC data
-#' @param variable_labels A list of variable labels
-#' @param ci Confidence interval for the VPC plot
-#' @param type Type of VPC plot, one of `"vpc"`, `"pc_vpc"`, `"pvc_vpc"`, `"blq"`, `"npde"`
-#' @return A ggplot object
+#' @param meta_data A data.frame of meta data
+#' @param n_rows Number of rows in the plot grid, default is 2
+#' @param n_cols Number of columns in the plot grid, default is 3
 #' @export
-base_vpc_plot <- function(data,
-                          vpc_data,
-                          variable_labels,
-                          ci = 0.8,
-                          type = "vpc") {
-  obs_var <- switch(type,
-    "vpc" = "obs_",
-    "pc_vpc" = "pc_obs_",
-    "pvc_vpc" = "pvc_obs_",
-    "blq" = "blq_obs_",
-    "npde" = "npde_obs_"
+#' @examples
+#'
+#' # Simulate 1-compartment model
+#' pk_data <- data_501 |>
+#' dplyr::mutate(CL = 2, V = 40)
+#' ind_time_profiles(pk_data, meta_data_501)
+#'
+ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
+  # By default assumes usual Nonmem names and labels
+  meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
+  variable_names <- sapply(
+    c("id", "time", "mdv", "dv", "blq", "lloq"),
+    function(x) pull_name(x, meta_data),
+    USE.NAMES = TRUE, simplify = FALSE
   )
-  sim_var <- switch(type,
-    "vpc" = "dv_",
-    "pc_vpc" = "pc_dv_",
-    "pvc_vpc" = "pvc_dv_",
-    "blq" = "blq_dv_",
-    "npde" = "npde_dv_"
+  variable_labels <- sapply(
+    variable_names,
+    function(x) pull_label(x, meta_data),
+    USE.NAMES = TRUE, simplify = FALSE
   )
-  obs_legend <- paste0("Observed Median, ", 50 * (1 - ci), "th and ", 50 * (1 + ci), "th Percentiles")
-  sim_legend <- paste0("Simulated Median, ", 50 * (1 - ci), "th and ", 50 * (1 + ci), "th Percentiles")
-  y_lab <- switch(type,
-    "vpc" = variable_labels$y,
-    "pc_vpc" = paste0("Prediction-corrected\n", variable_labels$y),
-    "pvc_vpc" = paste0("Prediction-variability-corrected\n", variable_labels$y),
-    "blq" = "Percent BLQ [%]",
-    "npde" = "NPDE"
-  )
+  sim_data <- simulate_pk(data)
+  tp_data <- fill_nonmem_vars(data) |>
+    dplyr::filter(.data[[variable_names$mdv]] == 0)
 
-  if (type %in% "blq") {
-    tp_plot <- ggplot(data = vpc_data, mapping = aes(x = time_med_med)) +
+  unique_ids <- unique(tp_data[[variable_names$id]])
+  n_plots <- ceiling(length(unique_ids)/(n_rows*n_cols))
+  all_plots <- list()
+  for(plot_index in seq_len(n_plots)){
+    selected_indices <- seq(
+      (plot_index - 1) * n_rows * n_cols + 1,
+      min(plot_index * n_rows * n_cols, length(unique_ids))
+    )
+    selected_ids <- unique_ids[selected_indices]
+
+    all_plots[[plot_index]] <- ggplot(
+      data = tp_data |>
+        dplyr::filter(
+          .data[[variable_names$blq]] <= 0,
+          .data[[variable_names$id]] %in% selected_ids
+          ),
+      mapping = aes(x = .data[[variable_names$time]])
+    ) +
       theme_bw() +
-      theme(legend.position = "top", legend.direction = "vertical") +
-      geom_ribbon(
-        aes(
-          ymin = .data[[paste0(sim_var, "min_min")]],
-          ymax = .data[[paste0(sim_var, "min_max")]],
-          fill = sim_legend
-        ),
-        alpha = 0.6
+      theme(legend.position = "top", legend.direction = "horizontal") +
+      geom_rug(
+        data = tp_data |>
+          dplyr::filter(
+            .data[[variable_names$blq]] > 0,
+            .data[[variable_names$id]] %in% selected_ids
+            ),
+        mapping = aes(x = .data[[variable_names$lloq]], IPRED, text = tooltip_text(.data, names(data)))
       ) +
-      geom_ribbon(
-        aes(
-          ymin = .data[[paste0(sim_var, "max_min")]],
-          ymax = .data[[paste0(sim_var, "max_max")]],
-          fill = sim_legend
-        ),
-        alpha = 0.6
+      geom_line(
+        data = sim_data |> filter(ID %in% selected_ids),
+        mapping = aes(x = TIME, y = DV, text = tooltip_text(.data, names(sim_data)), group = ID, color = "Individual")
       ) +
-      geom_ribbon(
-        aes(
-          ymin = .data[[paste0(sim_var, "med_min")]],
-          ymax = .data[[paste0(sim_var, "med_max")]],
-          fill = sim_legend
-        ),
-        alpha = 0.6
+      geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, names(tp_data)), color = "Population")) +
+      geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, names(tp_data)), color = "Individual")) +
+      geom_point(mapping = aes(y = .data[[variable_names$dv]], text = tooltip_text(.data, names(tp_data)), color = "Observed")) +
+      labs(x = variable_labels$time, y = variable_labels$dv, color = NULL) +
+      scale_color_manual(
+        values = c("Observed" = "black", "Population" = "royalblue", "Individual" = "firebrick")
       ) +
-      geom_line(aes(y = .data[[paste0(sim_var, "min_med")]], color = sim_legend)) +
-      geom_line(aes(y = .data[[paste0(sim_var, "max_med")]], color = sim_legend)) +
-      geom_line(aes(y = .data[[paste0(sim_var, "med_med")]], color = sim_legend)) +
-      geom_line(aes(y = .data[[paste0(obs_var, "min_med")]], color = obs_legend)) +
-      geom_line(aes(y = .data[[paste0(obs_var, "max_med")]], color = obs_legend)) +
-      geom_line(aes(y = .data[[paste0(obs_var, "med_med")]], color = obs_legend)) +
-      scale_color_manual(breaks = c(obs_legend, sim_legend), values = c("royalblue", "firebrick")) +
-      scale_fill_manual(breaks = sim_legend, values = "tomato") +
-      guides(fill = "none", alpha = "none") +
-      labs(x = variable_labels$x, y = y_lab, color = NULL)
-
-    return(tp_plot)
+      facet_wrap(
+        as.formula(paste0("~", variable_names$id)),
+        nrow = n_rows, ncol = n_cols, scales = "free"
+      )
   }
 
-  tp_plot <- ggplot(data = vpc_data, mapping = aes(x = time_med_med)) +
-    theme_bw() +
-    theme(legend.position = "top", legend.direction = "vertical") +
-    geom_point(
-      data = data,
-      mapping = aes(
-        y = .data[[paste0(obs_var, "med_med")]],
-        alpha = ifelse(blq_obs_med_med > 0, 0.6, 1)
+  return(all_plots)
+}
+
+
+#' @title ind_tad_profiles
+#' @description Plot DV, PRED and IPRED vs TAD
+#' @param data A data.frame of data
+#' @param meta_data A data.frame of meta data
+#' @param n_rows Number of rows in the plot grid, default is 2
+#' @param n_cols Number of columns in the plot grid, default is 3
+#' @export
+#' @examples
+#'
+#' # Simulate 1-compartment model
+#' pk_data <- data_501 |>
+#' dplyr::mutate(CL = 2, V = 40)
+#' ind_tad_profiles(pk_data, meta_data_501)
+#'
+ind_tad_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
+  # By default assumes usual Nonmem names and labels
+  meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
+  variable_names <- sapply(
+    c("id", "tad", "mdv", "dv", "blq", "lloq"),
+    function(x) pull_name(x, meta_data),
+    USE.NAMES = TRUE, simplify = FALSE
+  )
+  variable_labels <- sapply(
+    variable_names,
+    function(x) pull_label(x, meta_data),
+    USE.NAMES = TRUE, simplify = FALSE
+  )
+  sim_data <- simulate_pk(data)
+  tp_data <- fill_nonmem_vars(data) |>
+    dplyr::filter(.data[[variable_names$mdv]] == 0)
+
+  unique_ids <- unique(tp_data[[variable_names$id]])
+  n_plots <- ceiling(length(unique_ids)/(n_rows*n_cols))
+  all_plots <- list()
+  for(plot_index in seq_len(n_plots)){
+    selected_indices <- seq(
+      (plot_index - 1) * n_rows * n_cols + 1,
+      min(plot_index * n_rows * n_cols, length(unique_ids))
+    )
+    selected_ids <- unique_ids[selected_indices]
+
+    all_plots[[plot_index]] <- ggplot(
+      data = tp_data |>
+        dplyr::filter(
+          .data[[variable_names$blq]] <= 0,
+          .data[[variable_names$id]] %in% selected_ids
+        ),
+      mapping = aes(x = .data[[variable_names$tad]])
+    ) +
+      theme_bw() +
+      theme(legend.position = "top", legend.direction = "horizontal") +
+      geom_rug(
+        data = tp_data |>
+          dplyr::filter(
+            .data[[variable_names$blq]] > 0,
+            .data[[variable_names$id]] %in% selected_ids
+          ),
+        mapping = aes(x = .data[[variable_names$lloq]], IPRED, text = tooltip_text(.data, names(data)))
+      ) +
+      geom_line(
+        data = sim_data |> filter(ID %in% selected_ids),
+        mapping = aes(x = tad, y = DV, text = tooltip_text(.data, names(sim_data)), group = ID, color = "Individual")
+      ) +
+      geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, names(tp_data)), color = "Population")) +
+      geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, names(tp_data)), color = "Individual")) +
+      geom_point(mapping = aes(y = .data[[variable_names$dv]], text = tooltip_text(.data, names(tp_data)), color = "Observed")) +
+      labs(x = variable_labels$tad, y = variable_labels$dv, color = NULL) +
+      scale_color_manual(
+        values = c("Observed" = "black", "Population" = "royalblue", "Individual" = "firebrick")
+      ) +
+      facet_wrap(
+        as.formula(paste0("~", variable_names$id)),
+        nrow = n_rows, ncol = n_cols, scales = "free"
       )
-    ) +
-    geom_ribbon(
-      aes(
-        ymin = .data[[paste0(sim_var, "min_min")]],
-        ymax = .data[[paste0(sim_var, "min_max")]],
-        fill = sim_legend
-      ),
-      alpha = 0.6
-    ) +
-    geom_ribbon(
-      aes(
-        ymin = .data[[paste0(sim_var, "max_min")]],
-        ymax = .data[[paste0(sim_var, "max_max")]],
-        fill = sim_legend
-      ),
-      alpha = 0.6
-    ) +
-    geom_ribbon(
-      aes(
-        ymin = .data[[paste0(sim_var, "med_min")]],
-        ymax = .data[[paste0(sim_var, "med_max")]],
-        fill = sim_legend
-      ),
-      alpha = 0.6
-    ) +
-    geom_line(aes(y = .data[[paste0(sim_var, "min_med")]], color = sim_legend)) +
-    geom_line(aes(y = .data[[paste0(sim_var, "max_med")]], color = sim_legend)) +
-    geom_line(aes(y = .data[[paste0(sim_var, "med_med")]], color = sim_legend)) +
-    geom_line(aes(y = .data[[paste0(obs_var, "min_med")]], color = obs_legend)) +
-    geom_line(aes(y = .data[[paste0(obs_var, "max_med")]], color = obs_legend)) +
-    geom_line(aes(y = .data[[paste0(obs_var, "med_med")]], color = obs_legend)) +
-    scale_color_manual(breaks = c(obs_legend, sim_legend), values = c("royalblue", "firebrick")) +
-    scale_fill_manual(breaks = sim_legend, values = "tomato") +
-    guides(fill = "none", alpha = "none") +
-    labs(x = variable_labels$x, y = y_lab, color = NULL)
+  }
+
+  return(all_plots)
 }

@@ -23,7 +23,9 @@ tp_meta <- dplyr::bind_rows(
   meta_data_501,
   data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"))
 )
-tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
+tp_data <- data_501 |>
+dplyr::mutate(BLQ = 0, LLOQ = 1) |>
+dplyr::filter(MDV==0)
 
 # Get the time profile plots
 tp_plots <- time_profile(tp_data, tp_meta)

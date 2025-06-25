@@ -3,7 +3,6 @@ library(tidyverse)
 library(shiny)
 library(shinyWidgets)
 library(bslib, warn.conflicts = FALSE)
-library(pmplots)
 library(plotly, warn.conflicts = FALSE)
 
 add_col <- function(data, col_name) {
@@ -168,11 +167,14 @@ ui <- page_navbar(
             tagList(
               sliderInput("ind_page", span(icon("timeline"), "Page"), min = 1, value = 1, max = 1, step = 1),
               sliderInput("ind_rows", span(icon("layer-group"), " Rows per page"), min = 1, max = 5, value = 2, step = 1),
-              sliderInput("ind_cols", span(icon("layer-group"), " Columns per page"), min = 1, max = 5, value = 3, step = 1)
+              sliderInput("ind_cols", span(icon("layer-group"), " Columns per page"), min = 1, max = 5, value = 3, step = 1),
+              pickerInput("ind_scale_y", span(icon("ruler"), " Y-axis scale"), choices = c("linear", "log"), selected = "Linear")
             )
           )
         ),
-        card_body(plotOutput("time_profile"))
+        card_body(addSpinner(
+          fluidPage(plotlyOutput("time_profile"), spin = "fading-circle"))
+          )
       )
     )
   )
@@ -226,6 +228,15 @@ server <- function(input, output, session) {
       mutate(LLOQ = 10)
     return(data)
   })
+  get_tp_plots <- reactive({
+    ind_time_profiles(
+      get_data(),
+      get_meta_data(),
+      n_rows = input$ind_rows,
+      n_cols = input$ind_cols
+    )
+  })
+  # |> bindEvent(get_data(), get_meta_data(), input$ind_rows, input$ind_cols)
 
   enough_data <- reactive({
     !any(is.null(get_data()), is.null(get_meta_data()))
@@ -307,15 +318,18 @@ server <- function(input, output, session) {
     ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
   })
 
-  output$time_profile <- renderPlot({
-    p <- dv_pred_ipred(
-      get_data() |> filter(MDV == 0),
-      # facets = "ID", TODO: could be changed according to meta
-      id_per_plot = input$ind_rows * input$ind_cols,
-      nrow = input$ind_rows,
-      ncol = input$ind_cols
-    )
-    return(p[[input$ind_page]])
+  output$time_profile <- renderPlotly({
+    p <- get_tp_plots()
+    p <- ggplotly(p[[input$ind_page]], dynamicTicks = TRUE, tooltip = "text")
+    if (input$ind_scale_y %in% "linear") {
+      return(p)
+    }
+    n_plots <- input$ind_rows*input$ind_cols
+    p$x$layout$yaxis$type <- "log"
+    for(plot_index in seq_len(n_plots)) {
+      p$x$layout[[paste0("yaxis", plot_index)]]$type <- "log"
+    }
+    return(p)
   })
 
   #---- Downloads ----

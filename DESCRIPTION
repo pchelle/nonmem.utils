@@ -16,6 +16,7 @@ Imports:
     GGally,
     ggplot2,
     jsonlite,
+    mrgsolve,
     plotly,
     readr,
     rmarkdown,
