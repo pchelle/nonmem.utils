@@ -1,0 +1,93 @@
+---
+title: "GOF Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GOF Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+# library(nonmem.utils)
+```
+
+## Preamble
+
+Goodness-of-fit (GOF) analysis is a key diagnostic tool used to evaluate how well a PopPK model describes the observed data. 
+It helps determine whether the model is appropriate, reliable, and suitable for prediction
+
+To perform such analysis, Nonmem result file (e.g. `.tab` file) must include usual Nonmem variables such as `PRED`, `IPRED`, `CWRES` and `NPDE`.
+
+Such variables do not need to defined in the meta data dictionary as `PRED` and `IPRED` will use the `dv` type for labelling.
+
+
+## Interactive analysis
+
+To analyse interactively Nonmem results you can use the shiny app below:
+
+```
+nonmem.utils::run_shiny("gof-analysis")
+```
+
+## Quarto Report
+
+To create a docx report of the GOF analysis you can use the quarto based function below:
+
+```
+nonmem.utils::report_gof_analysis(
+data_path = "my/dataset.tab", 
+meta_data_path = "my/dictionary.csv"
+)
+```
+
+## Available analyses
+
+### Observed vs predicted
+
+The function `dv_preds()` plots observed vs individual and population predictions in both linear and log scales.
+
+```r
+dv_preds()
+```
+
+### Residuals
+
+To assess residual distributions, 3 functions are available: `residual_hist()`, `residual_qq()` and `residual_plot()`.
+
+- The function `residual_hist()` plots histogram of residuals
+
+```r
+residual_hist()
+```
+
+- The function `residual_qq()` perform QQ-plots of residuals
+
+```r
+residual_qq()
+```
+
+- The function `residual_plot()` plots residuals vs another variable to analyze potential trends
+
+```r
+residual_plot()
+```
+
+### Individual time profiles
+
+To review individual time profiles, the functions `ind_time_profiles()` and `ind_tad_profiles()` can be used:
+
+```r
+ind_time_profiles()
+```
+
+```r
+ind_tad_profiles()
+```
+

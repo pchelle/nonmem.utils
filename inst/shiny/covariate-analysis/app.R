@@ -6,12 +6,6 @@ library(bslib, warn.conflicts = FALSE)
 library(plotly, warn.conflicts = FALSE)
 library(GGally)
 
-get_field <- function(data, field_name, type_name) {
-  data |>
-    filter(Type %in% type_name) |>
-    pull(field_name)
-}
-
 #---- UI ----
 ui <- page_navbar(
   title = span(icon("database"), " Covariate Analysis"),
@@ -206,14 +200,14 @@ server <- function(input, output, session) {
       session = session,
       "select_eta",
       choices = all_etas$Name,
-      selected = first(all_etas$Name),
+      selected = all_etas$Name,
       choicesOpt = list(subtext = all_etas$Label)
     )
     updatePickerInput(
       session = session,
       "select_eta_cov",
       choices = all_etas$Name,
-      selected = first(all_etas$Name),
+      selected = all_etas$Name,
       choicesOpt = list(subtext = all_etas$Label)
     )
 

@@ -83,7 +83,7 @@ ui <- page_navbar(
         card_header(
           popover(
             span(icon("gear"), "Settings"),
-            tagList(
+            fluidPage(
               pickerInput("select_time", span(icon("timeline"), "Time Variable"), multiple = FALSE, choices = NA),
               sliderInput("bins", span(icon("layer-group"), " Number of bins"), min = 1, max = 20, value = 5),
               pickerInput("y_scale", span(icon("ruler"), " Scale"), choices = c("Linear", "Log", "Percent BLQ")),
@@ -108,11 +108,27 @@ ui <- page_navbar(
         card_body(plotlyOutput("fig_cov"))
       )
     ),
-    #---- Covariates ----
+    #---- Categoricals ----
     nav_panel(
-      title = "Covariates",
+      title = "Categoricals",
       icon = icon("box-archive"),
       card(full_screen = TRUE, DT::DTOutput("cov_cor_table"))
+    ),
+    #---- Data Inventory ----
+    nav_panel(
+      title = "Data Inventory",
+      icon = icon("box-archive"),
+      card(
+        full_screen = TRUE,
+        card_header(
+          popover(
+            span(icon("gear"), "Settings"),
+            pickerInput("select_inv_cat", "Select Group", multiple = FALSE, choices = "All")
+          ),
+          p("Data inventory")
+        ),
+        card_body(DT::dataTableOutput("sum_data"))
+      )
     ),
     #---- Summary ----
     nav_panel(
@@ -223,6 +239,13 @@ server <- function(input, output, session) {
       choices = names(cov_inventory(get_data(), get_meta_data())),
       selected = "All"
     )
+
+    updatePickerInput(
+      session = session,
+      "select_inv_cat",
+      choices = names(data_inventory(get_data(), get_meta_data())),
+      selected = "All"
+    )
   })
 
   #---- Tables ----
@@ -239,6 +262,17 @@ server <- function(input, output, session) {
   })
   output$data_mapping <- DT::renderDataTable({
     get_meta_data() |> DT::datatable()
+  })
+  output$sum_data <- DT::renderDT({
+    if (!enough_data()) {
+      return()
+    }
+    inventories <- data_inventory(get_data(), get_meta_data())
+    inventory <- data.frame(
+      Parameter = names(inventories[[input$select_inv_cat]]),
+      Value = t(inventories[[input$select_inv_cat]])
+      )
+    return(DT::datatable(inventory, rownames = FALSE))
   })
   output$sum_cov <- DT::renderDT({
     if (!enough_data()) {
@@ -284,9 +318,6 @@ server <- function(input, output, session) {
 
   #---- Figures ----
   output$fig_cov <- renderPlotly({
-    print(input$select_cov)
-    print(pull_label(input$select_cov, get_meta_data()))
-    print(names(get_sum_data()))
     p <- ggpairs(
       map_cat_data(get_sum_data(), get_meta_data()),
       columns = input$select_cov,

@@ -19,17 +19,17 @@ Get a list of data.frames summarizing data
 }
 \examples{
 
-# Currently requires BLQ data
-inventory_meta <- dplyr::bind_rows(
-  meta_data_501,
-  data.frame(Name = "BLQ", Type = "blq", Label = "Below LLOQ")
-)
-inventory_data <- data_501 |> dplyr::mutate(BLQ = 0)
+all_inventories <- data_inventory(data_501, meta_data_501)
 
-all_inventories <- data_inventory(inventory_data, inventory_meta)
+# Since meta_data_501 identifies SEX as cat covariate
+# inventory has a field split by Sex categories
+names(all_inventories)
 
 all_inventories$All
 
 all_inventories$Sex
+
+# Transpose data.frame
+t(all_inventories$All)
 
 }

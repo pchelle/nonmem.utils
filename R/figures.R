@@ -6,11 +6,14 @@
 #' @import GGally
 eta_plot <- function(data, meta_data = NULL) {
   id_variable <- pull_name("id", meta_data)
-  etas <- meta_data |>
-    filter(Name %in% pull_name("eta", meta_data))
-  categoricals <- meta_data |>
-    filter(Name %in% pull_name("cat", meta_data))
+  if(length(id_variable)==0) {
+    cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
+    return()
+  }
+  etas <- meta_data |> filter(Name %in% pull_name("eta", meta_data))
+  categoricals <- meta_data |> filter(Name %in% pull_name("cat", meta_data))
   if (nrow(etas) == 0) {
+    cli::cli_alert_danger("No {.strong eta} variable found in {.emph meta_data}")
     return(ggplot())
   }
   sum_data <- data |>
@@ -58,13 +61,15 @@ eta_plot <- function(data, meta_data = NULL) {
 #' @import GGally
 eta_cov_plot <- function(data, meta_data = NULL) {
   id_variable <- pull_name("id", meta_data)
-  etas <- meta_data |>
-    filter(Name %in% pull_name("eta", meta_data))
-  covariates <- meta_data |>
-    filter(Name %in% pull_name("cov", meta_data))
-  categoricals <- meta_data |>
-    filter(Name %in% pull_name("cat", meta_data))
+  if(length(id_variable)==0) {
+    cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
+    return()
+  }
+  etas <- meta_data |> filter(Name %in% pull_name("eta", meta_data))
+  covariates <- meta_data |> filter(Name %in% pull_name("cov", meta_data))
+  categoricals <- meta_data |> filter(Name %in% pull_name("cat", meta_data))
   if (nrow(etas) == 0) {
+    cli::cli_alert_danger("No {.strong eta} variable found in {.emph meta_data}")
     return(ggplot())
   }
   sum_data <- data |>
@@ -140,11 +145,14 @@ eta_cov_plot <- function(data, meta_data = NULL) {
 #'
 cov_plot <- function(data, meta_data = NULL) {
   id_variable <- pull_name("id", meta_data)
-  covariates <- meta_data |>
-    filter(Name %in% pull_name("cov", meta_data))
-  categoricals <- meta_data |>
-    filter(Name %in% pull_name("cat", meta_data))
+  if(length(id_variable)==0) {
+    cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
+    return()
+  }
+  covariates <- meta_data |> filter(Name %in% pull_name("cov", meta_data))
+  categoricals <- meta_data |> filter(Name %in% pull_name("cat", meta_data))
   if (nrow(covariates) + nrow(categoricals) == 0) {
+    cli::cli_alert_danger("No {.strong cov} nor {.strong cat} variable found in {.emph meta_data}")
     return(ggplot())
   }
   sum_data <- data |>
@@ -186,6 +194,7 @@ cov_plot <- function(data, meta_data = NULL) {
 #' @export
 dv_preds <- function(data, meta_data = NULL) {
   # By default assumes usual Nonmem names and labels
+  # TODO
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
     c("mdv", "dv", "blq", "lloq"),
@@ -267,7 +276,7 @@ residual_plot <- function(x_type = "time", y_type = "cwres", data, meta_data = N
   variable_labels$pred <- paste("Population Predictions of", variable_labels$dv)
   variable_labels$ipred <- paste("Individual Predictions of", variable_labels$dv)
 
-  res_data <- data |>
+  res_data <- fill_nonmem_vars(data) |>
     dplyr::filter(
       .data[[variable_names$mdv]] == 0,
       .data[[variable_names$blq]] <= 0
@@ -277,14 +286,12 @@ residual_plot <- function(x_type = "time", y_type = "cwres", data, meta_data = N
     data = res_data,
     mapping = aes(
       x = .data[[variable_names[[x_type]]]],
-      y = .data[[toupper(y_type)]]
+      y = .data[[toupper(y_type)]],
+      text = tooltip_text(.data, names(res_data))
     )
   ) +
     theme_bw() +
-    geom_point(
-      mapping = aes(text = tooltip_text(.data, names(res_data))),
-      color = "grey30"
-    ) +
+    geom_point(color = "grey30") +
     geom_smooth(formula = y ~ x, method = "loess", se = FALSE, color = "royalblue") +
     geom_hline(yintercept = 0, linetype = "dashed") +
     labs(
@@ -314,7 +321,7 @@ residual_qq <- function(y_type = "cwres", data, meta_data = NULL) {
     function(x) pull_label(x, meta_data),
     USE.NAMES = TRUE, simplify = FALSE
   )
-  res_data <- data |>
+  res_data <- fill_nonmem_vars(data) |>
     dplyr::filter(
       .data[[variable_names$mdv]] == 0,
       .data[[variable_names$blq]] <= 0
@@ -353,7 +360,7 @@ residual_hist <- function(y_type = "cwres", data, meta_data = NULL) {
     USE.NAMES = TRUE, simplify = FALSE
   )
 
-  res_data <- data |>
+  res_data <- fill_nonmem_vars(data) |>
     dplyr::filter(
       .data[[variable_names$mdv]] == 0,
       .data[[variable_names$blq]] <= 0

@@ -1,3 +1,26 @@
+#' @title dictionary_check
+#' @description
+#' Check if consistency between `data` and `meta_data`
+#' @param data A data.frame of the pk data
+#' @param meta_data A data.frame of meta data
+#' @return A data.frame with the meta data variables filled in
+#' @export
+dictionary_check <- function(data, meta_data){
+  data_names <- names(data)
+  #meta_data$Name
+  # Check if all meta data variables are present in the data
+  meta_not_in_data <- setdiff(meta_data$Name, data_names)
+  if(length(meta_not_in_data)>0){
+    cli::cli_alert_warning("{.emph meta_data} variable Names not found in {.emph data}: {.val {meta_not_in_data}}")
+  }
+  # Check if all data variables are present in the meta_data
+  data_not_in_meta <- setdiff(data_names, meta_data$Name)
+  if(length(data_not_in_meta)>0){
+    cli::cli_alert_warning("{.emph data} variables not found in {.emph meta_data} Names: {.val {data_not_in_meta}}")
+  }
+  return(invisible())
+}
+
 #' @title fill_meta_vars
 #' @description
 #' Fill required meta data types and variables
@@ -85,6 +108,10 @@ fill_nonmem_vars <- function(data, lloq = 10, group = "All") {
   }
   if (isFALSE("ID" %in% data_names)) {
     data$ID <- data$CID
+  }
+  # AMT
+  if (isFALSE("AMT" %in% data_names)) {
+    data$AMT <- 0
   }
   # EVID
   if (isFALSE("EVID" %in% data_names)) {
@@ -268,5 +295,4 @@ map_cat_data <- function(data, meta_data) {
 }
 
 # TODO: create help to compute time after dose, predose, etc.
-# get_tad <- function(){}
 # get_predose <- function(){}

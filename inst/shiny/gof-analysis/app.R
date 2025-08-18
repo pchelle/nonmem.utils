@@ -10,6 +10,8 @@ add_col <- function(data, col_name) {
   return(data)
 }
 
+#TODO: add a setting to split by categorical or color by covariate
+
 #---- UI ----
 ui <- page_navbar(
   title = span(icon("bullseye"), " Model Fit"),
@@ -172,9 +174,7 @@ ui <- page_navbar(
             )
           )
         ),
-        card_body(addSpinner(
-          fluidPage(plotlyOutput("time_profile"), spin = "fading-circle"))
-          )
+        card_body(plotlyOutput("time_profile"), spin = "fading-circle") #addSpinner()
       )
     )
   )

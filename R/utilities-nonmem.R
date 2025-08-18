@@ -13,9 +13,11 @@ simulate_pk <- function(data){
   data_names <- names(data)
   # Load appropriate model from available variable names
   model_file <- ifelse(
-    "V3" %in% data_names,
-    "3cmt.cpp",
-    ifelse("V2" %in% data_names, "2cmt.cpp", "1cmt.cpp")
+    "V3" %in% data_names, "3cmt.cpp",
+    ifelse(
+      "V2" %in% data_names, "2cmt.cpp",
+      ifelse("KA" %in% data_names, "1cmt-abs.cpp", "1cmt.cpp")
+    )
     )
   pk_model <- mrgsolve::mread(system.file("models", model_file, package = "nonmem.utils"), quiet = TRUE)
   #mrgsolve does not support EVID=3 or 4

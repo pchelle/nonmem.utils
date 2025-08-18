@@ -16,12 +16,15 @@
 #'
 cov_cor <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
-  covariates <- meta_data |>
-    filter(Name %in% pull_name("cov", meta_data))
-  categoricals <- meta_data |>
-    filter(Name %in% pull_name("cat", meta_data))
+  if(length(id_variable)==0) {
+    cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
+    return()
+  }
+  covariates <- meta_data |> filter(Name %in% pull_name("cov", meta_data))
+  categoricals <- meta_data |> filter(Name %in% pull_name("cat", meta_data))
   if (nrow(covariates) + nrow(categoricals) == 0) {
-    return(data.frame())
+    cli::cli_alert_danger("No {.strong cov} nor {.strong cat} variable found in {.emph meta_data}")
+    return()
   }
   sum_data <- data |>
     group_by(.data[[id_variable]]) |>
@@ -69,14 +72,16 @@ cov_cor <- function(data, meta_data) {
 #' @export
 eta_cor <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
-  etas <- meta_data |>
-    filter(Name %in% pull_name("eta", meta_data))
-  covariates <- meta_data |>
-    filter(Name %in% pull_name("cov", meta_data))
-  categoricals <- meta_data |>
-    filter(Name %in% pull_name("cat", meta_data))
+  if(length(id_variable)==0) {
+    cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
+    return()
+  }
+  etas <- meta_data |> filter(Name %in% pull_name("eta", meta_data))
+  covariates <- meta_data |> filter(Name %in% pull_name("cov", meta_data))
+  categoricals <- meta_data |> filter(Name %in% pull_name("cat", meta_data))
   if (nrow(etas) == 0) {
-    return(data.frame())
+    cli::cli_alert_danger("No {.strong eta} variable found in {.emph meta_data}")
+    return()
   }
   sum_data <- data |>
     group_by(.data[[id_variable]]) |>
@@ -112,22 +117,22 @@ eta_cor <- function(data, meta_data) {
 #' @import dplyr
 #' @examples
 #'
-#' # Currently requires BLQ data
-#' inventory_meta <- dplyr::bind_rows(
-#'   meta_data_501,
-#'   data.frame(Name = "BLQ", Type = "blq", Label = "Below LLOQ")
-#' )
-#' inventory_data <- data_501 |> dplyr::mutate(BLQ = 0)
+#' all_inventories <- data_inventory(data_501, meta_data_501)
 #'
-#' all_inventories <- data_inventory(inventory_data, inventory_meta)
+#' # Since meta_data_501 identifies SEX as cat covariate
+#' # inventory has a field split by Sex categories
+#' names(all_inventories)
 #'
 #' all_inventories$All
 #'
 #' all_inventories$Sex
 #'
+#' # Transpose data.frame
+#' t(all_inventories$All)
+#'
 data_inventory <- function(data, meta_data) {
   variable_names <- sapply(
-    c("id", "occ", "mdv", "amt", "dv", "blq", "cat"),
+    c("id", "occ", "mdv", "evid", "amt", "dv", "blq", "cat"),
     function(x) pull_name(x, meta_data),
     USE.NAMES = TRUE, simplify = FALSE
   )
@@ -136,15 +141,34 @@ data_inventory <- function(data, meta_data) {
     function(x) pull_label(x, meta_data),
     USE.NAMES = TRUE, simplify = FALSE
   )
+  # Handle no occasion variable
+  if(length(variable_names$occ)==0){
+    variable_names$occ <- variable_names$id
+    variable_labels$occ <- variable_labels$id
+  }
+  # Handle evid/amt
+  use_amt <- length(variable_names$evid) == 0
+  if(use_amt){
+    variable_names$evid <- "EVID"
+    data$EVID <- ifelse(is.na(data$AMT), 0, as.numeric(data$AMT>0))
+  }
+
+  # Handle no blq variable
+  no_blq <- length(variable_names$blq) == 0
+  if(no_blq){
+    variable_names$blq <- "BLQ"
+    data$BLQ <- 0
+  }
+
   # Summarize total number of subjects, pk studies, doses, observations and blq ratio
   # Summarize per number of subjects: pk studies, doses and observations
   # Summarize per number of pk study: doses and observations
-  data_inventory_total <- fill_nonmem_vars(data) |>
+  inventory_total <- fill_nonmem_vars(data) |>
     summarise(
       Subjects = n_distinct(.data[[variable_names$id]]),
       Studies = n_distinct(paste(.data[[variable_names$id]], .data[[variable_names$occ]])),
-      Doses = sum(.data[[variable_names$amt]] > 0, na.rm = TRUE),
-      Observations = sum(.data[[variable_names$mdv]] > 0, na.rm = TRUE),
+      Doses = sum(.data[[variable_names$evid]] %in% c(1,4)),
+      Observations = sum(.data[[variable_names$mdv]] == 0, na.rm = TRUE),
       `Percent BLQ` = round(100 * sum(.data[[variable_names$blq]] > 0, na.rm = TRUE) / sum(.data[[variable_names$mdv]] > 0, na.rm = TRUE), 2),
     ) |>
     mutate(
@@ -154,22 +178,25 @@ data_inventory <- function(data, meta_data) {
       `Observations per Subject` = round(Observations / Subjects, 2),
       `Observations per Study` = round(Observations / Studies, 2)
     )
+  if(no_blq){
+    inventory_total <- inventory_total |> select(-`Percent BLQ`)
+  }
 
   # if meta data includes source type data
   # Perform same inventory grouped by source
   if (length(variable_names$cat) == 0) {
-    return(list(All = data_inventory_total))
+    return(list(All = inventory_total))
   }
-  data_inventory_by_source <- sapply(
+  inventory_across_cat <- sapply(
     variable_names$cat,
     function(cat_name) {
-      map_cat_data(data, meta_data) |>
+      inventory_by_cat <- map_cat_data(data, meta_data) |>
         group_by(.data[[cat_name]]) |>
         summarise(
           Subjects = n_distinct(.data[[variable_names$id]]),
           Studies = n_distinct(paste(.data[[variable_names$id]], .data[[variable_names$occ]])),
-          Doses = sum(.data[[variable_names$amt]] > 0, na.rm = TRUE),
-          Observations = sum(.data[[variable_names$mdv]] > 0, na.rm = TRUE),
+          Doses = sum(.data[[variable_names$evid]] %in% c(1,4)),
+          Observations = sum(.data[[variable_names$mdv]] == 0, na.rm = TRUE),
           `Percent BLQ` = round(100 * sum(.data[[variable_names$blq]] > 0, na.rm = TRUE) / sum(.data[[variable_names$mdv]] > 0, na.rm = TRUE), 2),
         ) |>
         mutate(
@@ -179,12 +206,16 @@ data_inventory <- function(data, meta_data) {
           `Observations per Subject` = round(Observations / Subjects, 2),
           `Observations per Study` = round(Observations / Studies, 2)
         )
+      if(no_blq){
+        inventory_by_cat <- inventory_by_cat |> select(-`Percent BLQ`)
+      }
+      return(inventory_by_cat)
     },
     USE.NAMES = TRUE, simplify = FALSE
   )
-  names(data_inventory_by_source) <- variable_labels$cat
-  data_inventory <- c(data_inventory_by_source, list(All = data_inventory_total))
-  return(data_inventory)
+  names(inventory_across_cat) <- variable_labels$cat
+  final_inventory <- c(inventory_across_cat, list(All = inventory_total))
+  return(final_inventory)
 }
 
 #' @title cov_inventory
@@ -208,11 +239,16 @@ data_inventory <- function(data, meta_data) {
 #'
 cov_inventory <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
+  if(length(id_variable)==0) {
+    cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
+    return()
+  }
   covariates <- meta_data |>
     filter(Name %in% pull_name("cov", meta_data))
   categoricals <- meta_data |>
     filter(Name %in% pull_name("cat", meta_data))
   if (nrow(covariates) == 0) {
+    cli::cli_alert_danger("No {.strong cat} variable found in {.emph meta_data}")
     return()
   }
   sum_data <- fill_nonmem_vars(data) |>
@@ -299,9 +335,13 @@ cov_inventory <- function(data, meta_data) {
 #'
 cat_inventory <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
-  categoricals <- meta_data |>
-    filter(Name %in% pull_name("cat", meta_data))
+  if(length(id_variable)==0) {
+    cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
+    return()
+  }
+  categoricals <- meta_data |> filter(Name %in% pull_name("cat", meta_data))
   if (nrow(categoricals) == 0) {
+    cli::cli_alert_danger("No {.strong cat} variable found in {.emph meta_data}")
     return()
   }
   sum_data <- fill_nonmem_vars(data) |>
@@ -367,12 +407,8 @@ vpc_summary <- function(data, x, y, group = NULL, bins = 5, stairstep = FALSE, c
     group <- "group"
     data[[group]] <- ""
   }
-  time_bins <- unique(quantile(x = data[[x]], probs = seq(0, 1, length.out = bins + 1), na.rm = TRUE))
-  time_bins[1] <- floor(time_bins[1] * 100) / 100
-  time_bins[length(time_bins)] <- ceiling(time_bins[length(time_bins)] * 100) / 100
-
   vpc_data <- data |>
-    dplyr::mutate(bins = bin_values(.data[[x]])) |>
+    dplyr::mutate(bins = bin_values(.data[[x]], bins = bins)) |>
     tidyr::complete(bins, .data[[group]]) |>
     dplyr::group_by(bins, .data[[group]]) |>
     dplyr::summarise(

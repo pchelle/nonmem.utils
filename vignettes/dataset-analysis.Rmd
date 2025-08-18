@@ -1,0 +1,150 @@
+---
+title: "Dataset Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Dataset Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(nonmem.utils)
+```
+
+## Interactive analysis
+
+To analyse interactively a dataset you can use the shiny app below:
+
+```
+nonmem.utils::run_shiny("dataset-analysis")
+```
+
+## Quarto Report
+
+To create a docx report of the dataset analysis you can use the quarto based function below:
+
+```
+nonmem.utils::report_dataset_analysis(
+data_path = "my/dataset.csv", 
+meta_data_path = "my/dictionary.csv"
+)
+```
+
+## Available analyses
+
+### Inventories
+
+This section regroup 3 functions that aim at summarizing the available PK data: `data_inventory()`, `cov_inventory()` and `cat_inventory()`
+
+Data inventory mainly provides number PK studies (or occasions), patients, measurements and doses.
+
+The data inventory output is a named list of tables, including `"All"` for the summary table that use all the data.
+When `cat` variables are defined in the meta_data, the variable labels (`"Sex"` in the example below) are added to the list of tables.
+
+```{r}
+pk_summary <- data_inventory(data_501, meta_data_501)
+```
+
+You can also format the inventory to print them all in the same table
+
+```{r}
+#| results: 'asis'
+pk_summary <- data.frame(t(pk_summary$Sex), t(cbind(SEX = "All", pk_summary$All)))
+pk_header <- as.character(pk_summary[1, ])
+pk_summary <- tail(pk_summary, -1)
+names(pk_summary) <- pk_header
+knitr::kable(pk_summary)
+```
+
+Continuous covariate inventory provides summary statistics of the continuous covariates of the dataset.
+
+The covariate inventory output is a named list of tables, including `"All"` for the summary table that use all the data.
+When `cat` variables are defined in the meta_data, the variable labels (`"Sex"` in the example below) are added to the list of tables.
+
+```{r}
+pk_summary <- cov_inventory(data_501, meta_data_501)
+```
+
+Here is an example printing all the tables below each other:
+
+```{r}
+#| results: 'asis'
+for(summary_label in names(pk_summary)){
+  cat(summary_label)
+  cat("\n\n")
+  cat(knitr::kable(pk_summary[[summary_label]]), sep = "\n")
+  cat("\n\n")
+}
+```
+
+Categorical covariate inventory provides count and percent summary the categorical covariates of the dataset.
+
+The categorical covariate inventory output a table
+
+```{r}
+pk_summary <- cat_inventory(data_501, meta_data_501)
+knitr::kable(pk_summary)
+```
+
+### Time profiles
+
+The `time_profile()` and `tad_profile()` functions respectively plot the `dv` as a function of `time` and `tad`, along with median, 5th and 95th percentile profiles.
+
+Both functions include the `bins` argument that allows to define the number of bins for the median, 5th, 95th profiles.
+
+Both functions output a named list of plots, including `"All"` for plots that use all the data.
+When `cat` variables are defined in the meta_data, the variable names (`"SEX"` in the example below) are added to the list of plots.
+The corresponding plots will facet the time profiles by the cat variable labels.
+
+Each element of the list include a second named list: `"Linear"`, `"Log"` and `"Percent BLQ"` that will display the time profiles in linear scale, logarithmic scale or percent of BLQ values present in each bin.
+
+```{r}
+tp_plots <- time_profile(data_501, meta_data_501)
+```
+
+- Displaying time profiles in linear scale
+
+```{r}
+tp_plots$All$Linear
+```
+
+- Displaying time profiles in log scale scale
+
+```{r}
+tp_plots$All$Log
+```
+
+- Displaying time profiles by `"SEX"` in linear scale
+
+```{r}
+tp_plots$SEX$Linear
+```
+
+- Displaying time profiles by `"SEX"` in log scale
+
+```{r}
+tp_plots$SEX$Log
+```
+
+### Covariates distribution and correlation
+
+To analyze covariate distributions and potential correlations, 2 functions can be used: `cov_plot()` and `cov_cor()`.
+
+The function `cov_plot()` allows graphical analyses of the covariate distribution and correlation:
+
+```{r}
+cov_plot(data_501, meta_data_501)
+```
+
+The function `cov_cor()` provides a table with 
+
+- Spearman correlation test results between continuous covariates
+- ANOVA test results between continuous and categorical covariates
+
+```{r}
+knitr::kable(cov_cor(data_501, meta_data_501))
+```
