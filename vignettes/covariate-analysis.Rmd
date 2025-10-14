@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-# library(nonmem.utils)
+library(nonmem.utils)
 ```
 
 
@@ -29,8 +29,8 @@ Such variables are defined in the meta data dictionary as `Type`: `eta` as illus
 
 | Name | Type | Label | Unit |
 |------|------|-------|------|
-| ETA1 | eta  | Clearance |  |
-| ETA2 | eta  | Volume    |  |
+| ETA1 | eta  | &eta;CL |    |
+| ETA2 | eta  | &eta;V |     |
 
 ## Interactive analysis
 
@@ -57,8 +57,8 @@ meta_data_path = "my/dictionary.csv"
 
 To analyze etas distributions and potential correlations, the function `eta_plot()` can be used.
 
-```r
-eta_plot()
+```{r}
+eta_plot(data_501, meta_data_501)
 ```
 
 ### Covariates vs etas
@@ -67,7 +67,7 @@ To analyze potential correlations between etas and covariates, 2 functions can b
 
 The function `eta_cov_plot()` allows graphical analyses of the covariate distribution and correlation:
 
-```r
+```{r}
 eta_cov_plot(data_501, meta_data_501)
 ```
 
@@ -76,6 +76,6 @@ The function `eta_cor()` provides a table with
 - Spearman correlation test results between continuous covariates and etas
 - ANOVA test results between categorical covariates and etas
 
-```r
+```{r}
 knitr::kable(eta_cor(data_501, meta_data_501))
 ```

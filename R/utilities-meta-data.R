@@ -233,7 +233,8 @@ pull_label <- function(name, meta_data = NULL) {
       with_Unit = ifelse(is.na(Unit), "", paste0(" [", Unit, "]")),
       Label_with_Unit = paste0(Label, with_Unit)
     ) |>
-    dplyr::pull(Label_with_Unit)
+    dplyr::pull(Label_with_Unit) |>
+    stringi::stri_unescape_unicode()
   return(map_label)
 }
 

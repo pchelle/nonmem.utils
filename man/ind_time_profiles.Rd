@@ -22,7 +22,7 @@ Plot DV, PRED and IPRED vs TIME
 
 # Simulate 1-compartment model
 pk_data <- data_501 |>
-dplyr::mutate(CL = 2, V = 40)
+  dplyr::mutate(CL = 2, V = 40)
 ind_time_profiles(pk_data, meta_data_501)
 
 }

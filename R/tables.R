@@ -35,8 +35,8 @@ cov_cor <- function(data, meta_data) {
 
   cov_names <- covariates$Name
   cat_names <- categoricals$Name
-  cov_labels <- covariates$Label
-  cat_labels <- categoricals$Label
+  cov_labels <- stringi::stri_unescape_unicode(covariates$Label)
+  cat_labels <- stringi::stri_unescape_unicode(categoricals$Label)
 
   cor_data <- data.frame(Covariates = c(cov_labels, cat_labels))
 
@@ -90,7 +90,12 @@ eta_cor <- function(data, meta_data) {
     sum_data <- map_cat_data(sum_data, meta_data)
   }
 
-  cor_data <- data.frame(Covariates = c(covariates$Label, categoricals$Label))
+  cor_data <- data.frame(
+    Covariates = stringi::stri_unescape_unicode(c(
+      covariates$Label,
+      categoricals$Label
+      ))
+    )
 
   for (eta_name in etas$Name) {
     cor_data[[eta_name]] <- NA
@@ -103,7 +108,7 @@ eta_cor <- function(data, meta_data) {
       cor_data[length(covariates$Name) + cat_index_x, eta_name] <- lm_report(sum_data, cat_name, eta_name)
     }
   }
-  names(cor_data) <- c("Covariates", etas$Label)
+  names(cor_data) <- c("Covariates", stringi::stri_unescape_unicode(etas$Label))
   return(cor_data)
 }
 

@@ -164,7 +164,7 @@ server <- function(input, output, session) {
       table_rows <- grepl(pattern = "TABLE", sim_data_content)
       sim_data_content <- sim_data_content[!table_rows]
       # Re-write temp file
-      writeLines(c(data_header, sim_data_content), file = sim_data_file)
+      writeLines(c(data_header, sim_data_content), con = sim_data_file)
       sim_data <- readr::read_table(sim_data_file) |> filter(MDV==0)
       return(sim_data)
     }

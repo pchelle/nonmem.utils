@@ -5,7 +5,7 @@
 \alias{meta_data_501}
 \title{data_501}
 \format{
-An object of class \code{data.frame} with 12 rows and 6 columns.
+An object of class \code{data.frame} with 16 rows and 6 columns.
 }
 \usage{
 meta_data_501

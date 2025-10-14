@@ -7,13 +7,15 @@ dplyrVariables <- c(
   # Meta data variables
   "Name", "Type", "Label", "Unit", "with_Unit", "Label_with_Unit",
   # Inventory variables
-  "Subjects", "Studies", "Doses", "Observations", "Covariate", "Values",
+  "Subjects", "Studies", "Doses", "Observations", "Covariate", "Value", "Values", "Percent BLQ",
   # Nonmem variables
-  "ID", "EVID", "TIME", "PRED", "IPRED", 'MDV', 'BLQ', 'OBS', 'REP', 'DV','NPDE', "LLOQ",
+  "ID", "EVID", "TIME", "TAD", "PRED", "IPRED", "MDV", "BLQ", "OBS", "REP", "DV","NPDE", "CWRES", "LLOQ",
+  "oldID",
   # VPC variables
-  'blq', 'blq_obs_med_med', 'med_pred', 'time_med_med',
-  'Bins', 'pcOBS', 'pcDV', 'statistics', 'Max', 'Min',
-  'CV', 'Estimates', 'RSE', 'Shrinkage'
+  "pvcDV", "pvcOBS", "sdBinsPRED", "sdPRED", "time_bins", "time_med",
+  "tad", "blq", "blq_obs_med_med", "med_pred", "time_med_med",
+  "Bins", "pcOBS", "pcDV", "medPRED", "statistics", "Max", "Min",
+  "CV", "Estimates", "RSE", "Shrinkage"
 )
 
 utils::globalVariables(c(dplyrVariables))
@@ -41,3 +43,9 @@ meta_data_501 <- read.csv(
   system.file("test", "501-dictionary.csv", package = "nonmem.utils"),
   na = c("NA", "N/A", "", ".")
 )
+
+#' @title vpc_types
+#' @description
+#' All VPC types
+#' @export
+vpc_types <- c("vpc", "pc_vpc", "pvc_vpc", "blq", "npde")

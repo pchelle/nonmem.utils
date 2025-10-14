@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-# library(nonmem.utils)
+library(nonmem.utils)
 ```
 
 ## Preamble
@@ -53,8 +53,15 @@ meta_data_path = "my/dictionary.csv"
 
 The function `dv_preds()` plots observed vs individual and population predictions in both linear and log scales.
 
-```r
-dv_preds()
+```{r}
+dv_preds(data_501, meta_data_501)
+```
+
+To obtain the plot in log-log scale, the function `gg_log()` can be used as illustrated below:
+
+```{r}
+dv_preds(data_501, meta_data_501) |> 
+  gg_log()
 ```
 
 ### Residuals
@@ -63,31 +70,40 @@ To assess residual distributions, 3 functions are available: `residual_hist()`, 
 
 - The function `residual_hist()` plots histogram of residuals
 
-```r
-residual_hist()
+```{r}
+residual_hist(y_type = "cwres", data = data_501, meta_data = meta_data_501)
 ```
 
 - The function `residual_qq()` perform QQ-plots of residuals
 
-```r
-residual_qq()
+```{r}
+residual_qq(y_type = "cwres", data = data_501, meta_data = meta_data_501)
 ```
 
 - The function `residual_plot()` plots residuals vs another variable to analyze potential trends
 
-```r
-residual_plot()
+```{r}
+patchwork::wrap_plots(
+  residual_plot(x_type = "time", y_type = "cwres", data = data_501, meta_data = meta_data_501),
+  residual_plot(x_type = "pred", y_type = "cwres", data = data_501, meta_data = meta_data_501)
+)
 ```
 
 ### Individual time profiles
 
-To review individual time profiles, the functions `ind_time_profiles()` and `ind_tad_profiles()` can be used:
+To review individual time profiles, the functions `ind_time_profiles()` and `ind_tad_profiles()` can be used as illustrated below. The functions leverage simple 1-, 2-, and 3-compartment models using the `mrgsolve` package and PK parameters Nonmem naming convention (e.g. if dataset includes only `CL` and `V`, the code assumes a 1-compartment model).
 
-```r
-ind_time_profiles()
+```{r}
+ind_time_profiles(
+  data = data_501 |> dplyr::filter(ID <= 6), 
+  meta_data = meta_data_501
+  )
 ```
 
-```r
-ind_tad_profiles()
+```{r}
+ind_tad_profiles(
+  data = data_501 |> dplyr::filter(ID <= 6), 
+  meta_data = meta_data_501
+  )
 ```
 

@@ -6,7 +6,7 @@
 #' @import GGally
 eta_plot <- function(data, meta_data = NULL) {
   id_variable <- pull_name("id", meta_data)
-  if(length(id_variable)==0) {
+  if (length(id_variable) == 0) {
     cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
     return()
   }
@@ -61,7 +61,7 @@ eta_plot <- function(data, meta_data = NULL) {
 #' @import GGally
 eta_cov_plot <- function(data, meta_data = NULL) {
   id_variable <- pull_name("id", meta_data)
-  if(length(id_variable)==0) {
+  if (length(id_variable) == 0) {
     cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
     return()
   }
@@ -145,7 +145,7 @@ eta_cov_plot <- function(data, meta_data = NULL) {
 #'
 cov_plot <- function(data, meta_data = NULL) {
   id_variable <- pull_name("id", meta_data)
-  if(length(id_variable)==0) {
+  if (length(id_variable) == 0) {
     cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
     return()
   }
@@ -287,7 +287,8 @@ residual_plot <- function(x_type = "time", y_type = "cwres", data, meta_data = N
     mapping = aes(
       x = .data[[variable_names[[x_type]]]],
       y = .data[[toupper(y_type)]],
-      text = tooltip_text(.data, names(res_data))
+      text = tooltip_text(.data, names(res_data)),
+      group = 1
     )
   ) +
     theme_bw() +
@@ -345,8 +346,9 @@ residual_qq <- function(y_type = "cwres", data, meta_data = NULL) {
 #' @param y_type Type of y variable
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
+#' @param bins Number of bins
 #' @export
-residual_hist <- function(y_type = "cwres", data, meta_data = NULL) {
+residual_hist <- function(y_type = "cwres", data, meta_data = NULL, bins = 21) {
   # By default assumes usual Nonmem names and labels
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
@@ -366,15 +368,26 @@ residual_hist <- function(y_type = "cwres", data, meta_data = NULL) {
       .data[[variable_names$blq]] <= 0
     )
 
+  mean_res <- mean(res_data[[toupper(y_type)]])
+  sd_res <- sd(res_data[[toupper(y_type)]])
+  binwidth <- diff(range(res_data[[toupper(y_type)]])) / bins
+  n_res <- length(res_data[[toupper(y_type)]])
+
   p <- ggplot(
     data = res_data,
     mapping = aes(x = .data[[toupper(y_type)]])
   ) +
     theme_bw() +
-    geom_histogram(fill = "grey80", color = "grey30") +
+    geom_histogram(fill = "grey80", color = "grey30", bins = bins) +
     geom_vline(xintercept = 0, linetype = "dashed") +
     geom_vline(
       mapping = aes(xintercept = mean(.data[[toupper(y_type)]])),
+      color = "royalblue"
+    ) +
+    stat_function(
+      fun = function(x) {
+        stats::dnorm(x, mean = mean_res, sd = sd_res) * n_res * binwidth
+      },
       color = "royalblue"
     ) +
     labs(y = "Count")
@@ -396,8 +409,8 @@ residual_hist <- function(y_type = "cwres", data, meta_data = NULL) {
 #'   data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"))
 #' )
 #' tp_data <- data_501 |>
-#' dplyr::mutate(BLQ = 0, LLOQ = 1) |>
-#' dplyr::filter(MDV==0)
+#'   dplyr::mutate(BLQ = 0, LLOQ = 1) |>
+#'   dplyr::filter(MDV == 0)
 #'
 #' # Get the time profile plots
 #' tp_plots <- time_profile(tp_data, tp_meta)
@@ -636,53 +649,6 @@ tad_profile <- function(data, meta_data = NULL, bins = 7) {
   return(tp_plots)
 }
 
-#' @title vpc_plots
-#' @description
-#' Generate VPC plots for a given dataset.
-#' @param data A data.frame of data
-#' @param meta_data A data.frame of meta data
-#' @param x The x variable to use for VPC, default is "TAD"
-#' @param bins Number of bins to use for VPC, default is 7
-#' @param ci Confidence interval for the VPC plot, default is 0.8
-#' @param lloq Lower limit of quantification, default is 10
-#' @export
-vpc_plots <- function(data, meta_data, x = "TAD", bins = 7, ci = 0.8, lloq = 10) {
-  vpc_data_all <- run_vpc(data, x = x, group = "All", bins = bins, ci = ci, lloq = lloq)
-  obs_data <- fill_nonmem_vars(data) |>
-    dplyr::filter(REP == REP[1], MDV == 0) |>
-    dplyr::mutate(Bins = bin_values(.data[[x]], bins = bins)) |>
-    dplyr::group_by(Bins) |>
-    dplyr::mutate(
-      time_med_med = .data[[x]],
-      obs_med_med = ifelse(BLQ > 0, IPRED, OBS),
-      med_pred = median(PRED, na.rm = TRUE),
-      pc_obs_med_med = OBS * med_pred / PRED,
-      blq_obs_med_med = as.numeric(BLQ > 0),
-      npde_obs_med_med = NPDE
-    )
-
-  variable_labels <- list(
-    x = pull_label(x, meta_data),
-    y = pull_label("DV", meta_data)
-  )
-  vpc_plots_all <- sapply(
-    c("vpc", "pc_vpc", "blq", "npde"),
-    function(vpc_type) {
-      base_vpc_plot(
-        data = obs_data,
-        vpc_data = vpc_data_all,
-        variable_labels = variable_labels,
-        ci = ci,
-        type = vpc_type
-      ) |>
-        gg_lim(x = x, meta_data = meta_data)
-    },
-    simplify = FALSE,
-    USE.NAMES = TRUE
-  )
-  return(vpc_plots_all)
-}
-
 #' @title ind_time_profiles
 #' @description Plot DV, PRED and IPRED vs TIME
 #' @param data A data.frame of data
@@ -694,7 +660,7 @@ vpc_plots <- function(data, meta_data, x = "TAD", bins = 7, ci = 0.8, lloq = 10)
 #'
 #' # Simulate 1-compartment model
 #' pk_data <- data_501 |>
-#' dplyr::mutate(CL = 2, V = 40)
+#'   dplyr::mutate(CL = 2, V = 40)
 #' ind_time_profiles(pk_data, meta_data_501)
 #'
 ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
@@ -715,9 +681,9 @@ ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
     dplyr::filter(.data[[variable_names$mdv]] == 0)
 
   unique_ids <- unique(tp_data[[variable_names$id]])
-  n_plots <- ceiling(length(unique_ids)/(n_rows*n_cols))
+  n_plots <- ceiling(length(unique_ids) / (n_rows * n_cols))
   all_plots <- list()
-  for(plot_index in seq_len(n_plots)){
+  for (plot_index in seq_len(n_plots)) {
     selected_indices <- seq(
       (plot_index - 1) * n_rows * n_cols + 1,
       min(plot_index * n_rows * n_cols, length(unique_ids))
@@ -729,7 +695,7 @@ ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
         dplyr::filter(
           .data[[variable_names$blq]] <= 0,
           .data[[variable_names$id]] %in% selected_ids
-          ),
+        ),
       mapping = aes(x = .data[[variable_names$time]])
     ) +
       theme_bw() +
@@ -739,7 +705,7 @@ ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
           dplyr::filter(
             .data[[variable_names$blq]] > 0,
             .data[[variable_names$id]] %in% selected_ids
-            ),
+          ),
         mapping = aes(x = .data[[variable_names$lloq]], IPRED, text = tooltip_text(.data, names(data)))
       ) +
       geom_line(
@@ -774,7 +740,7 @@ ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
 #'
 #' # Simulate 1-compartment model
 #' pk_data <- data_501 |>
-#' dplyr::mutate(CL = 2, V = 40)
+#'   dplyr::mutate(CL = 2, V = 40)
 #' ind_tad_profiles(pk_data, meta_data_501)
 #'
 ind_tad_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
@@ -795,9 +761,9 @@ ind_tad_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
     dplyr::filter(.data[[variable_names$mdv]] == 0)
 
   unique_ids <- unique(tp_data[[variable_names$id]])
-  n_plots <- ceiling(length(unique_ids)/(n_rows*n_cols))
+  n_plots <- ceiling(length(unique_ids) / (n_rows * n_cols))
   all_plots <- list()
-  for(plot_index in seq_len(n_plots)){
+  for (plot_index in seq_len(n_plots)) {
     selected_indices <- seq(
       (plot_index - 1) * n_rows * n_cols + 1,
       min(plot_index * n_rows * n_cols, length(unique_ids))
@@ -840,4 +806,86 @@ ind_tad_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
   }
 
   return(all_plots)
+}
+
+#' @title boot_hist
+#' @description Histogram of bootstrap estimated (`y`)
+#' @param y_type Type of y variable
+#' @param data A data.frame of data
+#' @param meta_data A data.frame of meta data
+#' @param bins Number of bins
+#' @param ci Confidence interval
+#' @export
+boot_hist <- function(y_type = "theta", data, meta_data = NULL, bins = 11, ci = 0.95) {
+  # By default assumes usual Nonmem names and labels
+  type_meta_data <- meta_data |> filter(grepl(pattern = y_type, x = Name))
+  if (y_type %in% "sigma") {
+    type_meta_data$Value <- sqrt(type_meta_data$Value) *
+      ifelse(grepl("CV", type_meta_data$Unit), 100, 1)
+    for (row_index in 1:nrow(type_meta_data)) {
+      data[[type_meta_data$Name[row_index]]] <- sqrt(data[[type_meta_data$Name[row_index]]]) *
+        ifelse(grepl(pattern = "CV", type_meta_data$Unit[row_index]), 100, 1)
+    }
+  }
+  if (y_type %in% "omega") {
+    mat_indices <- gsub(pattern = "omega", replacement = "", type_meta_data$Name) |>
+      as.integer()
+    # Correlation
+    for (row_index in 1:nrow(type_meta_data)) {
+      if (mat_indices[row_index] %% 11 == 0) {
+        next
+      }
+      index_1 <- mat_indices %% 10
+      index_2 <- (mat_indices - index_1) / 10
+      omega_names <- paste0("omega", rep(c(index_1, index_2), c(index_1, index_2)))
+      omegas <- type_meta_data |>
+        filter(Name %in% omega_names) |>
+        pull(Value)
+      type_meta_data$Value[row_index] <- type_meta_data$Value[row_index] /
+        sqrt(omegas[1] * omegas[2])
+      data[[type_meta_data$Name[row_index]]] <- data[[type_meta_data$Name[row_index]]] /
+        sqrt(data[[omega_names[1]]] * data[[omega_names[2]]])
+    }
+    # CV
+    for (row_index in 1:nrow(type_meta_data)) {
+      if (mat_indices[row_index] %% 11 != 0) {
+        next
+      }
+      type_meta_data$Value[row_index] <- 100 * sqrt(type_meta_data$Value[row_index])
+      data[[type_meta_data$Name[row_index]]] <- 100 * sqrt(data[[type_meta_data$Name[row_index]]])
+    }
+  }
+  type_meta_data <- split(type_meta_data, 1:nrow(type_meta_data))
+
+  boot_plots <- sapply(
+    type_meta_data,
+    function(meta_data_index) {
+      bootstrap_values <- quantile(
+        data[[meta_data_index$Name]],
+        probs = c(0.5, (1 - ci) / 2, (1 + ci) / 2)
+      )
+      variable_label <- meta_data_index$Label
+      if (!is.na(meta_data_index$Unit)) {
+        variable_label <- paste0(variable_label, " [", meta_data_index$Unit, "]")
+      }
+
+      ggplot(data = data) +
+        theme_bw() +
+        geom_histogram(
+          mapping = aes(
+            x = .data[[meta_data_index$Name]],
+            y = after_stat(100 * count / sum(count))
+          ),
+          bins = bins,
+          color = "black", fill = "grey80"
+        ) +
+        geom_vline(xintercept = bootstrap_values[1], color = "dodgerblue") +
+        geom_vline(xintercept = bootstrap_values[2:3], color = "dodgerblue", linetype = "longdash") +
+        geom_vline(xintercept = meta_data_index$Value, color = "firebrick") +
+        labs(x = stringi::stri_unescape_unicode(variable_label), y = "Frequency [%]")
+    },
+    simplify = FALSE,
+    USE.NAMES = TRUE
+  )
+  return(boot_plots)
 }
