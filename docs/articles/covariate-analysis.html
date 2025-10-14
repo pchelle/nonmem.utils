@@ -84,7 +84,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># library(nonmem.utils)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">nonmem.utils</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="preamble">Preamble<a class="anchor" aria-label="anchor" href="#preamble"></a>
 </h2>
@@ -107,13 +107,13 @@ variable(s).</p>
 <tr class="odd">
 <td>ETA1</td>
 <td>eta</td>
-<td>Clearance</td>
+<td>ηCL</td>
 <td></td>
 </tr>
 <tr class="even">
 <td>ETA2</td>
 <td>eta</td>
-<td>Volume</td>
+<td>ηV</td>
 <td></td>
 </tr>
 </tbody>
@@ -147,7 +147,12 @@ quarto based function below:</p>
 <p>To analyze etas distributions and potential correlations, the
 function <code><a href="../reference/eta_plot.html">eta_plot()</a></code> can be used.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/eta_plot.html">eta_plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/eta_plot.html">eta_plot</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $All</span></span></code></pre></div>
+<p><img src="covariate-analysis_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $SEX</span></span></code></pre>
+<p><img src="covariate-analysis_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="covariates-vs-etas">Covariates vs etas<a class="anchor" aria-label="anchor" href="#covariates-vs-etas"></a>
@@ -157,16 +162,51 @@ functions can be used: <code><a href="../reference/eta_cov_plot.html">eta_cov_pl
 <code><a href="../reference/eta_cor.html">eta_cor()</a></code>.</p>
 <p>The function <code><a href="../reference/eta_cov_plot.html">eta_cov_plot()</a></code> allows graphical analyses of
 the covariate distribution and correlation:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/eta_cov_plot.html">eta_cov_plot</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/eta_cov_plot.html">eta_cov_plot</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $All</span></span></code></pre></div>
+<p><img src="covariate-analysis_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<pre><code><span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $SEX</span></span></code></pre>
+<p><img src="covariate-analysis_files/figure-html/unnamed-chunk-3-2.png" width="700"></p>
 <p>The function <code><a href="../reference/eta_cor.html">eta_cor()</a></code> provides a table with</p>
 <ul>
 <li>Spearman correlation test results between continuous covariates and
 etas</li>
 <li>ANOVA test results between categorical covariates and etas</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="../reference/eta_cor.html">eta_cor</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="9%">
+<col width="44%">
+<col width="45%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Covariates</th>
+<th align="left">ηCL</th>
+<th align="left">ηV</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Weight</td>
+<td align="left">-0.035 (p:0.793)</td>
+<td align="left">0.045 (p:0.733)</td>
+</tr>
+<tr class="even">
+<td align="left">Age</td>
+<td align="left">0.004 (p:0.974)</td>
+<td align="left">-0.015 (p:0.908)</td>
+</tr>
+<tr class="odd">
+<td align="left">Sex</td>
+<td align="left">(Intercept):0.004 (p:0.885)/Female:0.001 (p:0.986)</td>
+<td align="left">(Intercept):-0.010 (p:0.763)/Female:0.001
+(p:0.990)</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
   </div>

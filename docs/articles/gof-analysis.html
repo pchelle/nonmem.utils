@@ -84,7 +84,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># library(nonmem.utils)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">nonmem.utils</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="preamble">Preamble<a class="anchor" aria-label="anchor" href="#preamble"></a>
 </h2>
@@ -125,7 +125,28 @@ based function below:</p>
 <p>The function <code><a href="../reference/dv_preds.html">dv_preds()</a></code> plots observed vs individual and
 population predictions in both linear and log scales.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dv_preds.html">dv_preds</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dv_preds.html">dv_preds</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in geom_rug(data = dplyr::filter(fill_nonmem_vars(data),</span></span>
+<span><span class="co">#&gt; .data[[variable_names$mdv]] == : Ignoring unknown aesthetics:</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span></code></pre></div>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<p>To obtain the plot in log-log scale, the function
+<code><a href="../reference/gg_log.html">gg_log()</a></code> can be used as illustrated below:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dv_preds.html">dv_preds</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/gg_log.html">gg_log</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in geom_rug(data = dplyr::filter(fill_nonmem_vars(data),</span></span>
+<span><span class="co">#&gt; .data[[variable_names$mdv]] == : Ignoring unknown aesthetics:</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span></code></pre></div>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="residuals">Residuals<a class="anchor" aria-label="anchor" href="#residuals"></a>
@@ -137,31 +158,89 @@ population predictions in both linear and log scales.</p>
 <li>The function <code><a href="../reference/residual_hist.html">residual_hist()</a></code> plots histogram of
 residuals</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_hist.html">residual_hist</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_hist.html">residual_hist</a></span><span class="op">(</span>y_type <span class="op">=</span> <span class="st">"cwres"</span>, data <span class="op">=</span> <span class="va">data_501</span>, meta_data <span class="op">=</span> <span class="va">meta_data_501</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 <ul>
 <li>The function <code><a href="../reference/residual_qq.html">residual_qq()</a></code> perform QQ-plots of
 residuals</li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_qq.html">residual_qq</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_qq.html">residual_qq</a></span><span class="op">(</span>y_type <span class="op">=</span> <span class="st">"cwres"</span>, data <span class="op">=</span> <span class="va">data_501</span>, meta_data <span class="op">=</span> <span class="va">meta_data_501</span><span class="op">)</span></span></code></pre></div>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 <ul>
 <li>The function <code><a href="../reference/residual_plot.html">residual_plot()</a></code> plots residuals vs another
 variable to analyze potential trends</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_plot.html">residual_plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/residual_plot.html">residual_plot</a></span><span class="op">(</span>x_type <span class="op">=</span> <span class="st">"time"</span>, y_type <span class="op">=</span> <span class="st">"cwres"</span>, data <span class="op">=</span> <span class="va">data_501</span>, meta_data <span class="op">=</span> <span class="va">meta_data_501</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/residual_plot.html">residual_plot</a></span><span class="op">(</span>x_type <span class="op">=</span> <span class="st">"pred"</span>, y_type <span class="op">=</span> <span class="st">"cwres"</span>, data <span class="op">=</span> <span class="va">data_501</span>, meta_data <span class="op">=</span> <span class="va">meta_data_501</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,</span></span>
+<span><span class="co">#&gt; : pseudoinverse used at 0.885</span></span>
+<span><span class="co">#&gt; Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,</span></span>
+<span><span class="co">#&gt; : neighborhood radius 11.115</span></span>
+<span><span class="co">#&gt; Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,</span></span>
+<span><span class="co">#&gt; : reciprocal condition number 8.5113e-16</span></span>
+<span><span class="co">#&gt; Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,</span></span>
+<span><span class="co">#&gt; : There are other near singularities as well. 365.38</span></span>
+<span><span class="co">#&gt; Warning: The following aesthetics were dropped during statistical transformation: <span style="color: #00BB00;">text</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> This can happen when ggplot fails to infer the correct grouping structure in</span></span>
+<span><span class="co">#&gt;   the data.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Did you forget to specify a `group` aesthetic or to convert a numerical</span></span>
+<span><span class="co">#&gt;   variable into a factor?</span></span>
+<span><span class="co">#&gt; The following aesthetics were dropped during statistical transformation: <span style="color: #00BB00;">text</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> This can happen when ggplot fails to infer the correct grouping structure in</span></span>
+<span><span class="co">#&gt;   the data.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Did you forget to specify a `group` aesthetic or to convert a numerical</span></span>
+<span><span class="co">#&gt;   variable into a factor?</span></span></code></pre></div>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="individual-time-profiles">Individual time profiles<a class="anchor" aria-label="anchor" href="#individual-time-profiles"></a>
 </h3>
 <p>To review individual time profiles, the functions
 <code><a href="../reference/ind_time_profiles.html">ind_time_profiles()</a></code> and <code><a href="../reference/ind_tad_profiles.html">ind_tad_profiles()</a></code> can
-be used:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ind_time_profiles.html">ind_time_profiles</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+be used as illustrated below. The functions leverage simple 1-, 2-, and
+3-compartment models using the <code>mrgsolve</code> package and PK
+parameters Nonmem naming convention (e.g. if dataset includes only
+<code>CL</code> and <code>V</code>, the code assumes a 1-compartment
+model).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ind_tad_profiles.html">ind_tad_profiles</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ind_time_profiles.html">ind_time_profiles</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">data_501</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID</span> <span class="op">&lt;=</span> <span class="fl">6</span><span class="op">)</span>, </span>
+<span>  meta_data <span class="op">=</span> <span class="va">meta_data_501</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in geom_rug(data = dplyr::filter(tp_data, .data[[variable_names$blq]] &gt;</span></span>
+<span><span class="co">#&gt; : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_line(data = filter(sim_data, ID %in% selected_ids), mapping =</span></span>
+<span><span class="co">#&gt; aes(x = TIME, : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = .data[[variable_names$dv]], text =</span></span>
+<span><span class="co">#&gt; tooltip_text(.data, : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ind_tad_profiles.html">ind_tad_profiles</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">data_501</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID</span> <span class="op">&lt;=</span> <span class="fl">6</span><span class="op">)</span>, </span>
+<span>  meta_data <span class="op">=</span> <span class="va">meta_data_501</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in geom_rug(data = dplyr::filter(tp_data, .data[[variable_names$blq]] &gt;</span></span>
+<span><span class="co">#&gt; : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_line(data = filter(sim_data, ID %in% selected_ids), mapping =</span></span>
+<span><span class="co">#&gt; aes(x = tad, : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :</span></span>
+<span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = .data[[variable_names$dv]], text =</span></span>
+<span><span class="co">#&gt; tooltip_text(.data, : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
+<span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 </div>
 </div>
   </div>

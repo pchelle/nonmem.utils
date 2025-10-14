@@ -80,39 +80,71 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Dictionary</span></span></span>
 <span class="r-in"><span><span class="va">meta_data_501</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    Name Type                      Label                    Unit Min Max</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    ID   id                    Subject                    &lt;NA&gt;  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   OCC  occ                   Occasion                    &lt;NA&gt;  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  TIME time                       Time                       h  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   TAD  tad            Time After Dose                       h  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    DV   dv              Concentration                    mg/L  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  EVID evid           Event Identifier                    &lt;NA&gt;  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7   MDV  mdv Missing Dependent Variable                    &lt;NA&gt;  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   AMT  amt                     Amount                      mg  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9  RATE rate                       Rate                    mg/h  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10   WT  cov                     Weight                      kg  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11  AGE  cov                        Age                     yrs  NA  NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12  SEX  cat                        Sex "0":"Male"|"1":"Female"  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Name  Type                      Label                    Unit Min Max</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    ID    id                    Subject                    &lt;NA&gt;  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   OCC   occ                   Occasion                    &lt;NA&gt;  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  TIME  time                       Time                       h  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   TAD   tad            Time After Dose                       h  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    DV    dv              Concentration                    mg/L  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  EVID  evid           Event Identifier                    &lt;NA&gt;  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   MDV   mdv Missing Dependent Variable                    &lt;NA&gt;  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   AMT   amt                     Amount                      mg  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  RATE  rate                       Rate                    mg/h  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   WT   cov                     Weight                      kg  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11  AGE   cov                        Age                     yrs  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12  SEX   cat                        Sex "0":"Male"|"1":"Female"  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13   CL param                  Clearance                     L/h  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14    V param                     Volume                       L  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 ETA1   eta                  \\u03b7CL                    &lt;NA&gt;  NA  NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 ETA2   eta                   \\u03b7V                    &lt;NA&gt;  NA  NA</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Data</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">data_501</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ID OCC TIME TAD    DV EVID MDV  AMT RATE   WT AGE SEX</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1   1    0  -5  0.00    1   1 1000  200 58.4  51   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1   1    1  -4  6.47    0   0    0    0 58.4  51   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1   1    5   0 23.96    0   0    0    0 58.4  51   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1   1   12   7 17.81    0   0    0    0 58.4  51   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1   1   24  19  5.63    0   0    0    0 58.4  51   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  2   1    0  -5  0.00    1   1 1000  200 79.3  53   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ID OCC TIME TAD    DV EVID MDV  AMT RATE   WT AGE SEX      PRED        RES</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1   1    0  -5  0.00    1   1 1000  200 58.4  51   1  0.000000  0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1   1    1  -4  6.47    0   0    0    0 58.4  51   1  7.880463 -1.4104630</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1   1    5   0 23.96    0   0    0    0 58.4  51   1 32.607640 -8.6476430</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1   1   12   7 17.81    0   0    0    0 58.4  51   1 16.239350  1.5706550</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1   1   24  19  5.63    0   0    0    0 58.4  51   1  4.915492  0.7145082</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  2   1    0  -5  0.00    1   1 1000  200 79.3  53   1  0.000000  0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         CWRES     IPRED        IRES       IWRES        NPDE       CL        V</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.00000000  0.000000  0.00000000  0.00000000  0.00000000 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.36401740  6.725388 -0.25538840 -0.16938800 -0.36401740 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.03938300 28.521470 -4.56147100 -0.71339780 -1.03938300 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.48637080 15.618370  2.19162500  0.62593510  0.48637080 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.00197913  5.562734  0.06726642  0.05393973 -0.00197913 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.00000000  0.000000  0.00000000  0.00000000  0.00000000 3.261006 31.21143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         ETA1       ETA2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.12290870 -0.1500610</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Map data</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">map_cat_data</span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ID OCC TIME TAD    DV EVID MDV  AMT RATE   WT AGE    SEX</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1   1    0  -5  0.00    1   1 1000  200 58.4  51 Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1   1    1  -4  6.47    0   0    0    0 58.4  51 Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1   1    5   0 23.96    0   0    0    0 58.4  51 Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1   1   12   7 17.81    0   0    0    0 58.4  51 Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1   1   24  19  5.63    0   0    0    0 58.4  51 Female</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  2   1    0  -5  0.00    1   1 1000  200 79.3  53 Female</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ID OCC TIME TAD    DV EVID MDV  AMT RATE   WT AGE    SEX      PRED        RES</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1   1    0  -5  0.00    1   1 1000  200 58.4  51 Female  0.000000  0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  1   1    1  -4  6.47    0   0    0    0 58.4  51 Female  7.880463 -1.4104630</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  1   1    5   0 23.96    0   0    0    0 58.4  51 Female 32.607640 -8.6476430</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1   1   12   7 17.81    0   0    0    0 58.4  51 Female 16.239350  1.5706550</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  1   1   24  19  5.63    0   0    0    0 58.4  51 Female  4.915492  0.7145082</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  2   1    0  -5  0.00    1   1 1000  200 79.3  53 Female  0.000000  0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         CWRES     IPRED        IRES       IWRES        NPDE       CL        V</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.00000000  0.000000  0.00000000  0.00000000  0.00000000 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.36401740  6.725388 -0.25538840 -0.16938800 -0.36401740 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 -1.03938300 28.521470 -4.56147100 -0.71339780 -1.03938300 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  0.48637080 15.618370  2.19162500  0.62593510  0.48637080 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.00197913  5.562734  0.06726642  0.05393973 -0.00197913 2.451403 28.49479</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0.00000000  0.000000  0.00000000  0.00000000  0.00000000 3.261006 31.21143</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         ETA1       ETA2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.01883265  0.1651707</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 0.12290870 -0.1500610</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

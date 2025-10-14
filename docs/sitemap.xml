@@ -10,6 +10,7 @@
 <url><loc>/reference/base_tp_plot.html</loc></url>
 <url><loc>/reference/base_vpc_plot.html</loc></url>
 <url><loc>/reference/bin_values.html</loc></url>
+<url><loc>/reference/boot_hist.html</loc></url>
 <url><loc>/reference/calc_tad.html</loc></url>
 <url><loc>/reference/cat_inventory.html</loc></url>
 <url><loc>/reference/check_ranges.html</loc></url>
@@ -67,5 +68,6 @@
 <url><loc>/reference/tooltip_text.html</loc></url>
 <url><loc>/reference/vpc_plots.html</loc></url>
 <url><loc>/reference/vpc_summary.html</loc></url>
+<url><loc>/reference/vpc_types.html</loc></url>
 </urlset>
 
