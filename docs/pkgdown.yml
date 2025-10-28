@@ -1,8 +1,0 @@
-pandoc: 3.6.3
-pkgdown: 2.1.3
-pkgdown_sha: ~
-articles:
-  covariate-analysis: covariate-analysis.html
-  dataset-analysis: dataset-analysis.html
-  gof-analysis: gof-analysis.html
-last_built: 2025-10-14T11:04Z
