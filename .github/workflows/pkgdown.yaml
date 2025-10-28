@@ -11,14 +11,12 @@ on:
 
 name: pkgdown
 
-permissions: read-all
-
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
     # Only restrict concurrency for non-PR jobs
     concurrency:
-      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+      group: pkgdown-${{ github.event_name == 'pull_request' && github.run_id || 'main' }}
     permissions:
       contents: write
     env:
