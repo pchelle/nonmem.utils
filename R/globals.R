@@ -9,13 +9,14 @@ dplyrVariables <- c(
   # Inventory variables
   "Subjects", "Studies", "Doses", "Observations", "Covariate", "Value", "Values", "Percent BLQ",
   # Nonmem variables
-  "ID", "EVID", "TIME", "TAD", "PRED", "IPRED", "MDV", "BLQ", "OBS", "REP", "DV","NPDE", "CWRES", "LLOQ",
+  "ID", "EVID", "TIME", "TAD", "PRED", "IPRED", "MDV", "BLQ", "OBS", "REP", "DV", "NPDE", "CWRES", "LLOQ",
   "oldID",
   # VPC variables
   "pvcDV", "pvcOBS", "sdBinsPRED", "sdPRED", "time_bins", "time_med",
   "tad", "blq", "blq_obs_med_med", "med_pred", "time_med_med",
   "Bins", "pcOBS", "pcDV", "medPRED", "statistics", "Max", "Min",
-  "CV", "Estimates", "RSE", "Shrinkage"
+  "CV", "Estimates", "RSE", "Shrinkage",
+  "x", "y", "x_row", "y_row"
 )
 
 utils::globalVariables(c(dplyrVariables))

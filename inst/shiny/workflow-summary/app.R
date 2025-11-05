@@ -8,6 +8,7 @@ library(plotly, warn.conflicts = FALSE)
 
 #---- UI ----
 ui <- page_navbar(
+  theme = bs_theme(bootswatch = "zephyr"),
   title = span(icon("list-check"), " Workflow Summary"),
   sidebar = sidebar(
     #---- Inputs ----
@@ -35,79 +36,102 @@ ui <- page_navbar(
       accordion_panel(
         title = "Reporting",
         icon = icon("file-export"),
-        downloadButton("dataset_report", icon = icon("file-word"))
+        downloadButton("report_docx", icon = icon("file-word")),
+        downloadButton("report_pdf", icon = icon("file-pdf"))
       )
     )
   ),
-  navset_card_tab(
-    #---- Dataset ----
-    nav_panel(
-      title = "Data",
-      icon = icon("database"),
-      card(
-        card_header(
-          textInput(
-            "data_filter",
-            tooltip(
-              span(icon("filter"), "Data Filter"),
-              span(icon("circle-info"), "Filter is expected as dplyr expression")
-            ),
-            value = ""
-          )
+  #---- Dataset ----
+  nav_panel(
+    title = "Data",
+    icon = icon("database"),
+    card(
+      card_header(
+        textInput(
+          "data_filter",
+          tooltip(
+            span(icon("filter"), "Data Filter"),
+            span(icon("circle-info"), "Filter is expected as dplyr expression")
+          ),
+          value = ""
+        )
+      ),
+      card_body(DT::dataTableOutput("data"))
+    )
+  ),
+  #---- Plot ----
+  nav_panel(
+    title = "Figure",
+    icon = icon("chart-line"),
+    card(
+      card_header(
+        selectInput(
+          "ofv",
+          label = "Select Objective Function",
+          choices = c("OFV", "AIC", "BIC")
         ),
-        card_body(DT::dataTableOutput("data"))
-      )
-    ),
-    #---- Mapping ----
-    nav_panel(
-      title = "Mapping",
-      icon = icon("signs-post"),
-      card(DT::dataTableOutput("data_mapping"))
-    ),
-    #---- Fixed Effects ----
-    nav_panel(
-      title = "Fixed Effects",
-      icon = HTML("&Theta;"),
-      card(
-        card_header(
-          selectInput(
-            "select_model_theta",
-            label = span(icon("magnifying-glass"), "Select a model"),
-            choices = NA
+        selectInput(
+          "n_params",
+          label = "Color scale",
+          choices = c(
+            "Fixed Effects Parameters" = "n_theta",
+            "BSV Parameters" = "n_omega",
+            "RUV Parameters" = "n_sigma"
           )
-        ),
-        card_body(DT::dataTableOutput("theta_data"))
-      )
-    ),
-    #---- Random Effects Etas ----
-    nav_panel(
-      title = "Random Effects for BSV/BOV",
-      icon = HTML("&Omega;"),
-      card(
-        card_header(
-          selectInput(
-            "select_model_omega",
-            label = span(icon("magnifying-glass"), "Select a model"),
-            choices = NA
-          )
-        ),
-        card_body(DT::dataTableOutput("omega_data"))
-      )
-    ),
-    #---- Random Effects Eps ----
-    nav_panel(
-      title = "Random Effects for RUV",
-      icon = HTML("&Sigma;"),
-      card(
-        card_header(
-          selectInput(
-            "select_model_sigma",
-            label = span(icon("magnifying-glass"), "Select a model"),
-            choices = NA
-          )
-        ),
-        card_body(DT::dataTableOutput("sigma_data"))
-      )
+        )
+      ),
+      card_body(plotlyOutput("ofv_figure"))
+    )
+  ),
+  #---- Mapping ----
+  nav_panel(
+    title = "Mapping",
+    icon = icon("signs-post"),
+    card(DT::dataTableOutput("data_mapping"))
+  ),
+  #---- Fixed Effects ----
+  nav_panel(
+    title = "Fixed Effects",
+    icon = HTML("&Theta;"),
+    card(
+      card_header(
+        selectInput(
+          "select_model_theta",
+          label = span(icon("magnifying-glass"), "Select a model"),
+          choices = NA
+        )
+      ),
+      card_body(DT::dataTableOutput("theta_data"))
+    )
+  ),
+  #---- Random Effects Etas ----
+  nav_panel(
+    title = "Random Effects for BSV/BOV",
+    icon = HTML("&Omega;"),
+    card(
+      card_header(
+        selectInput(
+          "select_model_omega",
+          label = span(icon("magnifying-glass"), "Select a model"),
+          choices = NA
+        )
+      ),
+      card_body(DT::dataTableOutput("omega_data"))
+    )
+  ),
+  #---- Random Effects Eps ----
+  nav_panel(
+    title = "Random Effects for RUV",
+    icon = HTML("&Sigma;"),
+    card(
+      card_header(
+        selectInput(
+          "select_model_sigma",
+          label = span(icon("magnifying-glass"), "Select a model"),
+          choices = NA
+        )
+      ),
+      card_body(DT::dataTableOutput("sigma_data"))
     )
   )
 )
@@ -188,14 +212,14 @@ server <- function(input, output, session) {
     get_meta_data() |> DT::datatable()
   })
   output$theta_data <- DT::renderDataTable({
-    #selected_model <- which(get_data()$Name %in% input$select_model_theta)
+    # selected_model <- which(get_data()$Name %in% input$select_model_theta)
     reviewed_directory$nonmem_results[[input$select_model_theta]]$Theta |>
       as.data.frame() |>
       mutate_if(is.numeric, round, 3) |>
       DT::datatable(rownames = FALSE)
   })
   output$omega_data <- DT::renderDataTable({
-    #selected_model <- which(get_data()$Name %in% input$select_model_omega)
+    # selected_model <- which(get_data()$Name %in% input$select_model_omega)
     reviewed_directory$nonmem_results[[input$select_model_omega]]$Omega |>
       as.data.frame() |>
       cov_to_cor() |>
@@ -203,7 +227,7 @@ server <- function(input, output, session) {
       DT::datatable(rownames = FALSE)
   })
   output$sigma_data <- DT::renderDataTable({
-    #selected_model <- which(get_data()$Name %in% input$select_model_sigma)
+    # selected_model <- which(get_data()$Name %in% input$select_model_sigma)
     reviewed_directory$nonmem_results[[input$select_model_sigma]]$Sigma |>
       as.data.frame() |>
       cov_to_cor() |>
@@ -213,6 +237,34 @@ server <- function(input, output, session) {
 
 
   #---- Figures ----
+  output$ofv_figure <- renderPlotly({
+    ofv_data <- get_data()
+    ofv_data$Name <- factor(
+      ofv_data$Name,
+      levels = ofv_data$Name[order(ofv_data[[input$ofv]])]
+    )
+    ofv_plot <- ggplot(
+      data = ofv_data,
+      mapping = aes(
+        x = .data[[input$ofv]],
+        y = Name,
+        fill = .data[[input$n_params]]
+      )
+    ) +
+      geom_col() +
+      scale_fill_viridis_c() +
+      coord_cartesian(xlim = range(ofv_data[[input$ofv]])) +
+      labs(
+        x = input$ofv, y = NULL,
+        fill = switch(input$n_params,
+          "n_theta" = "Fixed Effects",
+          "n_omega" = "BSV",
+          "n_sigma" = "RUV"
+        )
+      )
+    return(ggplotly(ofv_plot))
+  })
+
   output$fig_cov <- renderPlotly({
     cat_variables <- get_field(
       get_meta_data(),
@@ -351,7 +403,7 @@ server <- function(input, output, session) {
     }
   )
 
-  output$dataset_report <- downloadHandler(
+  output$report_docx <- downloadHandler(
     filename = function() {
       "dataset-report.docx"
     },
@@ -370,6 +422,24 @@ server <- function(input, output, session) {
         report_path = file,
         bins = input$bins
       )
+      removeModal(session = session)
+    }
+  )
+
+  output$report_pdf <- downloadHandler(
+    filename = function() {
+      "dataset-report.pdf"
+    },
+    content = function(file) {
+      showModal(
+        modalDialog(
+          title = span(icon("file-pen"), " Writing report..."),
+          size = "s",
+          addSpinner(tableOutput("spinner"), spin = "fading-circle")
+        ),
+        session = session
+      )
+
       removeModal(session = session)
     }
   )

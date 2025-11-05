@@ -2,21 +2,11 @@
 title: "Covariate Analysis"
 date: "`r Sys.Date()`"
 output:
-  officedown::rdocx_document:
+  format:
+  typst:
     toc: true
-    toc_depth: 3
-    fig_width: 6.5
-    tables:
-      style: Table
-      layout: autofit
-      width: 1.0
-      conditional:
-        first_row: true
-        first_column: false
-        last_row: false
-        last_column: false
-        no_hband: true
-        no_vband: false
+    section-numbering: 1.1.a
+    columns: 2
 params:
   data_path:
     label: "Dataset"
@@ -95,7 +85,7 @@ __Figure__: &eta; pairs plot
 inventory_list <- eta_plot(data, meta_data)
 for (inventory_name in names(inventory_list)) {
   cat(inventory_name, "\n\n")
-  print(inventory_list[[inventory_name]])
+  cat(inventory_list[[inventory_name]] |> knitr::kable(), sep = "\n")
   cat("\n\n")
 }
 ```
@@ -112,7 +102,7 @@ __Figure__: &eta; vs covariates
 inventory_list <- eta_cov_plot(data, meta_data)
 for (inventory_name in names(inventory_list)) {
   cat(inventory_name, "\n\n")
-  print(inventory_list[[inventory_name]])
+  cat(inventory_list[[inventory_name]] |> knitr::kable(), sep = "\n")
   cat("\n\n")
 }
 ```
@@ -126,6 +116,5 @@ __Table__: correlations between &eta; vs covariates
 #| warning: false
 
 eta_cov_table <- eta_cor(data, meta_data)
-knitr::kable(eta_cov_table) |>
-  gsub(pattern = "/", replacement = "<br>")
+knitr::kable(eta_cov_table)
 ```

@@ -8,7 +8,8 @@ library(GGally)
 
 #---- UI ----
 ui <- page_navbar(
-  title = span(icon("database"), " Covariate Analysis"),
+  theme = bs_theme(bootswatch = "zephyr"),
+  title = span(icon("arrows-left-right-to-line"), " Covariate Analysis"),
   sidebar = sidebar(
     #---- Inputs ----
     accordion(
@@ -47,78 +48,77 @@ ui <- page_navbar(
       accordion_panel(
         title = "Reporting",
         icon = icon("file-export"),
-        downloadButton("dataset_report", icon = icon("file-word"))
+        downloadButton("report_docx", icon = icon("file-word")),
+        downloadButton("report_pdf", icon = icon("file-pdf"))
       )
     )
   ),
-  navset_card_tab(
-    #---- Dataset ----
-    nav_panel(
-      title = "Data",
-      icon = icon("database"),
-      card(
-        card_header(
-          textInput(
-            "data_filter",
-            tooltip(
-              span(icon("filter"), "Data Filter"),
-              span(icon("circle-info"), "Filter is expected as dplyr expression")
-            ),
-            value = ""
-          )
-        ),
-        card_body(DT::dataTableOutput("data"))
-      )
-    ),
-    #---- Mapping ----
-    nav_panel(
-      title = "Mapping",
-      icon = icon("signs-post"),
-      card(DT::dataTableOutput("data_mapping"))
-    ),
-    #---- Eta Plot ----
-    nav_panel(
-      title = HTML("&eta;"),
-      icon = icon("chart-line"),
-      card(
-        card_header(
-          popover(
-            span(icon("gear"), "Settings"),
-            pickerInput("select_eta_cat", "Grouping", choices = "All"),
-            pickerInput("select_eta", HTML("Select &eta;"), multiple = TRUE, choices = NA)
-          )
-        ),
-        card_body(plotlyOutput("eta_plot"))
-      )
-    ),
-    #---- Covariates ----
-    nav_panel(
-      title = "Covariates",
-      icon = icon("chart-simple"),
-      card(
-        card_header(
-          popover(
-            span(icon("gear"), "Settings"),
-            pickerInput("select_cov_cat", "Grouping", choices = "All"),
-            pickerInput("select_eta_cov", HTML("Select &eta;"), multiple = TRUE, choices = NA),
-            pickerInput("select_cov", "Select Covariate", multiple = TRUE, choices = NA)
-          )
-        ),
-        card_body(plotlyOutput("cov_eta_plot"))
-      )
-    ),
-    #---- Covariate correlation ----
-    nav_panel(
-      title = "Covariates",
-      icon = icon("box-archive"),
-      card(full_screen = TRUE, DT::DTOutput("eta_cov_table"))
-    ),
-    #---- Omega ----
-    nav_panel(
-      title = HTML("&Omega;"),
-      icon = icon("box-archive"),
-      card(DT::DTOutput("omega_table"))
+  #---- Dataset ----
+  nav_panel(
+    title = "Data",
+    icon = icon("database"),
+    card(
+      card_header(
+        textInput(
+          "data_filter",
+          tooltip(
+            span(icon("filter"), "Data Filter"),
+            span(icon("circle-info"), "Filter is expected as dplyr expression")
+          ),
+          value = ""
+        )
+      ),
+      card_body(DT::dataTableOutput("data"))
     )
+  ),
+  #---- Mapping ----
+  nav_panel(
+    title = "Mapping",
+    icon = icon("signs-post"),
+    card(DT::dataTableOutput("data_mapping"))
+  ),
+  #---- Eta Plot ----
+  nav_panel(
+    title = HTML("&eta;"),
+    icon = icon("chart-line"),
+    card(
+      card_header(
+        popover(
+          span(icon("gear"), "Settings"),
+          pickerInput("select_eta_cat", "Grouping", choices = "All"),
+          pickerInput("select_eta", HTML("Select &eta;"), multiple = TRUE, choices = NA)
+        )
+      ),
+      card_body(plotlyOutput("eta_plot"))
+    )
+  ),
+  #---- Covariates ----
+  nav_panel(
+    title = "Covariates",
+    icon = icon("chart-simple"),
+    card(
+      card_header(
+        popover(
+          span(icon("gear"), "Settings"),
+          pickerInput("select_cov_cat", "Grouping", choices = "All"),
+          pickerInput("select_eta_cov", HTML("Select &eta;"), multiple = TRUE, choices = NA),
+          pickerInput("select_cov", "Select Covariate", multiple = TRUE, choices = NA)
+        )
+      ),
+      card_body(plotlyOutput("cov_eta_plot"))
+    )
+  ),
+  #---- Covariate correlation ----
+  nav_panel(
+    title = "Covariates",
+    icon = icon("box-archive"),
+    card(full_screen = TRUE, DT::DTOutput("eta_cov_table"))
+  ),
+  #---- Omega ----
+  nav_panel(
+    title = HTML("&Omega;"),
+    icon = icon("box-archive"),
+    card(DT::DTOutput("omega_table"))
   )
 )
 
@@ -130,7 +130,7 @@ server <- function(input, output, session) {
       return()
     }
     is_nonmem_file <- grepl(pattern = ".tab", input$dataset$datapath)
-    if(is_nonmem_file){
+    if (is_nonmem_file) {
       return(readr::read_table(input$dataset$datapath, skip = 1))
     }
     readr::read_csv(input$dataset$datapath, na = c("NA", "N/A", "", "."))
@@ -229,7 +229,7 @@ server <- function(input, output, session) {
   })
 
   #---- Tables ----
-  output$data <- DT::renderDataTable({
+  output$data <- DT::renderDT({
     data <- get_data()
     if (!(input$data_filter %in% "")) {
       eval(parse(
@@ -251,7 +251,7 @@ server <- function(input, output, session) {
     omega_table <- as.data.frame(res_data$Omega) |>
       filter(Estimates > 0) |>
       select(-Initial) |>
-      mutate(CV = 100*sqrt(Estimates)) |>
+      mutate(CV = 100 * sqrt(Estimates)) |>
       mutate_if(is.numeric, round, 1)
     names(omega_table) <- c("Name", "Covariance", "RSE [%]", "Shrinkage [%]", "CV [%]")
 
@@ -262,9 +262,12 @@ server <- function(input, output, session) {
     if (!enough_data()) {
       return()
     }
-    eta_cov_table <- eta_cor(get_data(), get_meta_data()) |>
-      dplyr::mutate_all(gsub, pattern = "/", replacement="<br>")
-    DT::datatable(eta_cov_table, rownames = FALSE, escape = FALSE)
+    eta_cov_table <- eta_cor(get_data(), get_meta_data())
+    DT::datatable(
+      highlight_significant(eta_cov_table, format = "html"),
+      rownames = FALSE,
+      escape = FALSE
+    )
   })
 
   #---- Figures ----
@@ -286,12 +289,13 @@ server <- function(input, output, session) {
     content = function(file) {
       write.csv(
         readr::read_csv(system.file("template-dictionary.csv", package = "nonmem.utils")),
-        file, row.names = FALSE
-        )
+        file,
+        row.names = FALSE
+      )
     }
   )
 
-  output$dataset_report <- downloadHandler(
+  output$report_docx <- downloadHandler(
     filename = function() {
       "dataset-report.docx"
     },
@@ -309,6 +313,23 @@ server <- function(input, output, session) {
         meta_data_path = input$meta_data$datapath,
         report_path = file,
         bins = input$bins
+      )
+      removeModal(session = session)
+    }
+  )
+
+  output$report_pdf <- downloadHandler(
+    filename = function() {
+      "dataset-report.pdf"
+    },
+    content = function(file) {
+      showModal(
+        modalDialog(
+          title = span(icon("file-pen"), " Writing report..."),
+          size = "s",
+          addSpinner(tableOutput("spinner"), spin = "fading-circle")
+        ),
+        session = session
       )
       removeModal(session = session)
     }

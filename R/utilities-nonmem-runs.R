@@ -69,8 +69,8 @@ find_row <- function(patterns, text) {
 #' @keywords internal
 matrix_indices <- function(n_dim) {
   indices <- expand.grid(x = seq_len(n_dim), y = seq_len(n_dim)) |>
-    filter(x >= y) |>
-    arrange(x)
+    dplyr::filter(.data[["x"]] >= .data[["y"]]) |>
+    dplyr::arrange(.data[["x"]])
   return(indices)
 }
 
@@ -329,9 +329,13 @@ cov_to_cor <- function(data, cov_name = "Estimates") {
       cov_indices$y_row[diag_indices & cov_indices$y == y]
     }
   )
-  new_data <- bind_cols(data, cov_indices) |>
-    mutate(
-      CV = ifelse(x == y, sqrt(Estimates), Estimates / (Estimates[x_row] * Estimates[y_row]))
+  new_data <- dplyr::bind_cols(data, cov_indices) |>
+    dplyr::mutate(
+      CV = ifelse(
+        x == y,
+        sqrt(Estimates),
+        Estimates / (Estimates[x_row] * Estimates[y_row])
+      )
     ) |>
     select(-c(x, y, x_row, y_row))
   return(new_data)

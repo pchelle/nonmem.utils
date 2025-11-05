@@ -25,9 +25,12 @@ Render a docx document that analyses a dataset
 }
 \seealso{
 Other report: 
+\code{\link{highlight_significant}()},
 \code{\link{report_gof_analysis}()},
 \code{\link{report_limited_sampling_analysis}()},
 \code{\link{report_vpc_analysis}()},
-\code{\link{report_workflow_summary}()}
+\code{\link{report_workflow_summary}()},
+\code{\link{typst_scientific}()},
+\code{\link{typst_table}()}
 }
 \concept{report}

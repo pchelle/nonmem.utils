@@ -1,0 +1,122 @@
+---
+title: "Get Started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Get Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(nonmem.utils)
+```
+
+## Concept
+
+This package aims at providing helpers for reporting PopPK modeling as performed using Nonmem.
+
+`nonmem.utils` concept is to leverage a dictionary data.frame (`meta_data` argument) to provide a mapping between the data (`data` argument) variables and their information such as labels and units.
+
+### `data`
+
+The `data` argument is a data.frame that contains the data to be analyzed.
+
+To illustrate the package features, dataset 501 from [NONMEM Tutorial](https://doi.org/10.1002/psp4.12404) is exposed as shown below:
+
+```{r, results='asis'}
+data_501 |>
+  head() |>
+  knitr::kable()
+```
+
+### `meta_data`
+
+The `meta_data` argument is a dictionary data.frame that contains the information about the dataset.
+
+It should contain the following columns:
+
+- __`Name`__: name of the dataset variable
+- __`Type`__: type of the dataset variables in lower cases.
+  - The type can be one of the following: `id`, `occ`, `time`, `tad`, `dv`, `amt`, `evid`, `mdv`.
+  - If the variable is a continuous covariate, use `cov`.
+  - If the variable is a categorical covariate, use `cat`.
+  - If the variable is a model BSV/BOV parameters, use `eta`.
+
+- __`Label`__: displayed label of the dataset variable
+- __`Unit`__: displayed unit of the dataset variable
+  - For categorical covariates (Type is `cat`), see explanations and example below.
+  
+- __`Min`__: the minimum expected value of the dataset variable
+- __`Max`__: the maximum expected value of the dataset variable
+
+Mapping between the categorical covariate values and labels can be provided in the __`Label`__ column.
+The `jsonlite` package is leveraged to parse the mapping.
+As a consequence, the mapping is expected to be provided as __`"value":"label"`__ split by pipes `|`.
+
+For instance, to map a variable named `sex` with `0` coding for _male_ and `1` coding for _female_, 
+the Label cell should be have the following value:
+
+```json
+"0":"male"|"1":"female"
+```
+
+&#128161; _Defining multiple dictionaries can be useful if many covariates are available_
+
+To illustrate the package features, a dictionary for dataset 501 from [NONMEM Tutorial](https://doi.org/10.1002/psp4.12404) is exposed as shown below:
+
+```{r, results='asis'}
+meta_data_501 |>
+  knitr::kable()
+```
+
+## Example
+
+Once `data` and `meta_data` are defined, they can be used to populate graphical and tabular results for PopPK analyses as illustrated below:
+
+For instance
+
+```{r, results='asis'}
+cov_cor(data_501, meta_data_501) |>
+  knitr::kable()
+```
+
+```{r}
+cov_plot(data_501, meta_data_501)
+```
+
+## Available Analyses
+
+Dedicated articles show how to use `nonmem.utils` functions to support :
+
+- [Dataset Analysis and Summary](./dataset-analysis.html)
+- [Covariate Analysis](./covariate-analysis.html)
+- [Goodness of Fit Analysis](./gof-analysis.html)
+
+## Shiny 
+
+Run the following code to open the toolbox (also available in the RStudio Addins menu):
+
+``` r
+nonmem.utils::shiny_toolbox()
+```
+
+Select the desired tool from the toolbox (for instance, covariate-analysis) and click on the button <button>Done</button>.
+
+The appropriate code will be added to the R console to start the corresponding tool.
+
+## Reporting
+
+The package offers support functions to format analysis tables to `html`, `pdf` (using `typst`) and `docx`.
+
+To get a default `docx` or `pdf` report of your analysis, you can use functions such as below:
+
+``` r
+nonmem.utils::report_dataset_analysis(data_path, meta_data_path)
+```

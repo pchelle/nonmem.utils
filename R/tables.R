@@ -16,7 +16,7 @@
 #'
 cov_cor <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
-  if(length(id_variable)==0) {
+  if (length(id_variable) == 0) {
     cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
     return()
   }
@@ -72,7 +72,7 @@ cov_cor <- function(data, meta_data) {
 #' @export
 eta_cor <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
-  if(length(id_variable)==0) {
+  if (length(id_variable) == 0) {
     cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
     return()
   }
@@ -94,8 +94,8 @@ eta_cor <- function(data, meta_data) {
     Covariates = stringi::stri_unescape_unicode(c(
       covariates$Label,
       categoricals$Label
-      ))
-    )
+    ))
+  )
 
   for (eta_name in etas$Name) {
     cor_data[[eta_name]] <- NA
@@ -147,20 +147,20 @@ data_inventory <- function(data, meta_data) {
     USE.NAMES = TRUE, simplify = FALSE
   )
   # Handle no occasion variable
-  if(length(variable_names$occ)==0){
+  if (length(variable_names$occ) == 0) {
     variable_names$occ <- variable_names$id
     variable_labels$occ <- variable_labels$id
   }
   # Handle evid/amt
   use_amt <- length(variable_names$evid) == 0
-  if(use_amt){
+  if (use_amt) {
     variable_names$evid <- "EVID"
-    data$EVID <- ifelse(is.na(data$AMT), 0, as.numeric(data$AMT>0))
+    data$EVID <- ifelse(is.na(data$AMT), 0, as.numeric(data$AMT > 0))
   }
 
   # Handle no blq variable
   no_blq <- length(variable_names$blq) == 0
-  if(no_blq){
+  if (no_blq) {
     variable_names$blq <- "BLQ"
     data$BLQ <- 0
   }
@@ -172,7 +172,7 @@ data_inventory <- function(data, meta_data) {
     summarise(
       Subjects = n_distinct(.data[[variable_names$id]]),
       Studies = n_distinct(paste(.data[[variable_names$id]], .data[[variable_names$occ]])),
-      Doses = sum(.data[[variable_names$evid]] %in% c(1,4)),
+      Doses = sum(.data[[variable_names$evid]] %in% c(1, 4)),
       Observations = sum(.data[[variable_names$mdv]] == 0, na.rm = TRUE),
       `Percent BLQ` = round(100 * sum(.data[[variable_names$blq]] > 0, na.rm = TRUE) / sum(.data[[variable_names$mdv]] > 0, na.rm = TRUE), 2),
     ) |>
@@ -183,7 +183,7 @@ data_inventory <- function(data, meta_data) {
       `Observations per Subject` = round(Observations / Subjects, 2),
       `Observations per Study` = round(Observations / Studies, 2)
     )
-  if(no_blq){
+  if (no_blq) {
     inventory_total <- inventory_total |> select(-`Percent BLQ`)
   }
 
@@ -200,7 +200,7 @@ data_inventory <- function(data, meta_data) {
         summarise(
           Subjects = n_distinct(.data[[variable_names$id]]),
           Studies = n_distinct(paste(.data[[variable_names$id]], .data[[variable_names$occ]])),
-          Doses = sum(.data[[variable_names$evid]] %in% c(1,4)),
+          Doses = sum(.data[[variable_names$evid]] %in% c(1, 4)),
           Observations = sum(.data[[variable_names$mdv]] == 0, na.rm = TRUE),
           `Percent BLQ` = round(100 * sum(.data[[variable_names$blq]] > 0, na.rm = TRUE) / sum(.data[[variable_names$mdv]] > 0, na.rm = TRUE), 2),
         ) |>
@@ -211,7 +211,7 @@ data_inventory <- function(data, meta_data) {
           `Observations per Subject` = round(Observations / Subjects, 2),
           `Observations per Study` = round(Observations / Studies, 2)
         )
-      if(no_blq){
+      if (no_blq) {
         inventory_by_cat <- inventory_by_cat |> select(-`Percent BLQ`)
       }
       return(inventory_by_cat)
@@ -244,7 +244,7 @@ data_inventory <- function(data, meta_data) {
 #'
 cov_inventory <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
-  if(length(id_variable)==0) {
+  if (length(id_variable) == 0) {
     cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
     return()
   }
@@ -340,7 +340,7 @@ cov_inventory <- function(data, meta_data) {
 #'
 cat_inventory <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
-  if(length(id_variable)==0) {
+  if (length(id_variable) == 0) {
     cli::cli_alert_danger("No {.strong id} variable found in {.emph meta_data}")
     return()
   }

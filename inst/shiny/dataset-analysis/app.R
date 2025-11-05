@@ -14,6 +14,7 @@ get_field <- function(data, field_name, type_name) {
 
 #---- UI ----
 ui <- page_navbar(
+  theme = bs_theme(bootswatch = "zephyr"),
   title = span(icon("database"), " Dataset Analysis"),
   sidebar = sidebar(
     #---- Inputs ----
@@ -46,111 +47,110 @@ ui <- page_navbar(
       accordion_panel(
         title = "Reporting",
         icon = icon("file-export"),
-        downloadButton("dataset_report", icon = icon("file-word"))
+        downloadButton("report_docx", icon = icon("file-word")),
+        downloadButton("report_pdf", icon = icon("file-pdf"))
       )
     )
   ),
-  navset_card_tab(
-    #---- Dataset ----
-    nav_panel(
-      title = "Data",
-      icon = icon("database"),
-      card(
-        card_header(
-          textInput(
-            "data_filter",
-            tooltip(
-              span(icon("filter"), "Data Filter"),
-              span(icon("circle-info"), "Filter is expected as dplyr expression")
-            ),
-            value = ""
+  #---- Dataset ----
+  nav_panel(
+    title = "Data",
+    icon = icon("database"),
+    card(
+      card_header(
+        textInput(
+          "data_filter",
+          tooltip(
+            span(icon("filter"), "Data Filter"),
+            span(icon("circle-info"), "Filter is expected as dplyr expression")
+          ),
+          value = ""
+        )
+      ),
+      card_body(DT::dataTableOutput("data"))
+    )
+  ),
+  #---- Mapping ----
+  nav_panel(
+    title = "Mapping",
+    icon = icon("signs-post"),
+    card(DT::dataTableOutput("data_mapping"))
+  ),
+  #---- Time Profile ----
+  nav_panel(
+    title = "Time Profile",
+    icon = icon("chart-line"),
+    card(
+      card_header(
+        popover(
+          span(icon("gear"), "Settings"),
+          fluidPage(
+            pickerInput("select_time", span(icon("timeline"), "Time Variable"), multiple = FALSE, choices = NA),
+            sliderInput("bins", span(icon("layer-group"), " Number of bins"), min = 1, max = 20, value = 5),
+            pickerInput("y_scale", span(icon("ruler"), " Scale"), choices = c("Linear", "Log", "Percent BLQ")),
+            pickerInput("time_group", span(icon("object-ungroup"), " Grouping"), choices = "All")
           )
+        )
+      ),
+      card_body(plotlyOutput("time_profile"))
+    )
+  ),
+  #---- Covariates ----
+  nav_panel(
+    title = "Covariates",
+    icon = icon("chart-simple"),
+    card(
+      card_header(
+        popover(
+          span(icon("gear"), "Settings"),
+          pickerInput("select_cov", "Select Covariate", multiple = TRUE, choices = NA)
+        )
+      ),
+      card_body(plotlyOutput("fig_cov"))
+    )
+  ),
+  #---- Categoricals ----
+  nav_panel(
+    title = "Categoricals",
+    icon = icon("box-archive"),
+    card(full_screen = TRUE, DT::DTOutput("cov_cor_table"))
+  ),
+  #---- Data Inventory ----
+  nav_panel(
+    title = "Data Inventory",
+    icon = icon("box-archive"),
+    card(
+      full_screen = TRUE,
+      card_header(
+        popover(
+          span(icon("gear"), "Settings"),
+          pickerInput("select_inv_cat", "Select Group", multiple = FALSE, choices = "All")
         ),
-        card_body(DT::dataTableOutput("data"))
-      )
-    ),
-    #---- Mapping ----
-    nav_panel(
-      title = "Mapping",
-      icon = icon("signs-post"),
-      card(DT::dataTableOutput("data_mapping"))
-    ),
-    #---- Time Profile ----
-    nav_panel(
-      title = "Time Profile",
-      icon = icon("chart-line"),
-      card(
-        card_header(
-          popover(
-            span(icon("gear"), "Settings"),
-            fluidPage(
-              pickerInput("select_time", span(icon("timeline"), "Time Variable"), multiple = FALSE, choices = NA),
-              sliderInput("bins", span(icon("layer-group"), " Number of bins"), min = 1, max = 20, value = 5),
-              pickerInput("y_scale", span(icon("ruler"), " Scale"), choices = c("Linear", "Log", "Percent BLQ")),
-              pickerInput("time_group", span(icon("object-ungroup"), " Grouping"), choices = "All")
-            )
-          )
-        ),
-        card_body(plotlyOutput("time_profile"))
-      )
-    ),
-    #---- Covariates ----
-    nav_panel(
-      title = "Covariates",
-      icon = icon("chart-simple"),
-      card(
-        card_header(
-          popover(
-            span(icon("gear"), "Settings"),
-            pickerInput("select_cov", "Select Covariate", multiple = TRUE, choices = NA)
-          )
-        ),
-        card_body(plotlyOutput("fig_cov"))
-      )
-    ),
-    #---- Categoricals ----
-    nav_panel(
-      title = "Categoricals",
-      icon = icon("box-archive"),
-      card(full_screen = TRUE, DT::DTOutput("cov_cor_table"))
-    ),
-    #---- Data Inventory ----
-    nav_panel(
-      title = "Data Inventory",
-      icon = icon("box-archive"),
+        p("Data inventory")
+      ),
+      card_body(DT::dataTableOutput("sum_data"))
+    )
+  ),
+  #---- Summary ----
+  nav_panel(
+    title = "Summary",
+    icon = icon("box-archive"),
+    layout_column_wrap(
       card(
         full_screen = TRUE,
         card_header(
           popover(
             span(icon("gear"), "Settings"),
-            pickerInput("select_inv_cat", "Select Group", multiple = FALSE, choices = "All")
+            pickerInput("select_sum_cat", "Select Group", multiple = FALSE, choices = "All")
           ),
-          p("Data inventory")
+          p("Continuous covariate statistics")
         ),
-        card_body(DT::dataTableOutput("sum_data"))
-      )
-    ),
-    #---- Summary ----
-    nav_panel(
-      title = "Summary",
-      icon = icon("box-archive"),
-      layout_column_wrap(
-        card(
-          full_screen = TRUE,
-          card_header(
-            popover(
-              span(icon("gear"), "Settings"),
-              pickerInput("select_sum_cat", "Select Group", multiple = FALSE, choices = "All")
-            ),
-            p("Continuous covariate statistics")
-            ),
-          card_body(DT::dataTableOutput("sum_cov"))
-        ),
-        card(
-          full_screen = TRUE,
-          card_header(" Count"),
-          card_body(DT::dataTableOutput("sum_cat"))
-        )
+        card_body(DT::dataTableOutput("sum_cov"))
+      ),
+      card(
+        full_screen = TRUE,
+        card_header(" Count"),
+        card_body(DT::dataTableOutput("sum_cat"))
       )
     )
   )
@@ -164,7 +164,7 @@ server <- function(input, output, session) {
       return()
     }
     is_nonmem_file <- grepl(pattern = ".tab", input$dataset$datapath)
-    if(is_nonmem_file){
+    if (is_nonmem_file) {
       return(readr::read_table(input$dataset$datapath, skip = 1))
     }
     readr::read_csv(input$dataset$datapath, na = c("NA", "N/A", "", "."))
@@ -249,7 +249,7 @@ server <- function(input, output, session) {
   })
 
   #---- Tables ----
-  output$data <- DT::renderDataTable({
+  output$data <- DT::renderDT({
     data <- get_data()
     if (!(input$data_filter %in% "")) {
       eval(parse(
@@ -271,7 +271,7 @@ server <- function(input, output, session) {
     inventory <- data.frame(
       Parameter = names(inventories[[input$select_inv_cat]]),
       Value = t(inventories[[input$select_inv_cat]])
-      )
+    )
     return(DT::datatable(inventory, rownames = FALSE))
   })
   output$sum_cov <- DT::renderDT({
@@ -298,11 +298,13 @@ server <- function(input, output, session) {
     cat_table <- cat_inventory(get_data(), get_meta_data())
     cat_table <- lapply(
       cat_table,
-      function(x){
-        if(!is.numeric(x)){return(x)}
-        round(x,2)
+      function(x) {
+        if (!is.numeric(x)) {
+          return(x)
         }
-      ) |>
+        round(x, 2)
+      }
+    ) |>
       data.frame(check.names = FALSE) |>
       DT::datatable(rownames = FALSE)
     return(cat_table)
@@ -311,9 +313,8 @@ server <- function(input, output, session) {
     if (!enough_data()) {
       return()
     }
-    cov_table <- cov_cor(get_data(), get_meta_data()) |>
-      dplyr::mutate_all(gsub, pattern = "/", replacement="<br>")
-    DT::datatable(cov_table, rownames = FALSE, escape = FALSE)
+    cov_table <- cov_cor(get_data(), get_meta_data())
+    DT::datatable(highlight_significant(cov_table), rownames = FALSE, escape = FALSE)
   })
 
   #---- Figures ----
@@ -347,26 +348,28 @@ server <- function(input, output, session) {
     time_name <- pull_name("time", get_meta_data())
     tad_name <- pull_name("tad", get_meta_data())
 
-    if(input$select_time %in% time_name){
+    if (input$select_time %in% time_name) {
       tp_list <- time_profile(get_data(), get_meta_data(), bins = input$bins)
     }
-    if(input$select_time %in% tad_name){
+    if (input$select_time %in% tad_name) {
       tp_list <- tad_profile(get_data(), get_meta_data(), bins = input$bins)
     }
     tp_plots <- tp_list[[input$time_group]]
 
-    if(input$y_scale %in% "Log"){
+    if (input$y_scale %in% "Log") {
       tp_plot <- ggplotly(
         tp_plots[["Linear"]],
         dynamicTicks = TRUE,
-        tooltip = "text") |>
+        tooltip = "text"
+      ) |>
         plotly_log(x = FALSE)
       return(tp_plot)
     }
     tp_plot <- ggplotly(
       tp_plots[[input$y_scale]],
       dynamicTicks = TRUE,
-      tooltip = "text")
+      tooltip = "text"
+    )
 
     return(tp_plot)
   })
@@ -379,12 +382,13 @@ server <- function(input, output, session) {
     content = function(file) {
       write.csv(
         readr::read_csv(system.file("template-dictionary.csv", package = "nonmem.utils")),
-        file, row.names = FALSE
-        )
+        file,
+        row.names = FALSE
+      )
     }
   )
 
-  output$dataset_report <- downloadHandler(
+  output$report_docx <- downloadHandler(
     filename = function() {
       "dataset-report.docx"
     },
@@ -403,6 +407,24 @@ server <- function(input, output, session) {
         report_path = file,
         bins = input$bins
       )
+      removeModal(session = session)
+    }
+  )
+
+  output$report_pdf <- downloadHandler(
+    filename = function() {
+      "dataset-report.docx"
+    },
+    content = function(file) {
+      showModal(
+        modalDialog(
+          title = span(icon("file-pen"), " Writing report..."),
+          size = "s",
+          addSpinner(tableOutput("spinner"), spin = "fading-circle")
+        ),
+        session = session
+      )
+
       removeModal(session = session)
     }
   )

@@ -10,10 +10,11 @@ add_col <- function(data, col_name) {
   return(data)
 }
 
-#TODO: add a setting to split by categorical or color by covariate
+# TODO: add a setting to split by categorical or color by covariate
 
 #---- UI ----
 ui <- page_navbar(
+  theme = bs_theme(bootswatch = "zephyr"),
   title = span(icon("bullseye"), " Model Fit"),
   sidebar = sidebar(
     #---- Inputs ----
@@ -45,137 +46,136 @@ ui <- page_navbar(
       accordion_panel(
         title = "Reporting",
         icon = icon("file-export"),
-        downloadButton("dataset_report", icon = icon("file-word"))
+        downloadButton("report_docx", icon = icon("file-word")),
+        downloadButton("report_pdf", icon = icon("file-pdf"))
       )
     )
   ),
-  navset_card_tab(
-    #---- Dataset ----
-    nav_panel(
-      title = "Data",
-      icon = icon("database"),
-      card(
-        card_header(
-          textInput(
-            "data_filter",
-            tooltip(
-              span(icon("filter"), "Data Filter"),
-              span(icon("circle-info"), "Filter is expected as dplyr expression")
-            ),
-            value = ""
-          )
-        ),
-        card_body(DT::dataTableOutput("data"))
-      )
-    ),
-    #---- Mapping ----
-    nav_panel(
-      title = "Mapping",
-      icon = icon("signs-post"),
-      card(DT::dataTableOutput("data_mapping"))
-    ),
-    #---- Goodness of Fit ----
-    nav_panel(
-      title = "Goodness of Fit",
-      icon = icon("bullseye"),
-      card(
-        card_header(
-          popover(
-            span(icon("gear"), "Settings"),
-            tagList(
-              pickerInput("obs_vs_preds_scale", span(icon("ruler"), " Scale"), choices = c("linear", "log"))
-            )
-          )
-        ),
-        card_body(plotlyOutput("obs_vs_preds"))
-      )
-    ),
-    #---- Residuals ----
-    nav_panel(
-      title = "Residuals",
-      icon = icon("chart-simple"),
-      layout_columns(
-        card(
-          full_screen = TRUE,
-          card_header("CWRES histogram"),
-          plotlyOutput("res_hist")
-        ),
-        card(
-          full_screen = TRUE,
-          card_header("CWRES QQ-plot"),
-          plotlyOutput("res_qq")
+  #---- Dataset ----
+  nav_panel(
+    title = "Data",
+    icon = icon("database"),
+    card(
+      card_header(
+        textInput(
+          "data_filter",
+          tooltip(
+            span(icon("filter"), "Data Filter"),
+            span(icon("circle-info"), "Filter is expected as dplyr expression")
+          ),
+          value = ""
         )
       ),
-      layout_columns(
-        card(
-          full_screen = TRUE,
-          card_header("CWRES vs Time"),
-          plotlyOutput("res_vs_time")
-        ),
-        card(
-          full_screen = TRUE,
-          card_header("CWRES vs TAD"),
-          plotlyOutput("res_vs_tad")
-        ),
-        card(
-          full_screen = TRUE,
-          card_header("CWRES vs Predicted"),
-          plotlyOutput("res_vs_pred")
-        )
-      )
-    ),
-    #---- NPDE ----
-    nav_panel(
-      title = "NPDE",
-      icon = icon("chart-simple"),
-      layout_columns(
-        card(
-          full_screen = TRUE,
-          card_header("NPDE histogram"),
-          plotlyOutput("npde_hist")
-        ),
-        card(
-          full_screen = TRUE,
-          card_header("NPDE QQ-plot"),
-          plotlyOutput("npde_qq")
+      card_body(DT::dataTableOutput("data"))
+    )
+  ),
+  #---- Mapping ----
+  nav_panel(
+    title = "Mapping",
+    icon = icon("signs-post"),
+    card(DT::dataTableOutput("data_mapping"))
+  ),
+  #---- Goodness of Fit ----
+  nav_panel(
+    title = "Goodness of Fit",
+    icon = icon("bullseye"),
+    card(
+      card_header(
+        popover(
+          span(icon("gear"), "Settings"),
+          tagList(
+            pickerInput("obs_vs_preds_scale", span(icon("ruler"), " Scale"), choices = c("linear", "log"))
+          )
         )
       ),
-      layout_columns(
-        card(
-          full_screen = TRUE,
-          card_header("NPDE vs Time"),
-          plotlyOutput("npde_vs_time")
-        ),
-        card(
-          full_screen = TRUE,
-          card_header("NPDE vs TAD"),
-          plotlyOutput("npde_vs_tad")
-        ),
-        card(
-          full_screen = TRUE,
-          card_header("NPDE vs Predicted"),
-          plotlyOutput("npde_vs_pred")
-        )
+      card_body(plotlyOutput("obs_vs_preds"))
+    )
+  ),
+  #---- Residuals ----
+  nav_panel(
+    title = "Residuals",
+    icon = icon("chart-simple"),
+    layout_columns(
+      card(
+        full_screen = TRUE,
+        card_header("CWRES histogram"),
+        plotlyOutput("res_hist")
+      ),
+      card(
+        full_screen = TRUE,
+        card_header("CWRES QQ-plot"),
+        plotlyOutput("res_qq")
       )
     ),
-    #---- Individual Profiles ----
-    nav_panel(
-      title = "Individual Profiles",
-      icon = icon("person-circle-question"),
+    layout_columns(
       card(
-        card_header(
-          popover(
-            span(icon("gear"), "Settings"),
-            tagList(
-              sliderInput("ind_page", span(icon("timeline"), "Page"), min = 1, value = 1, max = 1, step = 1),
-              sliderInput("ind_rows", span(icon("layer-group"), " Rows per page"), min = 1, max = 5, value = 2, step = 1),
-              sliderInput("ind_cols", span(icon("layer-group"), " Columns per page"), min = 1, max = 5, value = 3, step = 1),
-              pickerInput("ind_scale_y", span(icon("ruler"), " Y-axis scale"), choices = c("linear", "log"), selected = "Linear")
-            )
-          )
-        ),
-        card_body(plotlyOutput("time_profile"), spin = "fading-circle") #addSpinner()
+        full_screen = TRUE,
+        card_header("CWRES vs Time"),
+        plotlyOutput("res_vs_time")
+      ),
+      card(
+        full_screen = TRUE,
+        card_header("CWRES vs TAD"),
+        plotlyOutput("res_vs_tad")
+      ),
+      card(
+        full_screen = TRUE,
+        card_header("CWRES vs Predicted"),
+        plotlyOutput("res_vs_pred")
       )
+    )
+  ),
+  #---- NPDE ----
+  nav_panel(
+    title = "NPDE",
+    icon = icon("chart-simple"),
+    layout_columns(
+      card(
+        full_screen = TRUE,
+        card_header("NPDE histogram"),
+        plotlyOutput("npde_hist")
+      ),
+      card(
+        full_screen = TRUE,
+        card_header("NPDE QQ-plot"),
+        plotlyOutput("npde_qq")
+      )
+    ),
+    layout_columns(
+      card(
+        full_screen = TRUE,
+        card_header("NPDE vs Time"),
+        plotlyOutput("npde_vs_time")
+      ),
+      card(
+        full_screen = TRUE,
+        card_header("NPDE vs TAD"),
+        plotlyOutput("npde_vs_tad")
+      ),
+      card(
+        full_screen = TRUE,
+        card_header("NPDE vs Predicted"),
+        plotlyOutput("npde_vs_pred")
+      )
+    )
+  ),
+  #---- Individual Profiles ----
+  nav_panel(
+    title = "Individual Profiles",
+    icon = icon("person-circle-question"),
+    card(
+      card_header(
+        popover(
+          span(icon("gear"), "Settings"),
+          tagList(
+            sliderInput("ind_page", span(icon("timeline"), "Page"), min = 1, value = 1, max = 1, step = 1),
+            sliderInput("ind_rows", span(icon("layer-group"), " Rows per page"), min = 1, max = 5, value = 2, step = 1),
+            sliderInput("ind_cols", span(icon("layer-group"), " Columns per page"), min = 1, max = 5, value = 3, step = 1),
+            pickerInput("ind_scale_y", span(icon("ruler"), " Y-axis scale"), choices = c("linear", "log"), selected = "Linear")
+          )
+        )
+      ),
+      card_body(plotlyOutput("time_profile"), spin = "fading-circle") # addSpinner()
     )
   )
 )
@@ -223,7 +223,7 @@ server <- function(input, output, session) {
       input$dataset$datapath,
       na = c("NA", "N/A", "", "."),
       skip = 1
-      ) |>
+    ) |>
       # TODO: remove column after data is fixed
       mutate(LLOQ = 10)
     return(data)
@@ -324,16 +324,16 @@ server <- function(input, output, session) {
     if (input$ind_scale_y %in% "linear") {
       return(p)
     }
-    n_plots <- input$ind_rows*input$ind_cols
+    n_plots <- input$ind_rows * input$ind_cols
     p$x$layout$yaxis$type <- "log"
-    for(plot_index in seq_len(n_plots)) {
+    for (plot_index in seq_len(n_plots)) {
       p$x$layout[[paste0("yaxis", plot_index)]]$type <- "log"
     }
     return(p)
   })
 
   #---- Downloads ----
-  output$dataset_report <- downloadHandler(
+  output$report_docx <- downloadHandler(
     filename = function() {
       "gof-report.docx"
     },
@@ -350,7 +350,25 @@ server <- function(input, output, session) {
         data_path = input$dataset$datapath,
         meta_data_path = input$meta_data$datapath,
         report_path = file
-        )
+      )
+      removeModal(session = session)
+    }
+  )
+
+  output$report_pdf <- downloadHandler(
+    filename = function() {
+      "gof-report.pdf"
+    },
+    content = function(file) {
+      showModal(
+        modalDialog(
+          title = span(icon("file-pen"), " Writing report..."),
+          size = "s",
+          addSpinner(tableOutput("spinner"), spin = "fading-circle")
+        ),
+        session = session
+      )
+
       removeModal(session = session)
     }
   )

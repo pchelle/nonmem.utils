@@ -73,7 +73,7 @@ Here is an example printing all the tables below each other:
 
 ```{r}
 #| results: 'asis'
-for(summary_label in names(pk_summary)){
+for (summary_label in names(pk_summary)) {
   cat(summary_label)
   cat("\n\n")
   cat(knitr::kable(pk_summary[[summary_label]]), sep = "\n")
@@ -145,6 +145,9 @@ The function `cov_cor()` provides a table with
 - Spearman correlation test results between continuous covariates
 - ANOVA test results between continuous and categorical covariates
 
-```{r}
-knitr::kable(cov_cor(data_501, meta_data_501))
+```{r, results='asis'}
+cov_table <- cov_cor(data_501, meta_data_501)
+cov_table |>
+  highlight_significant() |>
+  knitr::kable()
 ```

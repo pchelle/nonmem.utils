@@ -76,6 +76,9 @@ The function `eta_cor()` provides a table with
 - Spearman correlation test results between continuous covariates and etas
 - ANOVA test results between categorical covariates and etas
 
-```{r}
-knitr::kable(eta_cor(data_501, meta_data_501))
+```{r, results='asis'}
+eta_table <- eta_cor(data_501, meta_data_501)
+eta_table |>
+  highlight_significant() |>
+  knitr::kable()
 ```

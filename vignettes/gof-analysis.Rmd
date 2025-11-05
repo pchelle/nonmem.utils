@@ -60,7 +60,7 @@ dv_preds(data_501, meta_data_501)
 To obtain the plot in log-log scale, the function `gg_log()` can be used as illustrated below:
 
 ```{r}
-dv_preds(data_501, meta_data_501) |> 
+dv_preds(data_501, meta_data_501) |>
   gg_log()
 ```
 
@@ -95,15 +95,15 @@ To review individual time profiles, the functions `ind_time_profiles()` and `ind
 
 ```{r}
 ind_time_profiles(
-  data = data_501 |> dplyr::filter(ID <= 6), 
+  data = data_501 |> dplyr::filter(ID <= 6),
   meta_data = meta_data_501
-  )
+)
 ```
 
 ```{r}
 ind_tad_profiles(
-  data = data_501 |> dplyr::filter(ID <= 6), 
+  data = data_501 |> dplyr::filter(ID <= 6),
   meta_data = meta_data_501
-  )
+)
 ```
 

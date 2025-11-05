@@ -27,18 +27,18 @@ For infusions (\code{dur>0} or \code{rate>0}), the time after the end of infusio
 \examples{
 
 data_501 |>
-dplyr::mutate(TAD2 = calc_tad(id = ID, time = TIME, amt = AMT))
+  dplyr::mutate(TAD2 = calc_tad(id = ID, time = TIME, amt = AMT))
 
 data_501 |>
-dplyr::mutate(TAD2 = calc_tad(id = ID, time = TIME, evid = EVID))
+  dplyr::mutate(TAD2 = calc_tad(id = ID, time = TIME, evid = EVID))
 
 data_501 |>
-dplyr::mutate(TAD2 = calc_tad(
-id = ID,
-time = TIME,
-evid = EVID,
-amt = AMT,
-rate = RATE
-))
+  dplyr::mutate(TAD2 = calc_tad(
+    id = ID,
+    time = TIME,
+    evid = EVID,
+    amt = AMT,
+    rate = RATE
+  ))
 
 }

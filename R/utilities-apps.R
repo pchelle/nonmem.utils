@@ -11,7 +11,8 @@ shiny_toolbox <- function() {
     requireNamespace("rstudioapi", quietly = TRUE)
   )
   if (!can_run) {
-    cat("Please install shiny, miniUI and rstudioapi packages to run this function")
+    cli::cli_alert_danger("Packages {.val shiny}, {.val miniUI} and {.val rstudioapi} required")
+    cli::cli_alert("Install those packages using: {.code install.packages(c(\"shiny\", \"miniUI\", \"rstudioapi\"))}")
     return()
   }
   # Shiny App UI

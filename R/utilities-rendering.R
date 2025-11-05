@@ -161,3 +161,103 @@ report_vpc_analysis <- function(data_path,
   unlink(temp_dir, recursive = TRUE)
   return(file.exists(report_path))
 }
+
+#' @title typst_table
+#' @description
+#' Print a table in raw typst for pdf document rendering
+#' @param data A data.frame to render
+#' @param linebreak Line break pattern to be subbed by typst line break
+#' @export
+#' @family report
+#' @examples
+#'
+#' data_with_linebreak <- data.frame(Example = c("$10^2$<br>$-->$", "#sym.checkmark"))
+#' typst_table(data_with_linebreak)
+#'
+typst_table <- function(data, linebreak = "<br>") {
+  table_header <- paste0("[*", names(data), "*]", collapse = "")
+  table_content <- c(
+    "```{=typst}",
+    "#table(",
+    "  stroke: 1pt,",
+    "  align: horizon,",
+    paste0("  columns: ", ncol(data), ","),
+    paste0("  table.header", table_header, ",")
+  )
+  for (row_index in seq_len(nrow(data))) {
+    row_values <- as.character(as.data.frame(data[row_index, ]))
+    row_values <- ifelse(grepl("text\\(", row_values), row_values, paste0("[", row_values, "]"))
+    table_row <- paste0(row_values, ",", collapse = "")
+    table_row <- gsub(pattern = linebreak, replacement = " \\\\ ", table_row)
+    table_content <- c(table_content, paste0("  ", table_row))
+  }
+  table_content <- c(table_content, ")", "```")
+  return(table_content)
+}
+
+#' @title typst_scientific
+#' @description
+#' Add characters to render number into scientific writing
+#' @param values Values to render into scientific format
+#' @param digit Number of digits
+#' @export
+#' @family report
+#' @examples
+#'
+#' typst_scientific(stats::rlnorm(5))
+#'
+typst_scientific <- function(values, digit = 2) {
+  typst_values <- sprintf(paste0("%.", digit, "e"), values)
+  typst_values <- gsub(pattern = "e\\+", replacement = " dot 10^(", typst_values)
+  typst_values <- gsub(pattern = "e-", replacement = " dot 10^(-", typst_values)
+  return(paste0("$", typst_values, ")$"))
+}
+
+#' @title highlight_significant
+#' @description
+#' Add color for significant cell
+#' @param data A data.frame
+#' @param pval Significance threshold for p-value
+#' @param color Color when significant
+#' @param format `"typst"`, `"html"`
+#' @export
+#' @family report
+#' @examples
+#'
+#' cor_data <- cov_cor(data_501, meta_data_501)
+#' cor_data
+#'
+#' cor_data |> highlight_significant(pval = 0.1, format = "html")
+#'
+#' cor_data |> highlight_significant(pval = 0.1, format = "typst")
+#'
+#' cor_data |> highlight_significant(pval = 0.1, format = "docx")
+#'
+highlight_significant <- function(data, pval = 0.05, color = "green", format = "html") {
+  for (col_index in seq_len(ncol(data))) {
+    pvalues <- parse_pvalue(data[[col_index]])
+    data[[col_index]] <- dplyr::if_else(
+      pvalues <= pval,
+      true = switch(format,
+        "html" = paste0("<font color=\"", color, "\"><strong>", data[[col_index]], "</strong></font>"),
+        "docx" = paste0("**", data[[col_index]], "**"),
+        "typst" = paste0("#text(", color, ")[*", data[[col_index]], "*]")
+      ),
+      false = data[[col_index]],
+      missing = data[[col_index]]
+    )
+  }
+  return(data)
+}
+
+#' @title parse_pvalue
+#' @description
+#' Parse pvalue as `"(p: 0.xyz)"` or `"(p< 0.001)"` from text
+#' @param text character vector
+#' @keywords internal
+parse_pvalue <- function(text) {
+  pvalue <- gsub(pattern = ".*(\\((p:|p<))|(\\))", replacement = "", text)
+  return(suppressWarnings({
+    as.numeric(pvalue)
+  }))
+}

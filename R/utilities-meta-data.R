@@ -5,17 +5,17 @@
 #' @param meta_data A data.frame of meta data
 #' @return A data.frame with the meta data variables filled in
 #' @export
-dictionary_check <- function(data, meta_data){
+dictionary_check <- function(data, meta_data) {
   data_names <- names(data)
-  #meta_data$Name
+  # meta_data$Name
   # Check if all meta data variables are present in the data
   meta_not_in_data <- setdiff(meta_data$Name, data_names)
-  if(length(meta_not_in_data)>0){
+  if (length(meta_not_in_data) > 0) {
     cli::cli_alert_warning("{.emph meta_data} variable Names not found in {.emph data}: {.val {meta_not_in_data}}")
   }
   # Check if all data variables are present in the meta_data
   data_not_in_meta <- setdiff(data_names, meta_data$Name)
-  if(length(data_not_in_meta)>0){
+  if (length(data_not_in_meta) > 0) {
     cli::cli_alert_warning("{.emph data} variables not found in {.emph meta_data} Names: {.val {data_not_in_meta}}")
   }
   return(invisible())
@@ -27,8 +27,8 @@ dictionary_check <- function(data, meta_data){
 #' @param meta_data A data.frame of meta data
 #' @return A data.frame with the meta data variables filled in
 #' @export
-fill_meta_vars <- function(meta_data = NULL){
-  if(is.null(meta_data)){
+fill_meta_vars <- function(meta_data = NULL) {
+  if (is.null(meta_data)) {
     return(NULL)
   }
   meta_data_types <- meta_data$Type
@@ -115,31 +115,33 @@ fill_nonmem_vars <- function(data, lloq = 10, group = "All") {
   }
   # EVID
   if (isFALSE("EVID" %in% data_names)) {
-    data$EVID <- ifelse(is.na(data$AMT), 0, as.numeric(data$AMT>0))
+    data$EVID <- ifelse(is.na(data$AMT), 0, as.numeric(data$AMT > 0))
   }
   # OCC
   if (isFALSE("OCC" %in% data_names)) {
     data$OCC <- stats::ave(
       data$EVID,
       data$ID,
-      FUN = function(x) {cumsum(x >= 3)+1}
-      )
+      FUN = function(x) {
+        cumsum(x >= 3) + 1
+      }
+    )
   }
   # MDV
   if (isFALSE("MDV" %in% data_names)) {
-    data$MDV <- as.numeric(data$EVID>0)
+    data$MDV <- as.numeric(data$EVID > 0)
   }
   # BLQ handling
   if (isFALSE("LLOQ" %in% data_names)) {
     data$LLOQ <- lloq
   }
   # Diagnostic plots
-  for(var_name in c("OBS", "PRED", "IPRED")){
+  for (var_name in c("OBS", "PRED", "IPRED")) {
     if (isFALSE(var_name %in% data_names)) {
       data[[var_name]] <- data$DV
-      }
+    }
   }
-  for(var_name in c("BLQ", "CWRES", "NPDE")){
+  for (var_name in c("BLQ", "CWRES", "NPDE")) {
     if (isFALSE(var_name %in% data_names)) {
       data[[var_name]] <- 0
     }

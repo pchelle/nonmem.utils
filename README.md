@@ -2,6 +2,8 @@
 # nonmem.utils
 
 <!-- badges: start -->
+[![Check Package](https://github.com/pchelle/nonmem.utils/actions/workflows/r-cmd-check.yaml/badge.svg)](https://github.com/pchelle/nonmem.utils/actions/workflows/r-cmd-check.yaml)
+
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->

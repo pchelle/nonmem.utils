@@ -63,15 +63,20 @@ cor_report <- function(data, x, y) {
 #'
 lm_report <- function(data, x, y) {
   lm_result <- summary(lm(formula = as.formula(paste(y, "~", x)), data = data))
+  lm_names <- gsub(pattern = x, replacement = "", row.names(lm_result$coefficients))
+  lm_names <- gsub(
+    pattern = "\\(Intercept\\)",
+    replacement = head(levels(data[[x]]), 1),
+    lm_names
+  )
   lm_value <- paste0(
-    gsub(pattern = x, replacement = "", row.names(lm_result$coefficients)),
-    ":",
-    sprintf("%.3f", lm_result$coefficients[, 1]),
+    lm_names, ": ",
+    sprintf("%.2f", lm_result$coefficients[, 1]),
     " (p",
     ifelse(lm_result$coefficients[, 4] < 1e-3, "<", ":"),
     ifelse(lm_result$coefficients[, 4] < 1e-3, "0.001", sprintf("%.3f", lm_result$coefficients[, 4])),
     ")",
-    collapse = "/"
+    collapse = "<br>"
   )
   return(lm_value)
 }
@@ -163,7 +168,7 @@ check_ranges <- function(data, meta_data) {
 bin_values <- function(values, bins = 7) {
   # Makes a more robust binning based on the number of values
   unique_values <- unique(values)
-  if(length(unique_values) <= bins) {
+  if (length(unique_values) <= bins) {
     return(factor(values, levels = unique_values))
   }
   time_bins <- unique(quantile(x = values, probs = seq(0, 1, length.out = bins + 1), na.rm = TRUE))
