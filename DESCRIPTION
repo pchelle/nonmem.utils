@@ -18,12 +18,11 @@ Imports:
     ggplot2,
     jsonlite,
     mrgsolve,
-    patchwork,
     plotly,
-    readr,
     rmarkdown,
     scales,
     shiny,
+    stringi,
     tidyr
 Roxygen: list(markdown = TRUE)
 Suggests: 
@@ -35,5 +34,9 @@ Suggests:
     ragg,
     rstudioapi,
     shinydashboard,
-    shinyWidgets
+    shinyWidgets,
+    patchwork,
+    readr
 VignetteBuilder: knitr
+Depends: 
+    R (>= 4.3)
