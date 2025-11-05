@@ -39,6 +39,9 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
+  <a href="../articles/nonmem-utils.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -176,10 +179,13 @@ etas</li>
 <li>ANOVA test results between categorical covariates and etas</li>
 </ul>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="../reference/eta_cor.html">eta_cor</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">eta_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/eta_cor.html">eta_cor</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span></span>
+<span><span class="va">eta_table</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/highlight_significant.html">highlight_significant</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="9%">
+<col width="10%">
 <col width="44%">
 <col width="45%">
 </colgroup>
@@ -201,9 +207,8 @@ etas</li>
 </tr>
 <tr class="odd">
 <td align="left">Sex</td>
-<td align="left">(Intercept):0.004 (p:0.885)/Female:0.001 (p:0.986)</td>
-<td align="left">(Intercept):-0.010 (p:0.763)/Female:0.001
-(p:0.990)</td>
+<td align="left">Male: 0.00 (p:0.885)<br>Female: 0.00 (p:0.986)</td>
+<td align="left">Male: -0.01 (p:0.763)<br>Female: 0.00 (p:0.990)</td>
 </tr>
 </tbody>
 </table>

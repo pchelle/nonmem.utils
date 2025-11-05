@@ -25,6 +25,9 @@ For infusions (dur&amp;gt;0 or rate&amp;gt;0), the time after the end of infusio
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav"><li>
+  <a href="../articles/nonmem-utils.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -100,7 +103,7 @@ For infusions (<code>dur&gt;0</code> or <code>rate&gt;0</code>), the time after 
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">data_501</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TAD2 <span class="op">=</span> <span class="fu">calc_tad</span><span class="op">(</span>id <span class="op">=</span> <span class="va">ID</span>, time <span class="op">=</span> <span class="va">TIME</span>, amt <span class="op">=</span> <span class="va">AMT</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TAD2 <span class="op">=</span> <span class="fu">calc_tad</span><span class="op">(</span>id <span class="op">=</span> <span class="va">ID</span>, time <span class="op">=</span> <span class="va">TIME</span>, amt <span class="op">=</span> <span class="va">AMT</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ID OCC TIME TAD     DV EVID MDV  AMT RATE    WT AGE SEX       PRED</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    1   1    0  -5   0.00    1   1 1000  200  58.4  51   1   0.000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    1   1    1  -4   6.47    0   0    0    0  58.4  51   1   7.880463</span>
@@ -1006,7 +1009,7 @@ For infusions (<code>dur&gt;0</code> or <code>rate&gt;0</code>), the time after 
 <span class="r-out co"><span class="r-pr">#&gt;</span> 300 2.557300 24.02744  0.020120710 -0.262553600   24</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">data_501</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TAD2 <span class="op">=</span> <span class="fu">calc_tad</span><span class="op">(</span>id <span class="op">=</span> <span class="va">ID</span>, time <span class="op">=</span> <span class="va">TIME</span>, evid <span class="op">=</span> <span class="va">EVID</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TAD2 <span class="op">=</span> <span class="fu">calc_tad</span><span class="op">(</span>id <span class="op">=</span> <span class="va">ID</span>, time <span class="op">=</span> <span class="va">TIME</span>, evid <span class="op">=</span> <span class="va">EVID</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ID OCC TIME TAD     DV EVID MDV  AMT RATE    WT AGE SEX       PRED</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    1   1    0  -5   0.00    1   1 1000  200  58.4  51   1   0.000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    1   1    1  -4   6.47    0   0    0    0  58.4  51   1   7.880463</span>
@@ -1912,13 +1915,13 @@ For infusions (<code>dur&gt;0</code> or <code>rate&gt;0</code>), the time after 
 <span class="r-out co"><span class="r-pr">#&gt;</span> 300 2.557300 24.02744  0.020120710 -0.262553600   24</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">data_501</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TAD2 <span class="op">=</span> <span class="fu">calc_tad</span><span class="op">(</span></span></span>
-<span class="r-in"><span>id <span class="op">=</span> <span class="va">ID</span>,</span></span>
-<span class="r-in"><span>time <span class="op">=</span> <span class="va">TIME</span>,</span></span>
-<span class="r-in"><span>evid <span class="op">=</span> <span class="va">EVID</span>,</span></span>
-<span class="r-in"><span>amt <span class="op">=</span> <span class="va">AMT</span>,</span></span>
-<span class="r-in"><span>rate <span class="op">=</span> <span class="va">RATE</span></span></span>
-<span class="r-in"><span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>TAD2 <span class="op">=</span> <span class="fu">calc_tad</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    id <span class="op">=</span> <span class="va">ID</span>,</span></span>
+<span class="r-in"><span>    time <span class="op">=</span> <span class="va">TIME</span>,</span></span>
+<span class="r-in"><span>    evid <span class="op">=</span> <span class="va">EVID</span>,</span></span>
+<span class="r-in"><span>    amt <span class="op">=</span> <span class="va">AMT</span>,</span></span>
+<span class="r-in"><span>    rate <span class="op">=</span> <span class="va">RATE</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     ID OCC TIME TAD     DV EVID MDV  AMT RATE    WT AGE SEX       PRED</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1    1   1    0  -5   0.00    1   1 1000  200  58.4  51   1   0.000000</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2    1   1    1  -4   6.47    0   0    0    0  58.4  51   1   7.880463</span>

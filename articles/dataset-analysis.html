@@ -39,6 +39,9 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
+  <a href="../articles/nonmem-utils.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -203,7 +206,7 @@ of tables.</p>
 <code class="sourceCode R"><span><span class="va">pk_summary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cov_inventory.html">cov_inventory</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span></span></code></pre></div>
 <p>Here is an example printing all the tables below each other:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">for</span><span class="op">(</span><span class="va">summary_label</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pk_summary</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="kw">for</span> <span class="op">(</span><span class="va">summary_label</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pk_summary</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">summary_label</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"\n\n"</span><span class="op">)</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">pk_summary</span><span class="op">[[</span><span class="va">summary_label</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span>
@@ -439,10 +442,13 @@ covariate distribution and correlation:</p>
 covariates</li>
 </ul>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="../reference/cov_cor.html">cov_cor</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cov_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cov_cor.html">cov_cor</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span></span>
+<span><span class="va">cov_table</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/highlight_significant.html">highlight_significant</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="9%">
+<col width="10%">
 <col width="44%">
 <col width="45%">
 </colgroup>
@@ -464,9 +470,8 @@ covariates</li>
 </tr>
 <tr class="odd">
 <td align="left">Sex</td>
-<td align="left">(Intercept):74.147 (p&lt;0.001)/Female:5.914
-(p:0.094)</td>
-<td align="left">(Intercept):50.906 (p&lt;0.001)/Female:-0.263
+<td align="left">Male: 74.15 (p&lt;0.001)<br>Female: 5.91 (p:0.094)</td>
+<td align="left">Male: 50.91 (p&lt;0.001)<br>Female: -0.26
 (p:0.936)</td>
 </tr>
 </tbody>

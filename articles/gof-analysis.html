@@ -39,6 +39,9 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
+  <a href="../articles/nonmem-utils.html">Get started</a>
+</li>
+<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
@@ -137,7 +140,7 @@ population predictions in both linear and log scales.</p>
 <p>To obtain the plot in log-log scale, the function
 <code><a href="../reference/gg_log.html">gg_log()</a></code> can be used as illustrated below:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/dv_preds.html">dv_preds</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/dv_preds.html">dv_preds</a></span><span class="op">(</span><span class="va">data_501</span>, <span class="va">meta_data_501</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/gg_log.html">gg_log</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in geom_rug(data = dplyr::filter(fill_nonmem_vars(data),</span></span>
 <span><span class="co">#&gt; .data[[variable_names$mdv]] == : Ignoring unknown aesthetics:</span></span>
@@ -209,9 +212,9 @@ parameters Nonmem naming convention (e.g. if dataset includes only
 model).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ind_time_profiles.html">ind_time_profiles</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">data_501</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID</span> <span class="op">&lt;=</span> <span class="fl">6</span><span class="op">)</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">data_501</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID</span> <span class="op">&lt;=</span> <span class="fl">6</span><span class="op">)</span>,</span>
 <span>  meta_data <span class="op">=</span> <span class="va">meta_data_501</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in geom_rug(data = dplyr::filter(tp_data, .data[[variable_names$blq]] &gt;</span></span>
 <span><span class="co">#&gt; : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
 <span><span class="co">#&gt; Warning in geom_line(data = filter(sim_data, ID %in% selected_ids), mapping =</span></span>
@@ -226,9 +229,9 @@ model).</p>
 <p><img src="gof-analysis_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ind_tad_profiles.html">ind_tad_profiles</a></span><span class="op">(</span></span>
-<span>  data <span class="op">=</span> <span class="va">data_501</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID</span> <span class="op">&lt;=</span> <span class="fl">6</span><span class="op">)</span>, </span>
+<span>  data <span class="op">=</span> <span class="va">data_501</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID</span> <span class="op">&lt;=</span> <span class="fl">6</span><span class="op">)</span>,</span>
 <span>  meta_data <span class="op">=</span> <span class="va">meta_data_501</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in geom_rug(data = dplyr::filter(tp_data, .data[[variable_names$blq]] &gt;</span></span>
 <span><span class="co">#&gt; : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
 <span><span class="co">#&gt; Warning in geom_line(data = filter(sim_data, ID %in% selected_ids), mapping =</span></span>

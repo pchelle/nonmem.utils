@@ -5,4 +5,5 @@ articles:
   covariate-analysis: covariate-analysis.html
   dataset-analysis: dataset-analysis.html
   gof-analysis: gof-analysis.html
-last_built: 2025-10-28T10:57Z
+  nonmem-utils: nonmem-utils.html
+last_built: 2025-11-05T17:28Z

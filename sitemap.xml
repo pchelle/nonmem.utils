@@ -5,6 +5,7 @@
 <url><loc>/articles/dataset-analysis.html</loc></url>
 <url><loc>/articles/gof-analysis.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
+<url><loc>/articles/nonmem-utils.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/reference/base_tp_plot.html</loc></url>
@@ -33,6 +34,7 @@
 <url><loc>/reference/format_result.html</loc></url>
 <url><loc>/reference/gg_lim.html</loc></url>
 <url><loc>/reference/gg_log.html</loc></url>
+<url><loc>/reference/highlight_significant.html</loc></url>
 <url><loc>/reference/ind_tad_profiles.html</loc></url>
 <url><loc>/reference/ind_time_profiles.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
@@ -44,6 +46,7 @@
 <url><loc>/reference/parse_in_text.html</loc></url>
 <url><loc>/reference/parse_omega.html</loc></url>
 <url><loc>/reference/parse_omega_size.html</loc></url>
+<url><loc>/reference/parse_pvalue.html</loc></url>
 <url><loc>/reference/parse_sigma.html</loc></url>
 <url><loc>/reference/parse_theta.html</loc></url>
 <url><loc>/reference/plotly_log.html</loc></url>
@@ -66,6 +69,8 @@
 <url><loc>/reference/tad_profile.html</loc></url>
 <url><loc>/reference/time_profile.html</loc></url>
 <url><loc>/reference/tooltip_text.html</loc></url>
+<url><loc>/reference/typst_scientific.html</loc></url>
+<url><loc>/reference/typst_table.html</loc></url>
 <url><loc>/reference/vpc_plots.html</loc></url>
 <url><loc>/reference/vpc_summary.html</loc></url>
 <url><loc>/reference/vpc_types.html</loc></url>
