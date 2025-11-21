@@ -1,0 +1,116 @@
+# Package index
+
+## All functions
+
+- [`bin_values()`](https://pchelle.github.io/nonmem.utils/reference/bin_values.md)
+  : bin_values
+- [`boot_hist()`](https://pchelle.github.io/nonmem.utils/reference/boot_hist.md)
+  : boot_hist
+- [`calc_tad()`](https://pchelle.github.io/nonmem.utils/reference/calc_tad.md)
+  : calc_tad
+- [`cat_inventory()`](https://pchelle.github.io/nonmem.utils/reference/cat_inventory.md)
+  : cat_inventory
+- [`check_ranges()`](https://pchelle.github.io/nonmem.utils/reference/check_ranges.md)
+  : check_ranges
+- [`cor_report()`](https://pchelle.github.io/nonmem.utils/reference/cor_report.md)
+  : cor_report
+- [`cov_cor()`](https://pchelle.github.io/nonmem.utils/reference/cov_cor.md)
+  : cov_cor
+- [`cov_inventory()`](https://pchelle.github.io/nonmem.utils/reference/cov_inventory.md)
+  : cov_inventory
+- [`cov_plot()`](https://pchelle.github.io/nonmem.utils/reference/cov_plot.md)
+  : cov_plot
+- [`cov_to_cor()`](https://pchelle.github.io/nonmem.utils/reference/cov_to_cor.md)
+  : cov_to_cor
+- [`data_501`](https://pchelle.github.io/nonmem.utils/reference/data_501.md)
+  : data_501
+- [`data_inventory()`](https://pchelle.github.io/nonmem.utils/reference/data_inventory.md)
+  : data_inventory
+- [`dictionary_check()`](https://pchelle.github.io/nonmem.utils/reference/dictionary_check.md)
+  : dictionary_check
+- [`dv_ipred()`](https://pchelle.github.io/nonmem.utils/reference/dv_ipred.md)
+  : dv_ipred
+- [`dv_pred()`](https://pchelle.github.io/nonmem.utils/reference/dv_pred.md)
+  : dv_pred
+- [`dv_preds()`](https://pchelle.github.io/nonmem.utils/reference/dv_preds.md)
+  : dv_preds
+- [`eta_cor()`](https://pchelle.github.io/nonmem.utils/reference/eta_cor.md)
+  : eta_cor
+- [`eta_cov_plot()`](https://pchelle.github.io/nonmem.utils/reference/eta_cov_plot.md)
+  : eta_cov_plot
+- [`eta_plot()`](https://pchelle.github.io/nonmem.utils/reference/eta_plot.md)
+  : eta_plot
+- [`fill_meta_vars()`](https://pchelle.github.io/nonmem.utils/reference/fill_meta_vars.md)
+  : fill_meta_vars
+- [`fill_nonmem_vars()`](https://pchelle.github.io/nonmem.utils/reference/fill_nonmem_vars.md)
+  : fill_nonmem_vars
+- [`format_result()`](https://pchelle.github.io/nonmem.utils/reference/format_result.md)
+  : format_result
+- [`gg_lim()`](https://pchelle.github.io/nonmem.utils/reference/gg_lim.md)
+  : gg_lim
+- [`gg_log()`](https://pchelle.github.io/nonmem.utils/reference/gg_log.md)
+  : gg_log
+- [`highlight_significant()`](https://pchelle.github.io/nonmem.utils/reference/highlight_significant.md)
+  : highlight_significant
+- [`ind_tad_profiles()`](https://pchelle.github.io/nonmem.utils/reference/ind_tad_profiles.md)
+  : ind_tad_profiles
+- [`ind_time_profiles()`](https://pchelle.github.io/nonmem.utils/reference/ind_time_profiles.md)
+  : ind_time_profiles
+- [`lm_report()`](https://pchelle.github.io/nonmem.utils/reference/lm_report.md)
+  : lm_report
+- [`map_cat_data()`](https://pchelle.github.io/nonmem.utils/reference/map_cat_data.md)
+  : map_cat_data
+- [`meta_data_501`](https://pchelle.github.io/nonmem.utils/reference/meta_data_501.md)
+  : data_501
+- [`nonmem_res()`](https://pchelle.github.io/nonmem.utils/reference/nonmem_res.md)
+  : nonmem_res
+- [`plotly_log()`](https://pchelle.github.io/nonmem.utils/reference/plotly_log.md)
+  : plotly_log
+- [`pull_cat()`](https://pchelle.github.io/nonmem.utils/reference/pull_cat.md)
+  : pull_cat
+- [`pull_label()`](https://pchelle.github.io/nonmem.utils/reference/pull_label.md)
+  : pull_label
+- [`pull_limits()`](https://pchelle.github.io/nonmem.utils/reference/pull_limits.md)
+  : pull_limits
+- [`pull_name()`](https://pchelle.github.io/nonmem.utils/reference/pull_name.md)
+  : pull_name
+- [`report_dataset_analysis()`](https://pchelle.github.io/nonmem.utils/reference/report_dataset_analysis.md)
+  : report_dataset_analysis
+- [`report_gof_analysis()`](https://pchelle.github.io/nonmem.utils/reference/report_gof_analysis.md)
+  : report_gof_analysis
+- [`report_limited_sampling_analysis()`](https://pchelle.github.io/nonmem.utils/reference/report_limited_sampling_analysis.md)
+  : report_limited_sampling_analysis
+- [`report_vpc_analysis()`](https://pchelle.github.io/nonmem.utils/reference/report_vpc_analysis.md)
+  : report_dataset_analysis
+- [`report_workflow_summary()`](https://pchelle.github.io/nonmem.utils/reference/report_workflow_summary.md)
+  : report_workflow_summary
+- [`residual_hist()`](https://pchelle.github.io/nonmem.utils/reference/residual_hist.md)
+  : residual_plot
+- [`residual_plot()`](https://pchelle.github.io/nonmem.utils/reference/residual_plot.md)
+  : residual_plot
+- [`residual_qq()`](https://pchelle.github.io/nonmem.utils/reference/residual_qq.md)
+  : residual_qq
+- [`run_shiny()`](https://pchelle.github.io/nonmem.utils/reference/run_shiny.md)
+  : run_shiny
+- [`run_vpc()`](https://pchelle.github.io/nonmem.utils/reference/run_vpc.md)
+  : run_vpc
+- [`shiny_toolbox()`](https://pchelle.github.io/nonmem.utils/reference/shiny_toolbox.md)
+  : shiny_toolbox
+- [`simulate_pk()`](https://pchelle.github.io/nonmem.utils/reference/simulate_pk.md)
+  : simulate_pk
+- [`tad_profile()`](https://pchelle.github.io/nonmem.utils/reference/tad_profile.md)
+  : tad_profile
+- [`time_profile()`](https://pchelle.github.io/nonmem.utils/reference/time_profile.md)
+  : time_profile
+- [`tooltip_text()`](https://pchelle.github.io/nonmem.utils/reference/tooltip_text.md)
+  : tooltip_text
+- [`typst_scientific()`](https://pchelle.github.io/nonmem.utils/reference/typst_scientific.md)
+  : typst_scientific
+- [`typst_table()`](https://pchelle.github.io/nonmem.utils/reference/typst_table.md)
+  : typst_table
+- [`vpc_plots()`](https://pchelle.github.io/nonmem.utils/reference/vpc_plots.md)
+  : vpc_plots
+- [`vpc_summary()`](https://pchelle.github.io/nonmem.utils/reference/vpc_summary.md)
+  : vpc_summary
+- [`vpc_types`](https://pchelle.github.io/nonmem.utils/reference/vpc_types.md)
+  : vpc_types
