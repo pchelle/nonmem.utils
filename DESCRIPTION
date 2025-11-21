@@ -40,3 +40,4 @@ Suggests:
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.3)
+Config/Needs/website: rmarkdown

@@ -16,6 +16,18 @@ A data.frame summarizing the data
 }
 \description{
 Get a data.frame of
-Spearman correlation between covariates and etas
-Wilcoxon test between categorical covariates and etas
+\itemize{
+\item Spearman correlation between covariates and etas
+\item Wilcoxon test between categorical covariates and etas
+}
+}
+\examples{
+
+# Summarize data by ID
+sum_data <- data_501 |>
+  dplyr::group_by(ID) |>
+  dplyr::summarise_all(dplyr::first)
+
+eta_cor(sum_data, meta_data_501)
+
 }

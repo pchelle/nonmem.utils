@@ -29,7 +29,5 @@ all_inventories$All
 
 all_inventories$Sex
 
-# Transpose data.frame
-t(all_inventories$All)
 
 }

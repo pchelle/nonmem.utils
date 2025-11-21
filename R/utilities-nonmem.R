@@ -51,8 +51,8 @@ simulate_pk <- function(data) {
   )
 
   sim_data <- do.call("rbind", sim_data) |>
-    mutate(ID = oldID) |>
-    select(-oldID)
+    mutate(ID = .data[["oldID"]]) |>
+    select(-matches("oldID"))
 
   return(sim_data)
 }
@@ -72,10 +72,12 @@ simulate_pk <- function(data) {
 #' @examples
 #'
 #' data_501 |>
-#'   dplyr::mutate(TAD2 = calc_tad(id = ID, time = TIME, amt = AMT))
+#'   dplyr::mutate(TAD2 = calc_tad(id = ID, time = TIME, amt = AMT)) |>
+#'   dplyr::select(ID, TIME, AMT, TAD2)
 #'
 #' data_501 |>
-#'   dplyr::mutate(TAD2 = calc_tad(id = ID, time = TIME, evid = EVID))
+#'   dplyr::mutate(TAD2 = calc_tad(id = ID, time = TIME, evid = EVID)) |>
+#'   dplyr::select(ID, TIME, EVID, TAD2)
 #'
 #' data_501 |>
 #'   dplyr::mutate(TAD2 = calc_tad(
@@ -84,7 +86,8 @@ simulate_pk <- function(data) {
 #'     evid = EVID,
 #'     amt = AMT,
 #'     rate = RATE
-#'   ))
+#'   )) |>
+#'   dplyr::select(ID, TIME, EVID, AMT, RATE, TAD2)
 #'
 calc_tad <- function(id, time, amt = NULL, evid = NULL, rate = NULL, dur = NULL) {
   # No amt nor evid, first value per id is 0

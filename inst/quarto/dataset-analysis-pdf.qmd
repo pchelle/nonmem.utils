@@ -1,0 +1,174 @@
+---
+title: "PK Dataset Analysis"
+date: "`r Sys.Date()`"
+format: typst
+params:
+  data_path:
+    label: "Dataset"
+    value: na
+    input: file
+  meta_data_path:
+    label: "Metadata"
+    value: na
+    input: file
+  bins:
+    label: "Bins for summary statistics"
+    value: 11
+    input: slider
+    min: 1
+    max: 20
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = "#>",
+  dev = "ragg_png",
+  fig.align = "center",
+  fig.width = 6.5,
+  dpi = 320
+)
+library(tidyverse)
+library(patchwork)
+library(nonmem.utils)
+
+data <- data_501
+meta_data <- meta_data_501
+if(FALSE){
+is_nonmem_file <- grepl(".tab", params$data_path)
+if (is_nonmem_file) {
+  data <- readr::read_table(params$data_path, na = c("NA", "N/A", "", "."), skip = 1)
+} else {
+  data <- readr::read_csv(params$data_path, na = c("NA", "N/A", "", "."))
+}
+meta_data <- readr::read_csv(params$meta_data_path, na = c("NA", "N/A", "", "."))
+}
+```
+  
+## Data inventory
+
+__Table__: Subjects, doses and observations
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+inventory_list <- data_inventory(data, meta_data)
+typst_table(bind_cols(inventory_list)) |> cat(sep = "\n")
+```
+
+
+### Covariates
+
+__Table__: Summary of continuous covariates
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+cov_list <- cov_inventory(data, meta_data)
+for (cov_name in names(cov_list)) {
+  cat(cov_name, "\n\n")
+  typst_table(cov_list[[cov_name]]) |> cat(sep = "\n")
+  cat("\n\n")
+}
+```
+
+__Table__: Summary of categorical covariates
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+typst_table(cat_inventory(data, meta_data)) |> cat(sep = "\n")
+```
+
+## Time Profiles
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+tp_plots <- time_profile(data, meta_data, bins = params$bins)
+
+for (tp_name in names(tp_plots)) {
+  cat(paste0("__Figure__: Time profile in linear scale for ", tp_name, "\n\n"))
+  print(tp_plots[[tp_name]]$Linear)
+  cat(paste0("__Figure__: Time profile in logarithmic scale for ", tp_name, "\n\n"))
+  print(tp_plots[[tp_name]]$Log)
+  cat(paste0("__Figure__: Time profile of BLQ proportions for ", tp_name, "\n\n"))
+  print(tp_plots[[tp_name]]$`Percent BLQ`)
+}
+```
+
+## Time After Dose Profiles
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+tp_plots <- tad_profile(data, meta_data, bins = params$bins)
+
+for (tp_name in names(tp_plots)) {
+  cat(paste0("__Figure__: Time after dose profile in linear scale for ", tp_name, "\n\n"))
+  print(tp_plots[[tp_name]]$Linear)
+  cat(paste0("__Figure__: Time after dose profile in logarithmic scale for ", tp_name, "\n\n"))
+  print(tp_plots[[tp_name]]$Log)
+  cat(paste0("__Figure__: Time after dose profile of BLQ proportions for ", tp_name, "\n\n"))
+  print(tp_plots[[tp_name]]$`Percent BLQ`)
+}
+```
+
+
+## Covariate distributions and correlations
+
+__Figure__: Pairs plot of covariates
+
+```{r}
+#| echo: false
+#| warning: false
+
+cov_plot(data, meta_data)
+```
+
+
+__Table__: Spearman correlation and ANOVA regression coefficients estimated between covariates
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+cov_table <- cov_cor(data, meta_data)
+typst_table(cov_table) |>
+  cat(sep = "\n")
+```
+
+## Appendix
+
+### Dictionary
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+knitr::kable(meta_data)
+```
+
+### Assessment of data ranges
+
+```{r}
+#| echo: false
+#| results: asis
+#| warning: false
+
+#knitr::kable(check_ranges(data, meta_data))
+```
+
+

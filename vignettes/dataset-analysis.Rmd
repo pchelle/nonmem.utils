@@ -53,10 +53,7 @@ You can also format the inventory to print them all in the same table
 
 ```{r}
 #| results: 'asis'
-pk_summary <- data.frame(t(pk_summary$Sex), t(cbind(SEX = "All", pk_summary$All)))
-pk_header <- as.character(pk_summary[1, ])
-pk_summary <- tail(pk_summary, -1)
-names(pk_summary) <- pk_header
+pk_summary <- cbind(pk_summary$Sex, All = pk_summary$All[["All"]])
 knitr::kable(pk_summary)
 ```
 

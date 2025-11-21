@@ -122,11 +122,11 @@ ui <- page_navbar(
     card(
       full_screen = TRUE,
       card_header(
+        p("Data inventory"),
         popover(
           span(icon("gear"), "Settings"),
           pickerInput("select_inv_cat", "Select Group", multiple = FALSE, choices = "All")
-        ),
-        p("Data inventory")
+        )
       ),
       card_body(DT::dataTableOutput("sum_data"))
     )
@@ -139,17 +139,17 @@ ui <- page_navbar(
       card(
         full_screen = TRUE,
         card_header(
+          p("Continuous covariate statistics"),
           popover(
             span(icon("gear"), "Settings"),
             pickerInput("select_sum_cat", "Select Group", multiple = FALSE, choices = "All")
-          ),
-          p("Continuous covariate statistics")
+          )
         ),
         card_body(DT::dataTableOutput("sum_cov"))
       ),
       card(
         full_screen = TRUE,
-        card_header(" Count"),
+        card_header("Categorical covariate statistics"),
         card_body(DT::dataTableOutput("sum_cat"))
       )
     )
@@ -268,11 +268,7 @@ server <- function(input, output, session) {
       return()
     }
     inventories <- data_inventory(get_data(), get_meta_data())
-    inventory <- data.frame(
-      Parameter = names(inventories[[input$select_inv_cat]]),
-      Value = t(inventories[[input$select_inv_cat]])
-    )
-    return(DT::datatable(inventory, rownames = FALSE))
+    return(DT::datatable(inventories[[input$select_inv_cat]], rownames = FALSE))
   })
   output$sum_cov <- DT::renderDT({
     if (!enough_data()) {

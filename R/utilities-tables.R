@@ -30,7 +30,7 @@ cor_report <- function(data, x, y) {
   cor_value <- paste0(
     sprintf("%.3f", cor_result$estimate),
     " (p",
-    ifelse(cor_result$p.value < 1e-3, "<", ":"),
+    ifelse(cor_result$p.value < 1e-3, "< ", ": "),
     ifelse(cor_result$p.value < 1e-3, "0.001", sprintf("%.3f", cor_result$p.value)),
     ")"
   )
@@ -73,7 +73,7 @@ lm_report <- function(data, x, y) {
     lm_names, ": ",
     sprintf("%.2f", lm_result$coefficients[, 1]),
     " (p",
-    ifelse(lm_result$coefficients[, 4] < 1e-3, "<", ":"),
+    ifelse(lm_result$coefficients[, 4] < 1e-3, "< ", ": "),
     ifelse(lm_result$coefficients[, 4] < 1e-3, "0.001", sprintf("%.3f", lm_result$coefficients[, 4])),
     ")",
     collapse = "<br>"

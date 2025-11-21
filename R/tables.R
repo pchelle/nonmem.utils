@@ -64,12 +64,21 @@ cov_cor <- function(data, meta_data) {
 #' @title eta_cor
 #' @description
 #' Get a data.frame of
-#' Spearman correlation between covariates and etas
-#' Wilcoxon test between categorical covariates and etas
+#' - Spearman correlation between covariates and etas
+#' - Wilcoxon test between categorical covariates and etas
 #' @param data A data.frame of the pk data
 #' @param meta_data A data.frame of meta data
 #' @return A data.frame summarizing the data
 #' @export
+#' @examples
+#'
+#' # Summarize data by ID
+#' sum_data <- data_501 |>
+#'   dplyr::group_by(ID) |>
+#'   dplyr::summarise_all(dplyr::first)
+#'
+#' eta_cor(sum_data, meta_data_501)
+#'
 eta_cor <- function(data, meta_data) {
   id_variable <- pull_name("id", meta_data)
   if (length(id_variable) == 0) {
@@ -132,8 +141,6 @@ eta_cor <- function(data, meta_data) {
 #'
 #' all_inventories$Sex
 #'
-#' # Transpose data.frame
-#' t(all_inventories$All)
 #'
 data_inventory <- function(data, meta_data) {
   variable_names <- sapply(
@@ -164,6 +171,7 @@ data_inventory <- function(data, meta_data) {
     variable_names$blq <- "BLQ"
     data$BLQ <- 0
   }
+  data <- fill_nonmem_vars(data)
 
   # Summarize total number of subjects, pk studies, doses, observations and blq ratio
   # Summarize per number of subjects: pk studies, doses and observations
@@ -183,9 +191,11 @@ data_inventory <- function(data, meta_data) {
       `Observations per Subject` = round(Observations / Subjects, 2),
       `Observations per Study` = round(Observations / Studies, 2)
     )
+
   if (no_blq) {
     inventory_total <- inventory_total |> select(-`Percent BLQ`)
   }
+  inventory_total <- data.frame(Data = names(inventory_total), All = as.numeric(inventory_total))
 
   # if meta data includes source type data
   # Perform same inventory grouped by source
@@ -214,6 +224,16 @@ data_inventory <- function(data, meta_data) {
       if (no_blq) {
         inventory_by_cat <- inventory_by_cat |> select(-`Percent BLQ`)
       }
+      # Get cat labels and values
+      cat_values <- inventory_by_cat |> pull(.data[[cat_name]])
+      cat_label <- pull_label(cat_name, meta_data)
+      inventory_by_cat <- inventory_by_cat |> select(-any_of(cat_name))
+      inventory_by_cat <- data.frame(
+        Data = names(inventory_by_cat),
+        t(inventory_by_cat),
+        row.names = NULL
+        )
+      names(inventory_by_cat) <- c(cat_label, as.character(cat_values))
       return(inventory_by_cat)
     },
     USE.NAMES = TRUE, simplify = FALSE

@@ -187,7 +187,7 @@ typst_table <- function(data, linebreak = "<br>") {
   for (row_index in seq_len(nrow(data))) {
     row_values <- as.character(as.data.frame(data[row_index, ]))
     row_values <- ifelse(grepl("text\\(", row_values), row_values, paste0("[", row_values, "]"))
-    table_row <- paste0(row_values, ",", collapse = "")
+    table_row <- paste0(row_values, ", ", collapse = "")
     table_row <- gsub(pattern = linebreak, replacement = " \\\\ ", table_row)
     table_content <- c(table_content, paste0("  ", table_row))
   }

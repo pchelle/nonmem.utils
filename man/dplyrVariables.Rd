@@ -5,7 +5,7 @@
 \alias{dplyrVariables}
 \title{dplyrVariables}
 \format{
-An object of class \code{character} of length 55.
+An object of class \code{character} of length 54.
 }
 \usage{
 dplyrVariables
