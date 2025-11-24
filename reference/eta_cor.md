@@ -35,11 +35,11 @@ sum_data <- data_501 |>
   dplyr::summarise_all(dplyr::first)
 
 eta_cor(sum_data, meta_data_501)
-#>   Covariates                                              ηCL
+#>   Covariates                                        Clearance
 #> 1     Weight                                -0.035 (p: 0.793)
 #> 2        Age                                 0.004 (p: 0.974)
 #> 3        Sex Male: 0.00 (p: 0.885)<br>Female: 0.00 (p: 0.986)
-#>                                                  ηV
+#>                                              Volume
 #> 1                                  0.045 (p: 0.733)
 #> 2                                 -0.015 (p: 0.908)
 #> 3 Male: -0.01 (p: 0.763)<br>Female: 0.00 (p: 0.990)

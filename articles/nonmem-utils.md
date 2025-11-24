@@ -98,8 +98,8 @@ meta_data_501 |>
 | SEX  | cat   | Sex                        | “0”:“Male”\|“1”:“Female” | NA  | NA  |
 | CL   | param | Clearance                  | L/h                      | NA  | NA  |
 | V    | param | Volume                     | L                        | NA  | NA  |
-| ETA1 | eta   | 3b7CL                      | NA                       | NA  | NA  |
-| ETA2 | eta   | 3b7V                       | NA                       | NA  | NA  |
+| ETA1 | eta   | Clearance                  | NA                       | NA  | NA  |
+| ETA2 | eta   | Volume                     | NA                       | NA  | NA  |
 
 ## Example
 

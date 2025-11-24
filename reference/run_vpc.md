@@ -54,13 +54,13 @@ run_vpc(data_501, x = "TIME")
 #> ℹ Binning and preparing prediction-correction
 #> ℹ Calculated Bins: "1", "5", "12", and "24"
 #> ℹ Binning and preparing prediction-correction
-#> ✔ Binning and preparing prediction-correction [34ms]
+#> ✔ Binning and preparing prediction-correction [40ms]
 #> 
 #> ℹ Summarizing per Bins and Repetition REP
-#> ✔ Summarizing per Bins and Repetition REP [48ms]
+#> ✔ Summarizing per Bins and Repetition REP [37ms]
 #> 
 #> ℹ Summarizing across Repetitions REP
-#> ✔ Summarizing across Repetitions REP [76ms]
+#> ✔ Summarizing across Repetitions REP [74ms]
 #> 
 #> $vpc
 #>   Bins All  n time obs_med obs_min obs_max sim_med_med sim_med_min sim_med_max
@@ -1112,13 +1112,13 @@ run_vpc(data_501, x = "TIME")
 #> ℹ Binning and preparing prediction-correction
 #> ℹ Calculated Bins: "1", "5", "12", and "24"
 #> ℹ Binning and preparing prediction-correction
-#> ✔ Binning and preparing prediction-correction [28ms]
+#> ✔ Binning and preparing prediction-correction [23ms]
 #> 
 #> ℹ Summarizing per Bins and Repetition REP
 #> ✔ Summarizing per Bins and Repetition REP [36ms]
 #> 
 #> ℹ Summarizing across Repetitions REP
-#> ✔ Summarizing across Repetitions REP [69ms]
+#> ✔ Summarizing across Repetitions REP [68ms]
 #> 
 #> $vpc
 #>   Bins All  n time obs_med obs_min obs_max sim_med_med sim_med_min sim_med_max

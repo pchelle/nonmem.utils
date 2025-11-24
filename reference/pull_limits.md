@@ -38,8 +38,8 @@ meta_data_501
 #> 12  SEX   cat                        Sex "0":"Male"|"1":"Female"  NA  NA
 #> 13   CL param                  Clearance                     L/h  NA  NA
 #> 14    V param                     Volume                       L  NA  NA
-#> 15 ETA1   eta                  \\u03b7CL                    <NA>  NA  NA
-#> 16 ETA2   eta                   \\u03b7V                    <NA>  NA  NA
+#> 15 ETA1   eta                  Clearance                    <NA>  NA  NA
+#> 16 ETA2   eta                     Volume                    <NA>  NA  NA
 
 pull_limits("TIME", meta_data_501)
 #> [1] -Inf  Inf
