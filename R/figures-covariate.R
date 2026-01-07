@@ -64,7 +64,7 @@ eta_plot <- function(data, meta_data = NULL) {
 #' @export
 #' @import GGally
 #' @examples
-#'
+#' \dontshow{ragg::agg_png()}
 #' eta_cov_plot(data_501, meta_data_501)
 #'
 eta_cov_plot <- function(data, meta_data = NULL) {

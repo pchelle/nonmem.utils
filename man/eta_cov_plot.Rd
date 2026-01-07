@@ -15,7 +15,7 @@ eta_cov_plot(data, meta_data = NULL)
 Plot of etas vs covariates
 }
 \examples{
-
+\dontshow{ragg::agg_png()}
 eta_cov_plot(data_501, meta_data_501)
 
 }
