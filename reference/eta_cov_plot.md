@@ -23,9 +23,7 @@ eta_cov_plot(data, meta_data = NULL)
 ``` r
 eta_cov_plot(data_501, meta_data_501)
 #> $All
-
 #> 
 #> $SEX
-
 #> 
 ```

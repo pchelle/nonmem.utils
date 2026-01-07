@@ -117,7 +117,7 @@ population predictions in both linear and log scales.</p>
 <span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
 <span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :</span></span>
 <span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span></code></pre></div>
-<p><img src="gof-analysis_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" width="700"></p>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="700"></p>
 <p>To obtain the plot in log-log scale, the function
 <code><a href="../reference/gg_log.html">gg_log()</a></code> can be used as illustrated below:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -130,7 +130,7 @@ population predictions in both linear and log scales.</p>
 <span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
 <span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :</span></span>
 <span><span class="co">#&gt; Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span></code></pre></div>
-<p><img src="gof-analysis_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" width="700"></p>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="residuals">Residuals<a class="anchor" aria-label="anchor" href="#residuals"></a>
@@ -144,14 +144,14 @@ residuals</li>
 </ul>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_hist.html">residual_hist</a></span><span class="op">(</span>y_type <span class="op">=</span> <span class="st">"cwres"</span>, data <span class="op">=</span> <span class="va">data_501</span>, meta_data <span class="op">=</span> <span class="va">meta_data_501</span><span class="op">)</span></span></code></pre></div>
-<p><img src="gof-analysis_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" width="700"></p>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="700"></p>
 <ul>
 <li>The function <code><a href="../reference/residual_qq.html">residual_qq()</a></code> perform QQ-plots of
 residuals</li>
 </ul>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/residual_qq.html">residual_qq</a></span><span class="op">(</span>y_type <span class="op">=</span> <span class="st">"cwres"</span>, data <span class="op">=</span> <span class="va">data_501</span>, meta_data <span class="op">=</span> <span class="va">meta_data_501</span><span class="op">)</span></span></code></pre></div>
-<p><img src="gof-analysis_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" width="700"></p>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="700"></p>
 <ul>
 <li>The function <code><a href="../reference/residual_plot.html">residual_plot()</a></code> plots residuals vs another
 variable to analyze potential trends</li>
@@ -179,7 +179,7 @@ variable to analyze potential trends</li>
 <span><span class="co">#&gt;   the data.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Did you forget to specify a `group` aesthetic or to convert a numerical</span></span>
 <span><span class="co">#&gt;   variable into a factor?</span></span></code></pre></div>
-<p><img src="gof-analysis_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" width="700"></p>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="individual-time-profiles">Individual time profiles<a class="anchor" aria-label="anchor" href="#individual-time-profiles"></a>
@@ -207,7 +207,7 @@ model).</p>
 <span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = .data[[variable_names$dv]], text =</span></span>
 <span><span class="co">#&gt; tooltip_text(.data, : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
-<p><img src="gof-analysis_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" width="700"></p>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ind_tad_profiles.html">ind_tad_profiles</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">data_501</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">ID</span> <span class="op">&lt;=</span> <span class="fl">6</span><span class="op">)</span>,</span>
@@ -224,7 +224,7 @@ model).</p>
 <span><span class="co">#&gt; Warning in geom_point(mapping = aes(y = .data[[variable_names$dv]], text =</span></span>
 <span><span class="co">#&gt; tooltip_text(.data, : Ignoring unknown aesthetics: <span style="color: #00BB00;">text</span></span></span>
 <span><span class="co">#&gt; [[1]]</span></span></code></pre></div>
-<p><img src="gof-analysis_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" width="700"></p>
+<p><img src="gof-analysis_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

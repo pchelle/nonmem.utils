@@ -7,12 +7,12 @@
 
 ## Citation
 
-Chelle P (2025). *nonmem.utils: Toolbox for Investigating and Reporting
+Chelle P (2026). *nonmem.utils: Toolbox for Investigating and Reporting
 Nonmem Results*. R package version 0.1.0.
 
     @Manual{,
       title = {nonmem.utils: Toolbox for Investigating and Reporting Nonmem Results},
       author = {Pierre Chelle},
-      year = {2025},
+      year = {2026},
       note = {R package version 0.1.0},
     }
