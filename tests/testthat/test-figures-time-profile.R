@@ -13,7 +13,7 @@ test_that("time_profile returns a named list of plot lists", {
   expect_named(result$All, c("Linear", "Log", "Percent BLQ"))
 })
 
-test_that("time_profile All Linear snapshot", {
+test_that("time_profile All Linear renders correctly", {
   tp_meta <- dplyr::bind_rows(
     meta_data_501,
     data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"), Unit = NA, Min = NA, Max = NA)
@@ -23,10 +23,10 @@ test_that("time_profile All Linear snapshot", {
     dplyr::filter(MDV == 0)
 
   result <- time_profile(tp_data, tp_meta)
-  expect_snapshot(result$All$Linear)
+  suppressWarnings(vdiffr::expect_doppelganger("time_profile-All-Linear", result$All$Linear))
 })
 
-test_that("time_profile All Log snapshot", {
+test_that("time_profile All Log renders correctly", {
   tp_meta <- dplyr::bind_rows(
     meta_data_501,
     data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"), Unit = NA, Min = NA, Max = NA)
@@ -36,10 +36,10 @@ test_that("time_profile All Log snapshot", {
     dplyr::filter(MDV == 0)
 
   result <- time_profile(tp_data, tp_meta)
-  expect_snapshot(result$All$Log)
+  suppressWarnings(vdiffr::expect_doppelganger("time_profile-All-Log", result$All$Log))
 })
 
-test_that("time_profile All Percent BLQ snapshot", {
+test_that("time_profile All Percent BLQ renders correctly", {
   tp_meta <- dplyr::bind_rows(
     meta_data_501,
     data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"), Unit = NA, Min = NA, Max = NA)
@@ -49,7 +49,7 @@ test_that("time_profile All Percent BLQ snapshot", {
     dplyr::filter(MDV == 0)
 
   result <- time_profile(tp_data, tp_meta)
-  expect_snapshot(result$All$`Percent BLQ`)
+  vdiffr::expect_doppelganger("time_profile-All-PercentBLQ", result$All$`Percent BLQ`)
 })
 
 test_that("tad_profile returns a named list of plot lists", {
@@ -65,7 +65,7 @@ test_that("tad_profile returns a named list of plot lists", {
   expect_named(result$All, c("Linear", "Log", "Percent BLQ"))
 })
 
-test_that("tad_profile All Linear snapshot", {
+test_that("tad_profile All Linear renders correctly", {
   tp_meta <- dplyr::bind_rows(
     meta_data_501,
     data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"), Unit = NA, Min = NA, Max = NA)
@@ -73,10 +73,10 @@ test_that("tad_profile All Linear snapshot", {
   tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
 
   result <- tad_profile(tp_data, tp_meta)
-  expect_snapshot(result$All$Linear)
+  suppressWarnings(vdiffr::expect_doppelganger("tad_profile-All-Linear", result$All$Linear))
 })
 
-test_that("tad_profile All Log snapshot", {
+test_that("tad_profile All Log renders correctly", {
   tp_meta <- dplyr::bind_rows(
     meta_data_501,
     data.frame(Name = c("BLQ", "LLOQ"), Type = c("blq", "lloq"), Label = c("BLQ", "LLOQ"), Unit = NA, Min = NA, Max = NA)
@@ -84,5 +84,5 @@ test_that("tad_profile All Log snapshot", {
   tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
 
   result <- tad_profile(tp_data, tp_meta)
-  expect_snapshot(result$All$Log)
+  suppressWarnings(vdiffr::expect_doppelganger("tad_profile-All-Log", result$All$Log))
 })

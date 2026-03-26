@@ -37,7 +37,8 @@ Suggests:
     shinyWidgets,
     patchwork,
     readr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    vdiffr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Depends: 
