@@ -6,6 +6,9 @@ description: >
   building package infrastructure.
 metadata:
   source: https://github.com/posit-dev/skills/blob/main/r-lib/r-package-development/SKILL.md
+  author: Posit, PBC
+  version: upstream-main
+license: Apache-2.0 (per upstream repository; see metadata.source)
 ---
 
 # R package development
