@@ -1,69 +1,44 @@
-test_that("dv_preds returns a ggplot object", {
+test_that("dv_preds snapshot", {
   p <- dv_preds(data_501, meta_data_501)
-  expect_s3_class(p, "ggplot")
+  expect_snapshot(p)
 })
 
-test_that("dv_preds uses correct axis labels from meta_data_501", {
-  p <- dv_preds(data_501, meta_data_501)
-  expect_match(p$labels$x, "Concentration")
-  expect_match(p$labels$y, "Concentration")
-})
-
-test_that("dv_pred returns a ggplot object", {
+test_that("dv_pred snapshot", {
   p <- dv_pred(data_501, meta_data_501)
-  expect_s3_class(p, "ggplot")
+  expect_snapshot(p)
 })
 
-test_that("dv_pred uses correct axis labels from meta_data_501", {
-  p <- dv_pred(data_501, meta_data_501)
-  expect_match(p$labels$x, "Concentration")
-  expect_match(p$labels$y, "Population Predicted Concentration")
-})
-
-test_that("dv_ipred returns a ggplot object", {
+test_that("dv_ipred snapshot", {
   p <- dv_ipred(data_501, meta_data_501)
-  expect_s3_class(p, "ggplot")
+  expect_snapshot(p)
 })
 
-test_that("dv_ipred uses correct axis labels from meta_data_501", {
-  p <- dv_ipred(data_501, meta_data_501)
-  expect_match(p$labels$x, "Concentration")
-  expect_match(p$labels$y, "Fitted Concentration")
-})
-
-test_that("residual_plot returns a ggplot object for time vs cwres", {
+test_that("residual_plot time vs cwres snapshot", {
   p <- residual_plot(x_type = "time", y_type = "cwres", data = data_501, meta_data = meta_data_501)
-  expect_s3_class(p, "ggplot")
-  expect_equal(p$labels$y, "CWRES")
-  expect_match(p$labels$x, "Time")
+  expect_snapshot(p)
 })
 
-test_that("residual_plot returns a ggplot object for time vs npde", {
+test_that("residual_plot time vs npde snapshot", {
   p <- residual_plot(x_type = "time", y_type = "npde", data = data_501, meta_data = meta_data_501)
-  expect_s3_class(p, "ggplot")
-  expect_equal(p$labels$y, "NPDE")
+  expect_snapshot(p)
 })
 
-test_that("residual_qq returns a ggplot for cwres", {
+test_that("residual_qq cwres snapshot", {
   p <- residual_qq(y_type = "cwres", data = data_501, meta_data = meta_data_501)
-  expect_s3_class(p, "ggplot")
-  expect_match(p$labels$x, "Normal distribution quantiles")
-  expect_match(p$labels$y, "CWRES")
+  expect_snapshot(p)
 })
 
-test_that("residual_qq returns a ggplot for npde", {
+test_that("residual_qq npde snapshot", {
   p <- residual_qq(y_type = "npde", data = data_501, meta_data = meta_data_501)
-  expect_s3_class(p, "ggplot")
-  expect_match(p$labels$y, "NPDE")
+  expect_snapshot(p)
 })
 
-test_that("residual_hist returns a ggplot for cwres", {
+test_that("residual_hist cwres snapshot", {
   p <- residual_hist(y_type = "cwres", data = data_501, meta_data = meta_data_501)
-  expect_s3_class(p, "ggplot")
-  expect_equal(p$labels$y, "Count")
+  expect_snapshot(p)
 })
 
-test_that("residual_hist returns a ggplot for npde", {
+test_that("residual_hist npde snapshot", {
   p <- residual_hist(y_type = "npde", data = data_501, meta_data = meta_data_501, bins = 11)
-  expect_s3_class(p, "ggplot")
+  expect_snapshot(p)
 })
