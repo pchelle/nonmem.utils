@@ -2,12 +2,14 @@
 #' @description Plot DV vs PREDs
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips.
+#'   Default is `FALSE`.
 #' @export
 #' @examples
 #'
 #' dv_preds(data_501, meta_data_501)
 #'
-dv_preds <- function(data, meta_data = NULL) {
+dv_preds <- function(data, meta_data = NULL, as_plotly = FALSE) {
   # By default assumes usual Nonmem names and labels
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
@@ -37,10 +39,10 @@ dv_preds <- function(data, meta_data = NULL) {
           .data[[variable_names$mdv]] == 0,
           .data[[variable_names$blq]] > 0
         ),
-      mapping = maybe_add_text(aes(x = .data[[variable_names$lloq]], y = IPRED), data)
+      mapping = add_plotly_text(aes(x = .data[[variable_names$lloq]], y = IPRED), data, as_plotly)
     ) +
-    geom_point(mapping = maybe_add_text(aes(y = PRED, color = "Population"), data)) +
-    geom_point(mapping = maybe_add_text(aes(y = IPRED, color = "Individual"), data)) +
+    geom_point(mapping = add_plotly_text(aes(y = PRED, color = "Population"), data, as_plotly)) +
+    geom_point(mapping = add_plotly_text(aes(y = IPRED, color = "Individual"), data, as_plotly)) +
     geom_smooth(
       mapping = aes(x = .data[[variable_names$dv]], y = PRED), color = "navy",
       formula = y ~ x, method = "loess", se = FALSE
@@ -66,12 +68,14 @@ dv_preds <- function(data, meta_data = NULL) {
 #' @description Plot DV vs PRED
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips.
+#'   Default is `FALSE`.
 #' @export
 #' @examples
 #'
 #' dv_pred(data_501, meta_data_501)
 #'
-dv_pred <- function(data, meta_data = NULL) {
+dv_pred <- function(data, meta_data = NULL, as_plotly = FALSE) {
   # By default assumes usual Nonmem names and labels
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
@@ -101,7 +105,7 @@ dv_pred <- function(data, meta_data = NULL) {
           .data[[variable_names$mdv]] == 0,
           .data[[variable_names$blq]] > 0
         ),
-      mapping = maybe_add_text(aes(x = .data[[variable_names$lloq]], y = PRED), data)
+      mapping = add_plotly_text(aes(x = .data[[variable_names$lloq]], y = PRED), data, as_plotly)
     ) +
     geom_point(color = "grey30") +
     geom_smooth(formula = y ~ x, method = "loess", se = FALSE, color = "royalblue") +
@@ -119,12 +123,14 @@ dv_pred <- function(data, meta_data = NULL) {
 #' @description Plot DV vs IPRED
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips.
+#'   Default is `FALSE`.
 #' @export
 #' @examples
 #'
 #' dv_ipred(data_501, meta_data_501)
 #'
-dv_ipred <- function(data, meta_data = NULL) {
+dv_ipred <- function(data, meta_data = NULL, as_plotly = FALSE) {
   # By default assumes usual Nonmem names and labels
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
@@ -154,7 +160,7 @@ dv_ipred <- function(data, meta_data = NULL) {
           .data[[variable_names$mdv]] == 0,
           .data[[variable_names$blq]] > 0
         ),
-      mapping = maybe_add_text(aes(x = .data[[variable_names$lloq]]), data)
+      mapping = add_plotly_text(aes(x = .data[[variable_names$lloq]]), data, as_plotly)
     ) +
     geom_point(color = "grey30") +
     geom_smooth(formula = y ~ x, method = "loess", se = FALSE, color = "royalblue") +
@@ -174,6 +180,8 @@ dv_ipred <- function(data, meta_data = NULL) {
 #' @param y_type Type of y variable
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips.
+#'   Default is `FALSE`.
 #' @export
 #' @examples
 #'
@@ -184,7 +192,7 @@ dv_ipred <- function(data, meta_data = NULL) {
 #' meta_data = meta_data_501
 #' )
 #'
-residual_plot <- function(x_type = "time", y_type = "cwres", data, meta_data = NULL) {
+residual_plot <- function(x_type = "time", y_type = "cwres", data, meta_data = NULL, as_plotly = FALSE) {
   # By default assumes usual Nonmem names and labels
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
@@ -210,13 +218,14 @@ residual_plot <- function(x_type = "time", y_type = "cwres", data, meta_data = N
 
   p <- ggplot(
     data = res_data,
-    mapping = maybe_add_text(
+    mapping = add_plotly_text(
       aes(
         x = .data[[variable_names[[x_type]]]],
         y = .data[[toupper(y_type)]],
         group = 1
       ),
-      res_data
+      res_data,
+      as_plotly
     )
   ) +
     theme_bw() +

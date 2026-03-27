@@ -233,7 +233,8 @@ server <- function(input, output, session) {
       get_data(),
       get_meta_data(),
       n_rows = input$ind_rows,
-      n_cols = input$ind_cols
+      n_cols = input$ind_cols,
+      as_plotly = TRUE
     )
   })
   # |> bindEvent(get_data(), get_meta_data(), input$ind_rows, input$ind_cols)
@@ -270,7 +271,7 @@ server <- function(input, output, session) {
 
   #---- Figures ----
   output$obs_vs_preds <- renderPlotly({
-    p <- dv_preds(get_data(), get_meta_data())
+    p <- dv_preds(get_data(), get_meta_data(), as_plotly = TRUE)
     p <- ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
     if (input$obs_vs_preds_scale %in% "linear") {
       return(p)
@@ -286,15 +287,15 @@ server <- function(input, output, session) {
     ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
   })
   output$res_vs_pred <- renderPlotly({
-    p <- residual_plot(x_type = "pred", y_type = "cwres", get_data(), get_meta_data())
+    p <- residual_plot(x_type = "pred", y_type = "cwres", get_data(), get_meta_data(), as_plotly = TRUE)
     ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
   })
   output$res_vs_time <- renderPlotly({
-    p <- residual_plot(x_type = "time", y_type = "cwres", get_data(), get_meta_data())
+    p <- residual_plot(x_type = "time", y_type = "cwres", get_data(), get_meta_data(), as_plotly = TRUE)
     ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
   })
   output$res_vs_tad <- renderPlotly({
-    p <- residual_plot(x_type = "tad", y_type = "cwres", get_data(), get_meta_data())
+    p <- residual_plot(x_type = "tad", y_type = "cwres", get_data(), get_meta_data(), as_plotly = TRUE)
     ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
   })
   output$npde_hist <- renderPlotly({
@@ -306,15 +307,15 @@ server <- function(input, output, session) {
     ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
   })
   output$npde_vs_pred <- renderPlotly({
-    p <- residual_plot(x_type = "pred", y_type = "npde", get_data(), get_meta_data())
+    p <- residual_plot(x_type = "pred", y_type = "npde", get_data(), get_meta_data(), as_plotly = TRUE)
     ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
   })
   output$npde_vs_time <- renderPlotly({
-    p <- residual_plot(x_type = "time", y_type = "npde", get_data(), get_meta_data())
+    p <- residual_plot(x_type = "time", y_type = "npde", get_data(), get_meta_data(), as_plotly = TRUE)
     ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
   })
   output$npde_vs_tad <- renderPlotly({
-    p <- residual_plot(x_type = "tad", y_type = "npde", get_data(), get_meta_data())
+    p <- residual_plot(x_type = "tad", y_type = "npde", get_data(), get_meta_data(), as_plotly = TRUE)
     ggplotly(p, dynamicTicks = TRUE, tooltip = "text")
   })
 

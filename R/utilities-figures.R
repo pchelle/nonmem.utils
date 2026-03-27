@@ -36,28 +36,19 @@ tooltip_text <- function(data, var_names) {
   return(text_display)
 }
 
-#' @title is_interactive_session
-#' @description
-#' Returns `TRUE` when running in an interactive session or a Shiny app.
-#' Used to decide whether the `text` aesthetic should be added for plotly tooltips.
-#' @keywords internal
-is_interactive_session <- function() {
-  shiny::isRunning() || interactive()
-}
-
-#' @title maybe_add_text
+#' @title add_plotly_text
 #' @description
 #' Conditionally adds a `text` aesthetic to an `aes()` mapping for plotly tooltips.
-#' When not in an interactive session (e.g., during Quarto rendering or automated tests),
-#' the `text` aesthetic is omitted to prevent the ggplot2 warning
-#' "Ignoring unknown aesthetics: text".
+#' When `as_plotly = FALSE` (the default), the `text` aesthetic is omitted to prevent
+#' the ggplot2 warning "Ignoring unknown aesthetics: text" during static rendering
+#' (e.g., Quarto reports).
 #' @param mapping An `aes()` mapping object
 #' @param data A data.frame providing the variable names for the tooltip
-#' @param var_names A character vector of variable names to display in the tooltip.
-#'   Defaults to `names(data)`.
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips.
 #' @keywords internal
-maybe_add_text <- function(mapping, data, var_names = names(data)) {
-  if (is_interactive_session()) {
+add_plotly_text <- function(mapping, data, as_plotly = FALSE) {
+  if (as_plotly) {
+    var_names <- names(data)
     text_mapping <- local({
       vn <- var_names
       aes(text = tooltip_text(.data, vn))
@@ -144,12 +135,14 @@ gg_lim <- function(plot_object, meta_data, x = NULL, y = NULL) {
 #' @param variable_names A list of variable names
 #' @param variable_labels A list of variable labels
 #' @param use_tad Logical, if `TRUE`, use TAD instead of time
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips
 #' @keywords internal
 base_tp_plot <- function(data,
                          vpc_data,
                          variable_names,
                          variable_labels,
-                         use_tad = FALSE) {
+                         use_tad = FALSE,
+                         as_plotly = FALSE) {
   tp_plot <- ggplot(
     data = data |> filter(.data[[variable_names$blq]] <= 0),
     mapping = aes(x = .data[[variable_names[[ifelse(use_tad, "tad", "time")]]]])
@@ -158,42 +151,45 @@ base_tp_plot <- function(data,
     theme(legend.position = "top", legend.direction = "vertical") +
     geom_rug(
       data = data |> filter(.data[[variable_names$blq]] > 0),
-      mapping = maybe_add_text(aes(y = .data[[variable_names$lloq]]), data)
+      mapping = add_plotly_text(aes(y = .data[[variable_names$lloq]]), data, as_plotly)
     ) +
-    geom_point(mapping = maybe_add_text(aes(y = .data[[variable_names$dv]], color = "Observed"), data)) +
+    geom_point(mapping = add_plotly_text(aes(y = .data[[variable_names$dv]], color = "Observed"), data, as_plotly)) +
     geom_line(
       data = vpc_data,
-      mapping = maybe_add_text(
+      mapping = add_plotly_text(
         aes(
           x = .data[["x"]], y = .data[["ymin"]],
           group = "Median [5th-95th] Percentile",
           color = "Median [5th-95th] Percentile"
         ),
-        vpc_data
+        vpc_data,
+        as_plotly
       ),
       linewidth = 0.75
     ) +
     geom_line(
       data = vpc_data,
-      mapping = maybe_add_text(
+      mapping = add_plotly_text(
         aes(
           x = .data[["x"]], y = .data[["ymax"]],
           group = "Median [5th-95th] Percentile",
           color = "Median [5th-95th] Percentile"
         ),
-        vpc_data
+        vpc_data,
+        as_plotly
       ),
       linewidth = 0.75
     ) +
     geom_line(
       data = vpc_data,
-      mapping = maybe_add_text(
+      mapping = add_plotly_text(
         aes(
           x = .data[["x"]], y = .data[["y"]],
           group = "Median [5th-95th] Percentile",
           color = "Median [5th-95th] Percentile"
         ),
-        vpc_data
+        vpc_data,
+        as_plotly
       ),
       linewidth = 0.75
     ) +

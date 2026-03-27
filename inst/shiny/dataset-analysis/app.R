@@ -345,10 +345,10 @@ server <- function(input, output, session) {
     tad_name <- pull_name("tad", get_meta_data())
 
     if (input$select_time %in% time_name) {
-      tp_list <- time_profile(get_data(), get_meta_data(), bins = input$bins)
+      tp_list <- time_profile(get_data(), get_meta_data(), bins = input$bins, as_plotly = TRUE)
     }
     if (input$select_time %in% tad_name) {
-      tp_list <- tad_profile(get_data(), get_meta_data(), bins = input$bins)
+      tp_list <- tad_profile(get_data(), get_meta_data(), bins = input$bins, as_plotly = TRUE)
     }
     tp_plots <- tp_list[[input$time_group]]
 
