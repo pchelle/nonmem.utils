@@ -1,0 +1,22 @@
+name: Cleanup workflows
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  checks: read
+
+jobs:
+  batch-delete:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Delete artifacts
+      run: gh run list --json databaseId --jq '.[].databaseId' --limit 500 | tail -n +2 | xargs -n 1 gh run delete
