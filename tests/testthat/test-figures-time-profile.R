@@ -23,7 +23,7 @@ test_that("time_profile All Linear renders correctly", {
     dplyr::filter(MDV == 0)
 
   result <- time_profile(tp_data, tp_meta)
-  suppressWarnings(vdiffr::expect_doppelganger("time_profile-All-Linear", result$All$Linear))
+  vdiffr::expect_doppelganger("time_profile-All-Linear", result$All$Linear)
 })
 
 test_that("time_profile All Log renders correctly", {
@@ -36,7 +36,7 @@ test_that("time_profile All Log renders correctly", {
     dplyr::filter(MDV == 0)
 
   result <- time_profile(tp_data, tp_meta)
-  suppressWarnings(vdiffr::expect_doppelganger("time_profile-All-Log", result$All$Log))
+  vdiffr::expect_doppelganger("time_profile-All-Log", result$All$Log)
 })
 
 test_that("time_profile All Percent BLQ renders correctly", {
@@ -73,7 +73,7 @@ test_that("tad_profile All Linear renders correctly", {
   tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
 
   result <- tad_profile(tp_data, tp_meta)
-  suppressWarnings(vdiffr::expect_doppelganger("tad_profile-All-Linear", result$All$Linear))
+  vdiffr::expect_doppelganger("tad_profile-All-Linear", result$All$Linear)
 })
 
 test_that("tad_profile All Log renders correctly", {
@@ -84,5 +84,5 @@ test_that("tad_profile All Log renders correctly", {
   tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
 
   result <- tad_profile(tp_data, tp_meta)
-  suppressWarnings(vdiffr::expect_doppelganger("tad_profile-All-Log", result$All$Log))
+  vdiffr::expect_doppelganger("tad_profile-All-Log", result$All$Log)
 })

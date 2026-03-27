@@ -36,6 +36,37 @@ tooltip_text <- function(data, var_names) {
   return(text_display)
 }
 
+#' @title is_interactive_session
+#' @description
+#' Returns `TRUE` when running in an interactive session or a Shiny app.
+#' Used to decide whether the `text` aesthetic should be added for plotly tooltips.
+#' @keywords internal
+is_interactive_session <- function() {
+  shiny::isRunning() || interactive()
+}
+
+#' @title maybe_add_text
+#' @description
+#' Conditionally adds a `text` aesthetic to an `aes()` mapping for plotly tooltips.
+#' When not in an interactive session (e.g., during Quarto rendering or automated tests),
+#' the `text` aesthetic is omitted to prevent the ggplot2 warning
+#' "Ignoring unknown aesthetics: text".
+#' @param mapping An `aes()` mapping object
+#' @param data A data.frame providing the variable names for the tooltip
+#' @param var_names A character vector of variable names to display in the tooltip.
+#'   Defaults to `names(data)`.
+#' @keywords internal
+maybe_add_text <- function(mapping, data, var_names = names(data)) {
+  if (is_interactive_session()) {
+    text_mapping <- local({
+      vn <- var_names
+      aes(text = tooltip_text(.data, vn))
+    })
+    mapping <- structure(c(unclass(mapping), unclass(text_mapping)), class = "uneval")
+  }
+  mapping
+}
+
 #' @title gg_log
 #' @description Use pretty log scale plot
 #' @param plot_object A ggplot object
@@ -127,36 +158,42 @@ base_tp_plot <- function(data,
     theme(legend.position = "top", legend.direction = "vertical") +
     geom_rug(
       data = data |> filter(.data[[variable_names$blq]] > 0),
-      mapping = aes(y = .data[[variable_names$lloq]], text = tooltip_text(.data, names(data)))
+      mapping = maybe_add_text(aes(y = .data[[variable_names$lloq]]), data)
     ) +
-    geom_point(mapping = aes(y = .data[[variable_names$dv]], text = tooltip_text(.data, names(data)), color = "Observed")) +
+    geom_point(mapping = maybe_add_text(aes(y = .data[[variable_names$dv]], color = "Observed"), data)) +
     geom_line(
       data = vpc_data,
-      mapping = aes(
-        x = .data[["x"]], y = .data[["ymin"]],
-        text = tooltip_text(.data, names(vpc_data)),
-        group = "Median [5th-95th] Percentile",
-        color = "Median [5th-95th] Percentile"
+      mapping = maybe_add_text(
+        aes(
+          x = .data[["x"]], y = .data[["ymin"]],
+          group = "Median [5th-95th] Percentile",
+          color = "Median [5th-95th] Percentile"
+        ),
+        vpc_data
       ),
       linewidth = 0.75
     ) +
     geom_line(
       data = vpc_data,
-      mapping = aes(
-        x = .data[["x"]], y = .data[["ymax"]],
-        text = tooltip_text(.data, names(vpc_data)),
-        group = "Median [5th-95th] Percentile",
-        color = "Median [5th-95th] Percentile"
+      mapping = maybe_add_text(
+        aes(
+          x = .data[["x"]], y = .data[["ymax"]],
+          group = "Median [5th-95th] Percentile",
+          color = "Median [5th-95th] Percentile"
+        ),
+        vpc_data
       ),
       linewidth = 0.75
     ) +
     geom_line(
       data = vpc_data,
-      mapping = aes(
-        x = .data[["x"]], y = .data[["y"]],
-        text = tooltip_text(.data, names(vpc_data)),
-        group = "Median [5th-95th] Percentile",
-        color = "Median [5th-95th] Percentile"
+      mapping = maybe_add_text(
+        aes(
+          x = .data[["x"]], y = .data[["y"]],
+          group = "Median [5th-95th] Percentile",
+          color = "Median [5th-95th] Percentile"
+        ),
+        vpc_data
       ),
       linewidth = 0.75
     ) +

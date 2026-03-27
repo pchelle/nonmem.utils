@@ -309,15 +309,15 @@ ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
             .data[[variable_names$blq]] > 0,
             .data[[variable_names$id]] %in% selected_ids
           ),
-        mapping = aes(x = .data[[variable_names$lloq]], IPRED, text = tooltip_text(.data, names(data)))
+        mapping = maybe_add_text(aes(x = .data[[variable_names$lloq]], IPRED), data)
       ) +
       geom_line(
         data = sim_data |> filter(ID %in% selected_ids),
-        mapping = aes(x = TIME, y = DV, text = tooltip_text(.data, names(sim_data)), group = ID, color = "Individual")
+        mapping = maybe_add_text(aes(x = TIME, y = DV, group = ID, color = "Individual"), sim_data)
       ) +
-      geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, names(tp_data)), color = "Population")) +
-      geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, names(tp_data)), color = "Individual")) +
-      geom_point(mapping = aes(y = .data[[variable_names$dv]], text = tooltip_text(.data, names(tp_data)), color = "Observed")) +
+      geom_point(mapping = maybe_add_text(aes(y = PRED, color = "Population"), tp_data)) +
+      geom_point(mapping = maybe_add_text(aes(y = IPRED, color = "Individual"), tp_data)) +
+      geom_point(mapping = maybe_add_text(aes(y = .data[[variable_names$dv]], color = "Observed"), tp_data)) +
       labs(x = variable_labels$time, y = variable_labels$dv, color = NULL) +
       scale_color_manual(
         values = c("Observed" = "black", "Population" = "royalblue", "Individual" = "firebrick")
@@ -389,15 +389,15 @@ ind_tad_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
             .data[[variable_names$blq]] > 0,
             .data[[variable_names$id]] %in% selected_ids
           ),
-        mapping = aes(x = .data[[variable_names$lloq]], IPRED, text = tooltip_text(.data, names(data)))
+        mapping = maybe_add_text(aes(x = .data[[variable_names$lloq]], IPRED), data)
       ) +
       geom_line(
         data = sim_data |> filter(ID %in% selected_ids),
-        mapping = aes(x = tad, y = DV, text = tooltip_text(.data, names(sim_data)), group = ID, color = "Individual")
+        mapping = maybe_add_text(aes(x = tad, y = DV, group = ID, color = "Individual"), sim_data)
       ) +
-      geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, names(tp_data)), color = "Population")) +
-      geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, names(tp_data)), color = "Individual")) +
-      geom_point(mapping = aes(y = .data[[variable_names$dv]], text = tooltip_text(.data, names(tp_data)), color = "Observed")) +
+      geom_point(mapping = maybe_add_text(aes(y = PRED, color = "Population"), tp_data)) +
+      geom_point(mapping = maybe_add_text(aes(y = IPRED, color = "Individual"), tp_data)) +
+      geom_point(mapping = maybe_add_text(aes(y = .data[[variable_names$dv]], color = "Observed"), tp_data)) +
       labs(x = variable_labels$tad, y = variable_labels$dv, color = NULL) +
       scale_color_manual(
         values = c("Observed" = "black", "Population" = "royalblue", "Individual" = "firebrick")

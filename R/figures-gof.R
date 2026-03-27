@@ -37,10 +37,10 @@ dv_preds <- function(data, meta_data = NULL) {
           .data[[variable_names$mdv]] == 0,
           .data[[variable_names$blq]] > 0
         ),
-      mapping = aes(x = .data[[variable_names$lloq]], y = IPRED, text = tooltip_text(.data, names(data)))
+      mapping = maybe_add_text(aes(x = .data[[variable_names$lloq]], y = IPRED), data)
     ) +
-    geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, names(data)), color = "Population")) +
-    geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, names(data)), color = "Individual")) +
+    geom_point(mapping = maybe_add_text(aes(y = PRED, color = "Population"), data)) +
+    geom_point(mapping = maybe_add_text(aes(y = IPRED, color = "Individual"), data)) +
     geom_smooth(
       mapping = aes(x = .data[[variable_names$dv]], y = PRED), color = "navy",
       formula = y ~ x, method = "loess", se = FALSE
@@ -101,7 +101,7 @@ dv_pred <- function(data, meta_data = NULL) {
           .data[[variable_names$mdv]] == 0,
           .data[[variable_names$blq]] > 0
         ),
-      mapping = aes(x = .data[[variable_names$lloq]], y = PRED, text = tooltip_text(.data, names(data)))
+      mapping = maybe_add_text(aes(x = .data[[variable_names$lloq]], y = PRED), data)
     ) +
     geom_point(color = "grey30") +
     geom_smooth(formula = y ~ x, method = "loess", se = FALSE, color = "royalblue") +
@@ -154,7 +154,7 @@ dv_ipred <- function(data, meta_data = NULL) {
           .data[[variable_names$mdv]] == 0,
           .data[[variable_names$blq]] > 0
         ),
-      mapping = aes(x = .data[[variable_names$lloq]], text = tooltip_text(.data, names(data)))
+      mapping = maybe_add_text(aes(x = .data[[variable_names$lloq]]), data)
     ) +
     geom_point(color = "grey30") +
     geom_smooth(formula = y ~ x, method = "loess", se = FALSE, color = "royalblue") +
@@ -210,11 +210,13 @@ residual_plot <- function(x_type = "time", y_type = "cwres", data, meta_data = N
 
   p <- ggplot(
     data = res_data,
-    mapping = aes(
-      x = .data[[variable_names[[x_type]]]],
-      y = .data[[toupper(y_type)]],
-      text = tooltip_text(.data, names(res_data)),
-      group = 1
+    mapping = maybe_add_text(
+      aes(
+        x = .data[[variable_names[[x_type]]]],
+        y = .data[[toupper(y_type)]],
+        group = 1
+      ),
+      res_data
     )
   ) +
     theme_bw() +
