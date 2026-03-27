@@ -3,6 +3,8 @@
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
 #' @param bins Number of bins to use for VPC, default is 7
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips.
+#'   Default is `FALSE`.
 #' @export
 #' @examples
 #'
@@ -30,7 +32,7 @@
 #' # Data split by categorical covariate
 #' tp_plots$SEX$Linear
 #'
-time_profile <- function(data, meta_data = NULL, bins = 7) {
+time_profile <- function(data, meta_data = NULL, bins = 7, as_plotly = FALSE) {
   # By default assumes usual Nonmem names and labels
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
@@ -66,7 +68,8 @@ time_profile <- function(data, meta_data = NULL, bins = 7) {
     data = tp_data,
     vpc_data = vpc_data_all,
     variable_names = variable_names,
-    variable_labels = variable_labels
+    variable_labels = variable_labels,
+    as_plotly = as_plotly
   )
 
   blq_plot <- ggplot(data = blq_data_all, mapping = aes(x = x, y = blq)) +
@@ -102,7 +105,8 @@ time_profile <- function(data, meta_data = NULL, bins = 7) {
       data = tp_data,
       vpc_data = vpc_data_cat,
       variable_names = variable_names,
-      variable_labels = variable_labels
+      variable_labels = variable_labels,
+      as_plotly = as_plotly
     ) + facet_wrap(as.formula(paste0("~", cat_name)))
 
     blq_plot_cat <- ggplot(data = blq_data_cat, mapping = aes(x = x, y = blq)) +
@@ -130,6 +134,8 @@ time_profile <- function(data, meta_data = NULL, bins = 7) {
 #' @param data A data.frame of data
 #' @param meta_data A data.frame of meta data
 #' @param bins Number of bins to use for VPC, default is 7
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips.
+#'   Default is `FALSE`.
 #' @export
 #' @examples
 #'
@@ -155,7 +161,7 @@ time_profile <- function(data, meta_data = NULL, bins = 7) {
 #' # Data split by categorical covariate
 #' tp_plots$SEX$Linear
 #'
-tad_profile <- function(data, meta_data = NULL, bins = 7) {
+tad_profile <- function(data, meta_data = NULL, bins = 7, as_plotly = FALSE) {
   # By default assumes usual Nonmem names and labels
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
@@ -192,7 +198,8 @@ tad_profile <- function(data, meta_data = NULL, bins = 7) {
     vpc_data = vpc_data_all,
     variable_names = variable_names,
     variable_labels = variable_labels,
-    use_tad = TRUE
+    use_tad = TRUE,
+    as_plotly = as_plotly
   )
 
   blq_plot <- ggplot(data = blq_data_all, mapping = aes(x = x, y = blq)) +
@@ -229,7 +236,8 @@ tad_profile <- function(data, meta_data = NULL, bins = 7) {
       vpc_data = vpc_data_cat,
       variable_names = variable_names,
       variable_labels = variable_labels,
-      use_tad = TRUE
+      use_tad = TRUE,
+      as_plotly = as_plotly
     ) + facet_wrap(as.formula(paste0("~", cat_name)))
 
     blq_plot_cat <- ggplot(data = blq_data_cat, mapping = aes(x = x, y = blq)) +
@@ -258,6 +266,8 @@ tad_profile <- function(data, meta_data = NULL, bins = 7) {
 #' @param meta_data A data.frame of meta data
 #' @param n_rows Number of rows in the plot grid, default is 2
 #' @param n_cols Number of columns in the plot grid, default is 3
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips.
+#'   Default is `FALSE`.
 #' @export
 #' @examples
 #'
@@ -266,7 +276,7 @@ tad_profile <- function(data, meta_data = NULL, bins = 7) {
 #'   dplyr::mutate(CL = 2, V = 40)
 #' ind_time_profiles(pk_data, meta_data_501)
 #'
-ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
+ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3, as_plotly = FALSE) {
   # By default assumes usual Nonmem names and labels
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
@@ -309,15 +319,15 @@ ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
             .data[[variable_names$blq]] > 0,
             .data[[variable_names$id]] %in% selected_ids
           ),
-        mapping = aes(x = .data[[variable_names$lloq]], IPRED, text = tooltip_text(.data, names(data)))
+        mapping = add_plotly_text(aes(x = .data[[variable_names$lloq]], IPRED), data, as_plotly)
       ) +
       geom_line(
         data = sim_data |> filter(ID %in% selected_ids),
-        mapping = aes(x = TIME, y = DV, text = tooltip_text(.data, names(sim_data)), group = ID, color = "Individual")
+        mapping = add_plotly_text(aes(x = TIME, y = DV, group = ID, color = "Individual"), sim_data, as_plotly)
       ) +
-      geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, names(tp_data)), color = "Population")) +
-      geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, names(tp_data)), color = "Individual")) +
-      geom_point(mapping = aes(y = .data[[variable_names$dv]], text = tooltip_text(.data, names(tp_data)), color = "Observed")) +
+      geom_point(mapping = add_plotly_text(aes(y = PRED, color = "Population"), tp_data, as_plotly)) +
+      geom_point(mapping = add_plotly_text(aes(y = IPRED, color = "Individual"), tp_data, as_plotly)) +
+      geom_point(mapping = add_plotly_text(aes(y = .data[[variable_names$dv]], color = "Observed"), tp_data, as_plotly)) +
       labs(x = variable_labels$time, y = variable_labels$dv, color = NULL) +
       scale_color_manual(
         values = c("Observed" = "black", "Population" = "royalblue", "Individual" = "firebrick")
@@ -338,6 +348,8 @@ ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
 #' @param meta_data A data.frame of meta data
 #' @param n_rows Number of rows in the plot grid, default is 2
 #' @param n_cols Number of columns in the plot grid, default is 3
+#' @param as_plotly Logical, if `TRUE`, adds the `text` aesthetic for plotly tooltips.
+#'   Default is `FALSE`.
 #' @export
 #' @examples
 #'
@@ -346,7 +358,7 @@ ind_time_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
 #'   dplyr::mutate(CL = 2, V = 40)
 #' ind_tad_profiles(pk_data, meta_data_501)
 #'
-ind_tad_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
+ind_tad_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3, as_plotly = FALSE) {
   # By default assumes usual Nonmem names and labels
   meta_data <- fill_meta_vars(meta_data) %||% default_meta_data
   variable_names <- sapply(
@@ -389,15 +401,15 @@ ind_tad_profiles <- function(data, meta_data = NULL, n_rows = 2, n_cols = 3) {
             .data[[variable_names$blq]] > 0,
             .data[[variable_names$id]] %in% selected_ids
           ),
-        mapping = aes(x = .data[[variable_names$lloq]], IPRED, text = tooltip_text(.data, names(data)))
+        mapping = add_plotly_text(aes(x = .data[[variable_names$lloq]], IPRED), data, as_plotly)
       ) +
       geom_line(
         data = sim_data |> filter(ID %in% selected_ids),
-        mapping = aes(x = tad, y = DV, text = tooltip_text(.data, names(sim_data)), group = ID, color = "Individual")
+        mapping = add_plotly_text(aes(x = tad, y = DV, group = ID, color = "Individual"), sim_data, as_plotly)
       ) +
-      geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, names(tp_data)), color = "Population")) +
-      geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, names(tp_data)), color = "Individual")) +
-      geom_point(mapping = aes(y = .data[[variable_names$dv]], text = tooltip_text(.data, names(tp_data)), color = "Observed")) +
+      geom_point(mapping = add_plotly_text(aes(y = PRED, color = "Population"), tp_data, as_plotly)) +
+      geom_point(mapping = add_plotly_text(aes(y = IPRED, color = "Individual"), tp_data, as_plotly)) +
+      geom_point(mapping = add_plotly_text(aes(y = .data[[variable_names$dv]], color = "Observed"), tp_data, as_plotly)) +
       labs(x = variable_labels$tad, y = variable_labels$dv, color = NULL) +
       scale_color_manual(
         values = c("Observed" = "black", "Population" = "royalblue", "Individual" = "firebrick")
