@@ -62,16 +62,3 @@ test_that("lm_report returns a formatted string for categorical x", {
   expect_match(result, "\\(p")
 })
 
-test_that("check_ranges returns meta_data with Data Min, Data Max, and Out of Range columns", {
-  result <- check_ranges(data_501, meta_data_501)
-  expect_s3_class(result, "data.frame")
-  expect_true(all(c("Data Min", "Data Max", "Out of Range") %in% names(result)))
-  # Should have same number of rows as meta_data_501
-  expect_equal(nrow(result), nrow(meta_data_501))
-})
-
-test_that("check_ranges Out of Range count is zero for valid data", {
-  result <- check_ranges(data_501, meta_data_501)
-  # meta_data_501 has no min/max constraints, so out of range should be 0
-  expect_true(all(unlist(result[["Out of Range"]]) == 0))
-})

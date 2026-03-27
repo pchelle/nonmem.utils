@@ -5,3 +5,6 @@
 ^_pkgdown\.yml$
 ^pkgdown$
 ^vignettes/articles$
+^.claude$
+^.github$
+^CLAUDE.md

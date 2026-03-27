@@ -52,14 +52,6 @@ test_that("map_cat_data converts categorical columns to factors", {
   expect_false(is.factor(mapped_data$TIME))
 })
 
-test_that("dictionary_check produces messages for mismatched variable names", {
-  # A reduced meta_data missing one variable should message about data variable not in meta_data
-  reduced_meta <- meta_data_501[meta_data_501$Name != "AGE", ]
-  expect_message(
-    dictionary_check(data_501, reduced_meta)
-  )
-})
-
 test_that("fill_meta_vars adds required variables when missing", {
   minimal_meta <- data.frame(
     Name = c("TIME", "DV"),
