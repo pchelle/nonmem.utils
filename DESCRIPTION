@@ -27,6 +27,7 @@ Imports:
 Roxygen: list(markdown = TRUE)
 Suggests: 
     bslib,
+    covr,
     DT,
     knitr,
     miniUI,
