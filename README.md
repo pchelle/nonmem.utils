@@ -3,6 +3,7 @@
 
 <!-- badges: start -->
 [![Check Package](https://github.com/pchelle/nonmem.utils/actions/workflows/r-cmd-check.yaml/badge.svg)](https://github.com/pchelle/nonmem.utils/actions/workflows/r-cmd-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/pchelle/nonmem.utils/branch/main/graph/badge.svg)](https://app.codecov.io/gh/pchelle/nonmem.utils?branch=main)
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
