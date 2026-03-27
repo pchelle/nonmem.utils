@@ -36,16 +36,6 @@ tp_data <- data_501 |>
 
 # Get the time profile plots
 tp_plots <- time_profile(tp_data, tp_meta)
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
 
 # Plots are split by categorical variables, all use them all
 names(tp_plots)

@@ -39,10 +39,5 @@ meta_data = meta_data_501
 #> Warning: neighborhood radius 11.115
 #> Warning: reciprocal condition number  8.2288e-17
 #> Warning: There are other near singularities as well. 365.38
-#> Warning: The following aesthetics were dropped during statistical transformation: text.
-#> ℹ This can happen when ggplot fails to infer the correct grouping structure in
-#>   the data.
-#> ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
-#>   variable into a factor?
 
 ```

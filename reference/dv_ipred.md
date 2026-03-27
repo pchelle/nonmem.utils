@@ -22,6 +22,5 @@ dv_ipred(data, meta_data = NULL)
 
 ``` r
 dv_ipred(data_501, meta_data_501)
-#> Warning: Ignoring unknown aesthetics: text
 
 ```

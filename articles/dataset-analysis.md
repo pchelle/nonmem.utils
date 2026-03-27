@@ -158,26 +158,6 @@ bin.
 
 ``` r
 tp_plots <- time_profile(data_501, meta_data_501)
-#> Warning in geom_rug(data = filter(data, .data[[variable_names$blq]] > 0), :
-#> Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = .data[[variable_names$dv]], text =
-#> tooltip_text(.data, : Ignoring unknown aesthetics: text
-#> Warning in geom_line(data = vpc_data, mapping = aes(x = .data[["x"]], y =
-#> .data[["ymin"]], : Ignoring unknown aesthetics: text
-#> Warning in geom_line(data = vpc_data, mapping = aes(x = .data[["x"]], y =
-#> .data[["ymax"]], : Ignoring unknown aesthetics: text
-#> Warning in geom_line(data = vpc_data, mapping = aes(x = .data[["x"]], y =
-#> .data[["y"]], : Ignoring unknown aesthetics: text
-#> Warning in geom_rug(data = filter(data, .data[[variable_names$blq]] > 0), :
-#> Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = .data[[variable_names$dv]], text =
-#> tooltip_text(.data, : Ignoring unknown aesthetics: text
-#> Warning in geom_line(data = vpc_data, mapping = aes(x = .data[["x"]], y =
-#> .data[["ymin"]], : Ignoring unknown aesthetics: text
-#> Warning in geom_line(data = vpc_data, mapping = aes(x = .data[["x"]], y =
-#> .data[["ymax"]], : Ignoring unknown aesthetics: text
-#> Warning in geom_line(data = vpc_data, mapping = aes(x = .data[["x"]], y =
-#> .data[["y"]], : Ignoring unknown aesthetics: text
 ```
 
 - Displaying time profiles in linear scale

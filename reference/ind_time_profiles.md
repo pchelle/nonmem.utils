@@ -33,56 +33,6 @@ ind_time_profiles(data, meta_data = NULL, n_rows = 2, n_cols = 3)
 pk_data <- data_501 |>
   dplyr::mutate(CL = 2, V = 40)
 ind_time_profiles(pk_data, meta_data_501)
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
 #> [[1]]
 
 #> 

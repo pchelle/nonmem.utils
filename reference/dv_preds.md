@@ -22,8 +22,5 @@ dv_preds(data, meta_data = NULL)
 
 ``` r
 dv_preds(data_501, meta_data_501)
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
 
 ```

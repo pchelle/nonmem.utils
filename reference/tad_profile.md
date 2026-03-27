@@ -34,16 +34,6 @@ tp_data <- data_501 |> dplyr::mutate(BLQ = 0, LLOQ = 1)
 
 # Get the time profile plots
 tp_plots <- tad_profile(tp_data, tp_meta)
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
-#> Warning: Ignoring unknown aesthetics: text
 
 # Plots are split by categorical variables, all use them all
 names(tp_plots)

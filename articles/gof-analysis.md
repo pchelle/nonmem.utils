@@ -44,13 +44,6 @@ and log scales.
 
 ``` r
 dv_preds(data_501, meta_data_501)
-#> Warning in geom_rug(data = dplyr::filter(fill_nonmem_vars(data),
-#> .data[[variable_names$mdv]] == : Ignoring unknown aesthetics:
-#> text
-#> Warning in geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, :
-#> Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :
-#> Ignoring unknown aesthetics: text
 ```
 
 ![](gof-analysis_files/figure-html/unnamed-chunk-2-1.png)
@@ -62,13 +55,6 @@ can be used as illustrated below:
 ``` r
 dv_preds(data_501, meta_data_501) |>
   gg_log()
-#> Warning in geom_rug(data = dplyr::filter(fill_nonmem_vars(data),
-#> .data[[variable_names$mdv]] == : Ignoring unknown aesthetics:
-#> text
-#> Warning in geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, :
-#> Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :
-#> Ignoring unknown aesthetics: text
 ```
 
 ![](gof-analysis_files/figure-html/unnamed-chunk-3-1.png)
@@ -118,16 +104,6 @@ patchwork::wrap_plots(
 #> : reciprocal condition number 8.2288e-17
 #> Warning in simpleLoess(y, x, w, span, degree = degree, parametric = parametric,
 #> : There are other near singularities as well. 365.38
-#> Warning: The following aesthetics were dropped during statistical transformation: text.
-#> ℹ This can happen when ggplot fails to infer the correct grouping structure in
-#>   the data.
-#> ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
-#>   variable into a factor?
-#> The following aesthetics were dropped during statistical transformation: text.
-#> ℹ This can happen when ggplot fails to infer the correct grouping structure in
-#>   the data.
-#> ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
-#>   variable into a factor?
 ```
 
 ![](gof-analysis_files/figure-html/unnamed-chunk-6-1.png)
@@ -148,16 +124,6 @@ ind_time_profiles(
   data = data_501 |> dplyr::filter(ID <= 6),
   meta_data = meta_data_501
 )
-#> Warning in geom_rug(data = dplyr::filter(tp_data, .data[[variable_names$blq]] >
-#> : Ignoring unknown aesthetics: text
-#> Warning in geom_line(data = filter(sim_data, ID %in% selected_ids), mapping =
-#> aes(x = TIME, : Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, :
-#> Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :
-#> Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = .data[[variable_names$dv]], text =
-#> tooltip_text(.data, : Ignoring unknown aesthetics: text
 #> [[1]]
 ```
 
@@ -168,16 +134,6 @@ ind_tad_profiles(
   data = data_501 |> dplyr::filter(ID <= 6),
   meta_data = meta_data_501
 )
-#> Warning in geom_rug(data = dplyr::filter(tp_data, .data[[variable_names$blq]] >
-#> : Ignoring unknown aesthetics: text
-#> Warning in geom_line(data = filter(sim_data, ID %in% selected_ids), mapping =
-#> aes(x = tad, : Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = PRED, text = tooltip_text(.data, :
-#> Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = IPRED, text = tooltip_text(.data, :
-#> Ignoring unknown aesthetics: text
-#> Warning in geom_point(mapping = aes(y = .data[[variable_names$dv]], text =
-#> tooltip_text(.data, : Ignoring unknown aesthetics: text
 #> [[1]]
 ```
 
