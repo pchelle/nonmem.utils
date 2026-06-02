@@ -25,6 +25,7 @@ residual_qq(y_type = "cwres", data, meta_data = NULL)
 ## Examples
 
 ``` r
+
 residual_qq(
 y_type = "cwres",
 data = data_501,

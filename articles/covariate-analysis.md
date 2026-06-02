@@ -1,6 +1,7 @@
 # Covariate Analysis
 
 ``` r
+
 library(nonmem.utils)
 ```
 
@@ -26,6 +27,7 @@ as illustrated below:
 To analyse interactively Nonmem results you can use the shiny app below:
 
 ``` r
+
 nonmem.utils::run_shiny("covariate-analysis")
 ```
 
@@ -35,6 +37,7 @@ To create a docx report of the covariate analysis you can use the quarto
 based function below:
 
 ``` r
+
 nonmem.utils::report_covariate_analysis(
 data_path = "my/dataset.tab", 
 meta_data_path = "my/dictionary.csv"
@@ -50,6 +53,7 @@ To analyze etas distributions and potential correlations, the function
 can be used.
 
 ``` r
+
 eta_plot(data_501, meta_data_501)
 #> $All
 ```
@@ -74,6 +78,7 @@ The function
 allows graphical analyses of the covariate distribution and correlation:
 
 ``` r
+
 eta_cov_plot(data_501, meta_data_501)
 #> $All
 ```
@@ -94,6 +99,7 @@ provides a table with
 - ANOVA test results between categorical covariates and etas
 
 ``` r
+
 eta_table <- eta_cor(data_501, meta_data_501)
 eta_table |>
   highlight_significant() |>

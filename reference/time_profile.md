@@ -25,6 +25,7 @@ time_profile(data, meta_data = NULL, bins = 7)
 ## Examples
 
 ``` r
+
 # Requires BLQ and LLOQ
 tp_meta <- dplyr::bind_rows(
   meta_data_501,

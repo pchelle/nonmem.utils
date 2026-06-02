@@ -29,6 +29,7 @@ residual_plot(x_type = "time", y_type = "cwres", data, meta_data = NULL)
 ## Examples
 
 ``` r
+
 residual_plot(
 x_type = "time",
 y_type = "cwres",

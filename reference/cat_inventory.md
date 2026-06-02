@@ -25,6 +25,7 @@ A data.frame summarizing the data
 ## Examples
 
 ``` r
+
 cat_inventories <- cat_inventory(data_501, meta_data_501)
 
 cat_inventories

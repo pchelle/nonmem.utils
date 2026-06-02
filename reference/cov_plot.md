@@ -21,6 +21,7 @@ cov_plot(data, meta_data = NULL)
 ## Examples
 
 ``` r
+
 cov_plot(data_501, meta_data_501)
 
 ```

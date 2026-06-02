@@ -29,6 +29,7 @@ ind_tad_profiles(data, meta_data = NULL, n_rows = 2, n_cols = 3)
 ## Examples
 
 ``` r
+
 # Simulate 1-compartment model
 pk_data <- data_501 |>
   dplyr::mutate(CL = 2, V = 40)

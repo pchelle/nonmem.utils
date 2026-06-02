@@ -25,6 +25,7 @@ A list of data.frame summarizing the data
 ## Examples
 
 ``` r
+
 all_inventories <- data_inventory(data_501, meta_data_501)
 
 # Since meta_data_501 identifies SEX as cat covariate

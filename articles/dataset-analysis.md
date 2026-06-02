@@ -1,6 +1,7 @@
 # Dataset Analysis
 
 ``` r
+
 library(nonmem.utils)
 ```
 
@@ -40,12 +41,14 @@ defined in the meta_data, the variable labels (`"Sex"` in the example
 below) are added to the list of tables.
 
 ``` r
+
 pk_summary <- data_inventory(data_501, meta_data_501)
 ```
 
 You can also format the inventory to print them all in the same table
 
 ``` r
+
 pk_summary <- cbind(pk_summary$Sex, All = pk_summary$All[["All"]])
 knitr::kable(pk_summary)
 ```
@@ -71,12 +74,14 @@ variables are defined in the meta_data, the variable labels (`"Sex"` in
 the example below) are added to the list of tables.
 
 ``` r
+
 pk_summary <- cov_inventory(data_501, meta_data_501)
 ```
 
 Here is an example printing all the tables below each other:
 
 ``` r
+
 for (summary_label in names(pk_summary)) {
   cat(summary_label)
   cat("\n\n")
@@ -124,6 +129,7 @@ categorical covariates of the dataset.
 The categorical covariate inventory output a table
 
 ``` r
+
 pk_summary <- cat_inventory(data_501, meta_data_501)
 knitr::kable(pk_summary)
 ```
@@ -157,12 +163,14 @@ linear scale, logarithmic scale or percent of BLQ values present in each
 bin.
 
 ``` r
+
 tp_plots <- time_profile(data_501, meta_data_501)
 ```
 
 - Displaying time profiles in linear scale
 
 ``` r
+
 tp_plots$All$Linear
 ```
 
@@ -171,6 +179,7 @@ tp_plots$All$Linear
 - Displaying time profiles in log scale scale
 
 ``` r
+
 tp_plots$All$Log
 ```
 
@@ -179,6 +188,7 @@ tp_plots$All$Log
 - Displaying time profiles by `"SEX"` in linear scale
 
 ``` r
+
 tp_plots$SEX$Linear
 ```
 
@@ -187,6 +197,7 @@ tp_plots$SEX$Linear
 - Displaying time profiles by `"SEX"` in log scale
 
 ``` r
+
 tp_plots$SEX$Log
 ```
 
@@ -205,6 +216,7 @@ The function
 allows graphical analyses of the covariate distribution and correlation:
 
 ``` r
+
 cov_plot(data_501, meta_data_501)
 ```
 
@@ -218,6 +230,7 @@ provides a table with
 - ANOVA test results between continuous and categorical covariates
 
 ``` r
+
 cov_table <- cov_cor(data_501, meta_data_501)
 cov_table |>
   highlight_significant() |>

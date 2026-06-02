@@ -31,6 +31,7 @@ A factor with the binned values
 ## Examples
 
 ``` r
+
 data_501 |> dplyr::mutate(Bins = bin_values(values = TIME, bins = 7))
 #>     ID OCC TIME TAD     DV EVID MDV  AMT RATE    WT AGE SEX       PRED
 #> 1    1   1    0  -5   0.00    1   1 1000  200  58.4  51   1   0.000000

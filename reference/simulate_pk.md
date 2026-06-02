@@ -22,6 +22,7 @@ A data.frame with simulated PK data.
 ## Examples
 
 ``` r
+
 head(simulate_pk(data_501 |> dplyr::filter(ID == 1)))
 #>   ID TIME tad  CENTRAL        DV
 #> 1  1  0.0 0.0  0.00000 0.0000000

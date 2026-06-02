@@ -71,15 +71,15 @@ This project includes Claude Skills from
 development, code review, testing, and CI. The following skills are
 available in `.claude/skills/`:
 
-| Skill                    | Purpose                                                     |
-|--------------------------|-------------------------------------------------------------|
-| `shiny-bslib`            | Build modern Shiny dashboards using bslib Bootstrap 5       |
-| `shiny-bslib-theming`    | Advanced theming for Shiny apps with bslib                  |
-| `r-package-development`  | R package development with devtools, testthat, and roxygen2 |
-| `testing-r-packages`     | Best practices for R package testing with testthat 3+       |
-| `cli`                    | CLI styling and messaging using the cli R package           |
-| `critical-code-reviewer` | Rigorous adversarial code reviews                           |
-| `describe-design`        | Create architectural documentation                          |
+| Skill | Purpose |
+|----|----|
+| `shiny-bslib` | Build modern Shiny dashboards using bslib Bootstrap 5 |
+| `shiny-bslib-theming` | Advanced theming for Shiny apps with bslib |
+| `r-package-development` | R package development with devtools, testthat, and roxygen2 |
+| `testing-r-packages` | Best practices for R package testing with testthat 3+ |
+| `cli` | CLI styling and messaging using the cli R package |
+| `critical-code-reviewer` | Rigorous adversarial code reviews |
+| `describe-design` | Create architectural documentation |
 
 ## Technology Stack
 

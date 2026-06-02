@@ -1,6 +1,7 @@
 # GOF Analysis
 
 ``` r
+
 library(nonmem.utils)
 ```
 
@@ -43,6 +44,7 @@ plots observed vs individual and population predictions in both linear
 and log scales.
 
 ``` r
+
 dv_preds(data_501, meta_data_501)
 ```
 
@@ -53,6 +55,7 @@ To obtain the plot in log-log scale, the function
 can be used as illustrated below:
 
 ``` r
+
 dv_preds(data_501, meta_data_501) |>
   gg_log()
 ```
@@ -72,6 +75,7 @@ and
   plots histogram of residuals
 
 ``` r
+
 residual_hist(y_type = "cwres", data = data_501, meta_data = meta_data_501)
 ```
 
@@ -82,6 +86,7 @@ residual_hist(y_type = "cwres", data = data_501, meta_data = meta_data_501)
   perform QQ-plots of residuals
 
 ``` r
+
 residual_qq(y_type = "cwres", data = data_501, meta_data = meta_data_501)
 ```
 
@@ -92,6 +97,7 @@ residual_qq(y_type = "cwres", data = data_501, meta_data = meta_data_501)
   plots residuals vs another variable to analyze potential trends
 
 ``` r
+
 patchwork::wrap_plots(
   residual_plot(x_type = "time", y_type = "cwres", data = data_501, meta_data = meta_data_501),
   residual_plot(x_type = "pred", y_type = "cwres", data = data_501, meta_data = meta_data_501)
@@ -120,6 +126,7 @@ Nonmem naming convention (e.g. if dataset includes only `CL` and `V`,
 the code assumes a 1-compartment model).
 
 ``` r
+
 ind_time_profiles(
   data = data_501 |> dplyr::filter(ID <= 6),
   meta_data = meta_data_501
@@ -130,6 +137,7 @@ ind_time_profiles(
 ![](gof-analysis_files/figure-html/unnamed-chunk-7-1.png)
 
 ``` r
+
 ind_tad_profiles(
   data = data_501 |> dplyr::filter(ID <= 6),
   meta_data = meta_data_501

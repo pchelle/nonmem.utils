@@ -29,6 +29,7 @@ A data.frame summarizing the data
 ## Examples
 
 ``` r
+
 # Summarize data by ID
 sum_data <- data_501 |>
   dplyr::group_by(ID) |>

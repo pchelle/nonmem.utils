@@ -32,6 +32,7 @@ Other report:
 ## Examples
 
 ``` r
+
 data_with_linebreak <- data.frame(Example = c("$10^2$<br>$-->$", "#sym.checkmark"))
 typst_table(data_with_linebreak)
 #>  [1] "```{=typst}"                "#table("                   

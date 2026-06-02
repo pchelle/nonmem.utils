@@ -25,6 +25,7 @@ A list of data.frames summarizing the covariate data
 ## Examples
 
 ``` r
+
 cov_inventories <- cov_inventory(data_501, meta_data_501)
 
 cov_inventories$All

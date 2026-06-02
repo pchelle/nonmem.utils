@@ -21,6 +21,7 @@ eta_plot(data, meta_data = NULL)
 ## Examples
 
 ``` r
+
 eta_plot(data_501, meta_data_501)
 #> $All
 

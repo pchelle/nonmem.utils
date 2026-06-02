@@ -47,6 +47,7 @@ A data.frame summarizing the data distribution with variables: `bins`,
 ## Examples
 
 ``` r
+
 vpc_summary(
   data = data_501 |> dplyr::filter(MDV == 0),
   x = "TIME",

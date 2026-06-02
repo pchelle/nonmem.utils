@@ -33,6 +33,7 @@ boot_hist(y_type = "theta", data, meta_data = NULL, bins = 11, ci = 0.95)
 ## Examples
 
 ``` r
+
 # Mimicking bootstrap results obtained through nonmem
 boot_data <- data.frame(
   theta1 = stats::rlnorm(1e3, meanlog = log(2), sdlog = 1),

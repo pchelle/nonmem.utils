@@ -39,6 +39,7 @@ calc_tad(id, time, amt = NULL, evid = NULL, rate = NULL, dur = NULL)
 ## Examples
 
 ``` r
+
 data_501 |>
   dplyr::mutate(TAD2 = calc_tad(id = ID, time = TIME, amt = AMT)) |>
   dplyr::select(ID, TIME, AMT, TAD2)

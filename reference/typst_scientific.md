@@ -32,6 +32,7 @@ Other report:
 ## Examples
 
 ``` r
+
 typst_scientific(stats::rlnorm(5))
 #> [1] "$5.48 dot 10^(-02)$" "$1.40 dot 10^(00)$"  "$2.15 dot 10^(00)$" 
 #> [4] "$5.12 dot 10^(-01)$" "$8.51 dot 10^(-01)$"

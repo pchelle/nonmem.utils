@@ -29,6 +29,7 @@ residual_hist(y_type = "cwres", data, meta_data = NULL, bins = 21)
 ## Examples
 
 ``` r
+
 residual_hist(
 y_type = "cwres",
 data = data_501,

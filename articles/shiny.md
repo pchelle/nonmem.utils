@@ -9,6 +9,7 @@ Use the code below or the Addins drop-down menu to check all available
 analyses:
 
 ``` r
+
 nonmem.utils::shiny_toolbox()
 ```
 
@@ -19,6 +20,7 @@ nonmem.utils::shiny_toolbox()
 ## Dataset Analysis
 
 ``` r
+
 nonmem.utils::run_shiny("dataset-analysis")
 ```
 

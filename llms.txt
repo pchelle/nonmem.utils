@@ -14,6 +14,7 @@ viewing, investigating and reporting Nonmem.
 You can install the development version of nonmem.utils like so:
 
 ``` r
+
 remotes::install_github("pchelle/nonmem.utils")
 ```
 
@@ -23,6 +24,7 @@ Run the following code to open the toolbox (also available in the
 RStudio Addins menu):
 
 ``` r
+
 nonmem.utils::shiny_toolbox()
 ```
 
@@ -47,6 +49,7 @@ such cases, the tools will read them using
 [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html).
 
 ``` r
+
 data <- readr::read_csv("path/to/your/data.csv")
 ```
 
@@ -55,6 +58,7 @@ header. In such cases, the tools will read them using
 [`readr::read_table()`](https://readr.tidyverse.org/reference/read_table.html).
 
 ``` r
+
 data <- readr::read_table("path/to/your/data.tab", skip = 1)
 ```
 
@@ -68,6 +72,7 @@ will read them using
 [`readr::read_csv()`](https://readr.tidyverse.org/reference/read_delim.html).
 
 ``` r
+
 meta_data <- readr::read_csv("path/to/your/dictionary.csv")
 ```
 

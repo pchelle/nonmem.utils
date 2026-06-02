@@ -29,6 +29,7 @@ A character of correlation and p-value
 ## Examples
 
 ``` r
+
 # Summarize data by ID
 sum_data <- data_501 |>
   dplyr::group_by(ID) |>

@@ -40,6 +40,7 @@ Other report:
 ## Examples
 
 ``` r
+
 cor_data <- cov_cor(data_501, meta_data_501)
 cor_data
 #>   Covariates                                            Weight
