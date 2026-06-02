@@ -31,7 +31,8 @@ input-data quality checks, model-fit diagnostics, and covariate-effect review.
 1. Validate dataset and dictionary file readability.
 2. Validate key dictionary typing (`id`, `dv`, `time`/`tad`, `eta`, `cov`, `cat`).
 3. Validate GOF columns (`PRED`, `IPRED`, `CWRES`) when GOF is requested.
-4. Track optional fields (`NPDE`, `.res`) and gracefully degrade if absent.
+4. Track optional fields (NPDE = Normalized Prediction Distribution Errors,
+   and `.res` NONMEM run-result files) and gracefully degrade if absent.
 
 ## Workflow
 
@@ -62,8 +63,8 @@ Recommended structure:
 4. ETA/covariate section: `eta_plot()`, `eta_cov_plot()`, `eta_cor()`.
 5. Optional appendix with metadata table and key assumptions.
 
-Use graceful degradation for optional diagnostics (`NPDE`, `.res`) and clearly
-label skipped sections.
+Use graceful degradation for optional diagnostics (NPDE and optional NONMEM
+`.res` run-result files) and clearly label skipped sections.
 
 ## Expected outputs
 
@@ -75,7 +76,8 @@ label skipped sections.
 ## Failure handling
 
 - Stop on missing required core inputs.
-- Continue with warnings on optional diagnostics unavailable (e.g., NPDE, `.res`).
+- Continue with warnings on optional diagnostics unavailable (e.g., NPDE or
+  missing `.res` run-result files).
 - Surface clear remediation actions before retrying.
 
 ## Minimal command examples
