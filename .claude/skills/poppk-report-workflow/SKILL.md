@@ -46,12 +46,31 @@ input-data quality checks, model-fit diagnostics, and covariate-effect review.
    - Interactive apps (`run_shiny(...)`) for exploration
    - Report functions (`report_dataset_analysis`, `report_gof_analysis`)
    - Direct quarto rendering for covariate report template if needed
+   - A custom Quarto `.qmd` report that mixes selected diagnostics from multiple
+     analyses (e.g., data inventory + GOF plots + ETA diagnostics)
+
+## Custom mixed-diagnostic Quarto reports
+
+When users ask for one combined report, create a dedicated `.qmd` file and
+compose chunks from dataset, GOF, and covariate workflows in a single document.
+
+Recommended structure:
+
+1. Setup chunk: load `nonmem.utils`, read `data` and `meta_data`.
+2. Data summary section: `data_inventory()`, `cov_inventory()`, `cat_inventory()`.
+3. GOF section: `dv_preds()`, `residual_hist()`, `residual_qq()`, `residual_plot()`.
+4. ETA/covariate section: `eta_plot()`, `eta_cov_plot()`, `eta_cor()`.
+5. Optional appendix with metadata table and key assumptions.
+
+Use graceful degradation for optional diagnostics (`NPDE`, `.res`) and clearly
+label skipped sections.
 
 ## Expected outputs
 
 - Reproducible sequence of analyses
 - Consistent table/figure set across projects
 - Consolidated reporting artifacts ready for review
+- Optional custom `.qmd` report combining diagnostics from multiple modules
 
 ## Failure handling
 
@@ -65,4 +84,11 @@ input-data quality checks, model-fit diagnostics, and covariate-effect review.
 nonmem.utils::report_dataset_analysis("dataset.csv", "dictionary.csv")
 nonmem.utils::report_gof_analysis("run001.tab", "dictionary.csv")
 nonmem.utils::run_shiny("covariate-analysis")
+```
+
+```r
+# Skeleton for a custom mixed diagnostic report chunk
+data_inventory(data, meta_data)
+dv_preds(data, meta_data)
+eta_plot(data, meta_data)
 ```
