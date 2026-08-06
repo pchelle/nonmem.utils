@@ -1,0 +1,14 @@
+{
+  "eval_id": "covariate-eta-table",
+  "eval_name": "Covariate eta analysis + table",
+  "expectations": [
+    {"text": "Uses eta_plot()", "passed": true, "evidence": "eta_plot(data, meta_data)"},
+    {"text": "Uses eta_cor()", "passed": true, "evidence": "eta_cor(data, meta_data)"},
+    {"text": "Highlights significance for html", "passed": true, "evidence": "highlight_significant(pval = 0.05, format = 'html')"},
+    {"text": "Declares eta Type in dictionary", "passed": true, "evidence": "Builds eta_rows with Type='eta' for missing ETA1/ETA2, robust NA-padding; then fill_meta_vars()"},
+    {"text": "Handles list/ggmatrix return", "passed": true, "evidence": "print_eta_pairs() iterates named list and print()s each ggmatrix (notes 'ggmatrix must be displayed with print()')"},
+    {"text": "Script parses without syntax error", "passed": true, "evidence": "Rscript parse OK"},
+    {"text": "Idiomatic use of meta_data dictionary and nonmem.utils namespace", "passed": true, "evidence": "Correct read_table(skip=1) for .tab; fill_meta_vars; correct return-type handling; kable(escape=FALSE) for HTML; would run against real API"}
+  ],
+  "summary": {"passed": 7, "failed": 0, "total": 7, "pass_rate": 1.0}
+}

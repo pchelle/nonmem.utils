@@ -1,0 +1,15 @@
+{
+  "eval_id": "gof-multifigure",
+  "eval_name": "GOF multi-panel figure",
+  "expectations": [
+    {"text": "Uses dv_preds()", "passed": true, "evidence": "dv_preds(data = data, meta_data = meta_data)"},
+    {"text": "Applies log scale via gg_log()", "passed": true, "evidence": "|> gg_log(x = TRUE, y = TRUE) — correct pipe usage"},
+    {"text": "Residuals vs time", "passed": true, "evidence": "residual_plot(x_type = 'time', y_type = 'cwres', ...) — correct arg names"},
+    {"text": "Residuals vs pred", "passed": true, "evidence": "residual_plot(x_type = 'pred', y_type = 'cwres', ...)"},
+    {"text": "QQ plot", "passed": true, "evidence": "residual_qq(y_type = 'cwres', data, meta_data)"},
+    {"text": "Reads .tab with read_table and skip=1", "passed": true, "evidence": "read_table(tab_path, skip = 1)"},
+    {"text": "Script parses without syntax error", "passed": true, "evidence": "Rscript parse OK"},
+    {"text": "Combines panels with patchwork and uses nonmem.utils namespace", "passed": true, "evidence": "patchwork (p1 | p2) / (p3 | p4) + plot_annotation(); library(nonmem.utils); would run against real API"}
+  ],
+  "summary": {"passed": 8, "failed": 0, "total": 8, "pass_rate": 1.0}
+}

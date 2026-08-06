@@ -1,0 +1,15 @@
+{
+  "eval_id": "gof-multifigure",
+  "eval_name": "GOF multi-panel figure",
+  "expectations": [
+    {"text": "Uses dv_preds()", "passed": true, "evidence": "dv_preds(data = nm_res, meta_data = meta_data)"},
+    {"text": "Applies log scale via gg_log()", "passed": true, "evidence": "dv_preds(...) + gg_log() — present but MISUSED: gg_log is not a + layer"},
+    {"text": "Residuals vs time", "passed": true, "evidence": "residual_plot(..., x='TIME', y='CWRES') — regex matches but WRONG arg names (no x/y args)"},
+    {"text": "Residuals vs pred", "passed": true, "evidence": "residual_plot(..., x='PRED', y='CWRES') — regex matches but WRONG arg names"},
+    {"text": "QQ plot", "passed": true, "evidence": "residual_qq(..., y='CWRES') — wrong arg (should be y_type)"},
+    {"text": "Reads .tab with read_table and skip=1", "passed": false, "evidence": "Used nonmem_res(tab_path) — wrong reader (.res parser, not .tab); no read_table(skip=1)"},
+    {"text": "Script parses without syntax error", "passed": true, "evidence": "Rscript parse OK"},
+    {"text": "Combines panels with patchwork and uses nonmem.utils namespace", "passed": false, "evidence": "Wrong API usage throughout: nonmem_res misused for .tab; nonexistent read_meta_data(); '+ gg_log()' would error; residual_plot/residual_qq use x=/y= args -> runtime 'unused arguments' error"}
+  ],
+  "summary": {"passed": 6, "failed": 2, "total": 8, "pass_rate": 0.75}
+}

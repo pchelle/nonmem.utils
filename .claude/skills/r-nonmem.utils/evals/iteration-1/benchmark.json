@@ -1,0 +1,27 @@
+{
+  "skill_name": "r-nonmem.utils",
+  "iteration": 1,
+  "configurations": {
+    "with_skill": {
+      "evals": {"gof-multifigure": {"passed": 8, "total": 8, "pass_rate": 1.0},
+                "covariate-eta-table": {"passed": 7, "total": 7, "pass_rate": 1.0}},
+      "aggregate": {"passed": 15, "failed": 0, "total": 15, "pass_rate": 1.0},
+      "timing": "N/A (subagent results did not expose token/duration fields)"
+    },
+    "baseline": {
+      "evals": {"gof-multifigure": {"passed": 6, "total": 8, "pass_rate": 0.75},
+                "covariate-eta-table": {"passed": 5, "total": 7, "pass_rate": 0.71}},
+      "aggregate": {"passed": 11, "failed": 4, "total": 15, "pass_rate": 0.73},
+      "timing": "N/A"
+    }
+  },
+  "delta": {"pass_rate": "+0.27 (1.00 with_skill vs 0.73 baseline)"},
+  "analyst_notes": [
+    "with_skill reached 100% on iteration 1 (>= 90% threshold met); scripts use correct function NAMES, ARGUMENT NAMES, and READERS and would run against the real installed API.",
+    "Baseline knew the function names (dv_preds, residual_plot, eta_plot, eta_cor, highlight_significant) but consistently got ARGUMENTS and USAGE wrong: used nonmem_res() to read .tab (it parses .res), called residual_plot with x=/y= instead of x_type=/y_type=, used '+ gg_log()' instead of '|> gg_log()', and omitted format='html'. These would raise runtime errors against the real API.",
+    "The differentiator is API correctness (signatures, return types, gotchas) — exactly what the skill/reference provides. code_pattern assertions under-discriminate (baseline matches function-name regexes); the qualitative + real-API-correctness judgment captures the true gap.",
+    "Stopping: with_skill pass_rate is 100% (ceiling), so further iterations cannot improve it. No iteration 2 needed. Smoke test (38/38 documented patterns) independently confirms the documented API runs clean.",
+    "Non-discriminating assertions to watch: pure function-name 'contains' checks pass for both arms. Prefer arg-name/return-type assertions in future iterations."
+  ],
+  "stopping_decision": "PASS — with_skill 100% >= 90%, at ceiling (no improvement possible). Skill validated."
+}

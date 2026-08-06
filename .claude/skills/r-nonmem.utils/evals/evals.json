@@ -1,0 +1,34 @@
+{
+  "skill_name": "r-nonmem.utils",
+  "evals": [
+    {
+      "id": 1,
+      "name": "gof-multifigure",
+      "prompt": "Using the R package nonmem.utils, write a single self-contained R script that produces a 2x2 goodness-of-fit figure for a NONMEM result table. The NONMEM .tab output is at variable `tab_path` and the dataset dictionary CSV is at `dict_path`. The four panels should be: (1) observed DV vs PRED and IPRED on log-log scale, (2) CWRES vs TIME, (3) CWRES vs PRED, (4) CWRES normal QQ plot. Read the .tab the way nonmem.utils expects, load the dictionary, and lay out the four panels together. Save the script to the path given in `out_script` and do not execute it.",
+      "assertions": [
+        {"type": "code_pattern", "description": "Uses dv_preds()", "check": "contains 'dv_preds('"},
+        {"type": "code_pattern", "description": "Applies log scale via gg_log()", "check": "contains 'gg_log('"},
+        {"type": "code_pattern", "description": "Residuals vs time", "check": "regex residual_plot\\\\([^)]*time[^)]*cwres|residual_plot\\\\([^)]*cwres[^)]*time"},
+        {"type": "code_pattern", "description": "Residuals vs pred", "check": "regex residual_plot\\\\([^)]*pred[^)]*cwres|residual_plot\\\\([^)]*cwres[^)]*pred"},
+        {"type": "code_pattern", "description": "QQ plot", "check": "contains 'residual_qq('"},
+        {"type": "code_pattern", "description": "Reads .tab with read_table and skip=1", "check": "regex read_table\\\\([^)]*skip\\\\s*=\\\\s*1"},
+        {"type": "execution", "description": "Script parses without syntax error", "check": "Rscript parse OK"},
+        {"type": "qualitative", "description": "Combines panels with patchwork and uses nonmem.utils namespace"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "covariate-eta-table",
+      "prompt": "Using the R package nonmem.utils, write a self-contained R script for an eta-based covariate analysis. The NONMEM .tab result (with columns ETA1 and ETA2) is at `tab_path` and the dictionary CSV is at `dict_path`. The dictionary currently does NOT declare the etas. Produce: (a) a pairs plot of the etas, and (b) an eta-by-covariate correlation table whose significant cells are highlighted for an HTML Quarto document. Make the script robust to the list/objects these functions return. Save the script to `out_script` and do not execute it.",
+      "assertions": [
+        {"type": "code_pattern", "description": "Uses eta_plot()", "check": "contains 'eta_plot('"},
+        {"type": "code_pattern", "description": "Uses eta_cor()", "check": "contains 'eta_cor('"},
+        {"type": "code_pattern", "description": "Highlights significance for html", "check": "regex highlight_significant\\\\([^)]*format\\\\s*=\\\\s*['\\\"]html"},
+        {"type": "code_pattern", "description": "Declares eta Type in dictionary", "check": "regex Type\\\\s*==?\\\\s*['\\\"]eta|c\\\\([^)]*eta"},
+        {"type": "code_pattern", "description": "Handles list/ggmatrix return", "check": "regex \\\\$All|\\\\[\\\\[|wrap_plots|print\\\\("},
+        {"type": "execution", "description": "Script parses without syntax error", "check": "Rscript parse OK"},
+        {"type": "qualitative", "description": "Idiomatic use of meta_data dictionary and nonmem.utils namespace"}
+      ]
+    }
+  ]
+}

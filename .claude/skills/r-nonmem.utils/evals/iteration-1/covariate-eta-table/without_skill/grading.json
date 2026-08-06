@@ -1,0 +1,14 @@
+{
+  "eval_id": "covariate-eta-table",
+  "eval_name": "Covariate eta analysis + table",
+  "expectations": [
+    {"text": "Uses eta_plot()", "passed": true, "evidence": "eta_plot(nm_data, meta_data) (with GGally fallback)"},
+    {"text": "Uses eta_cor()", "passed": true, "evidence": "eta_cor(nm_data, meta_data)"},
+    {"text": "Highlights significance for html", "passed": false, "evidence": "Called highlight_significant(eta_cov_df) WITHOUT format='html'; later calls cor_report(format='html') — wrong signature"},
+    {"text": "Declares eta Type in dictionary", "passed": true, "evidence": "declare_etas() sets type col to 'eta'"},
+    {"text": "Handles list/ggmatrix return", "passed": true, "evidence": "extract_component() + print(); regex matches but is_ggplot won't match ggmatrix (falls back to x[[1]])"},
+    {"text": "Script parses without syntax error", "passed": true, "evidence": "Rscript parse OK"},
+    {"text": "Idiomatic use of meta_data dictionary and nonmem.utils namespace", "passed": false, "evidence": "nonmem_res() misused to read .tab (returns parsed .res list, not a table) -> stopifnot(is.data.frame(nm_data)) would ERROR at runtime; cor_report(format=) wrong args; highlight_significant without format"}
+  ],
+  "summary": {"passed": 5, "failed": 2, "total": 7, "pass_rate": 0.71}
+}
